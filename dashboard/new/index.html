@@ -1,0 +1,626 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-qkjl6s6s> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>写文章 - 我的动漫小屋</title><link rel="icon" type="image/svg+xml" href="/favicon/anime.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon/anime-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon/anime-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/favicon/anime-180.png"><link rel="shortcut icon" href="/favicon/anime.ico"><meta name="theme-color" content="#ff9ac8"><meta name="apple-mobile-web-app-title" content="我的动漫小屋"><meta name="application-name" content="我的动漫小屋"><style>#anime-sound-toggle{position:fixed;left:16px;bottom:16px;z-index:999995;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid rgba(255,154,200,.38);background:#12101c8c;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#ffd9ea;font-size:12px;line-height:1;cursor:pointer;user-select:none;box-shadow:0 6px 22px #ff8fc12e;transition:transform .2s ease,background .2s ease,opacity .2s ease}#anime-sound-toggle:hover{transform:translateY(-2px);background:#261c32bf}#anime-sound-toggle:focus-visible{outline:2px solid rgba(255,154,200,.8);outline-offset:2px}#anime-sound-toggle.is-off{opacity:.55;border-color:#ffffff2e;color:#ffffffa6}#anime-sound-icon{font-size:14px}@media(max-width:640px){#anime-sound-toggle{left:10px;bottom:10px;padding:7px 10px}#anime-sound-text{display:none}}
+</style>
+<link rel="stylesheet" href="/_astro/AnimeBackdrop.apcTOslU.css">
+<style>[data-astro-cid-qkjl6s6s]{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#1b1e33,#0a0b12);font-family:system-ui,-apple-system,Noto Sans SC,sans-serif;color:#fff;padding:40px 20px}.container[data-astro-cid-qkjl6s6s]{max-width:800px;margin:0 auto}h1[data-astro-cid-qkjl6s6s]{margin:0 0 8px;font-size:26px}.sub[data-astro-cid-qkjl6s6s]{color:#ffffff8c;font-size:13px;margin-bottom:28px}label[data-astro-cid-qkjl6s6s]{display:block;font-size:13px;margin-bottom:6px;color:#ffffffbf}input[data-astro-cid-qkjl6s6s],textarea[data-astro-cid-qkjl6s6s]{width:100%;padding:12px 14px;background:#0000004d;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:14px;margin-bottom:20px;outline:none;font-family:inherit}input[data-astro-cid-qkjl6s6s]:focus,textarea[data-astro-cid-qkjl6s6s]:focus{border-color:#ff9ac8;box-shadow:0 0 0 3px #ff9ac826}textarea[data-astro-cid-qkjl6s6s]{min-height:320px;resize:vertical;line-height:1.6}.actions[data-astro-cid-qkjl6s6s]{display:flex;gap:12px}button[data-astro-cid-qkjl6s6s],a[data-astro-cid-qkjl6s6s]{padding:12px 22px;border-radius:10px;font-size:14px;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:all .2s}.btn-primary[data-astro-cid-qkjl6s6s]{background:linear-gradient(135deg,#ff9ac8,#a78bfa);color:#fff}.btn-primary[data-astro-cid-qkjl6s6s]:hover{transform:translateY(-1px);box-shadow:0 10px 30px #ff9ac84d}.btn-primary[data-astro-cid-qkjl6s6s]:disabled{opacity:.5;cursor:not-allowed}.btn-ghost[data-astro-cid-qkjl6s6s]{background:#ffffff14;color:#fff;border:1px solid rgba(255,255,255,.15)}.btn-ghost[data-astro-cid-qkjl6s6s]:hover{background:#ffffff26}.btn-ghost[data-astro-cid-qkjl6s6s]:disabled{opacity:.5;cursor:not-allowed}.msg[data-astro-cid-qkjl6s6s]{margin-top:16px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}.msg[data-astro-cid-qkjl6s6s].err{display:block;background:#ff505026;color:#ffb0b0;border:1px solid rgba(255,80,80,.3)}.msg[data-astro-cid-qkjl6s6s].ok{display:block;background:#64ff9626;color:#a8ffc4;border:1px solid rgba(100,255,150,.3)}.hint[data-astro-cid-qkjl6s6s]{font-size:12px;color:#fff6;margin-top:-16px;margin-bottom:20px}.upload-row[data-astro-cid-qkjl6s6s]{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}.upload-row[data-astro-cid-qkjl6s6s] button[data-astro-cid-qkjl6s6s]{padding:8px 16px;font-size:13px}.upload-status[data-astro-cid-qkjl6s6s]{font-size:12px;color:#ffffff80}.upload-status[data-astro-cid-qkjl6s6s].ok{color:#a8ffc4}.upload-status[data-astro-cid-qkjl6s6s].err{color:#ffb0b0}
+</style><script type="module" src="/_astro/page.CiPokonQ.js"></script></head> <body data-astro-cid-qkjl6s6s> <div id="anime-backdrop" aria-hidden="true"> <div class="anime-backdrop-media"> <img id="anime-backdrop-img" src="/anime-wallpaper/desktop-01.avif" alt="" loading="eager"> </div> <div class="anime-backdrop-glow"></div> <div class="anime-backdrop-veil"></div> <div class="anime-petals"> <span style="left:2%; width:7px; height:7px; opacity:0.25; --petal-delay:0s; --petal-duration:15s; --petal-drift:40px;"></span><span style="left:15.3%; width:11px; height:11px; opacity:0.35; --petal-delay:-1.9s; --petal-duration:18.5s; --petal-drift:-70px;"></span><span style="left:28.6%; width:15px; height:15px; opacity:0.45; --petal-delay:-3.8s; --petal-duration:22s; --petal-drift:100px;"></span><span style="left:20.9%; width:19px; height:19px; opacity:0.55; --petal-delay:-5.699999999999999s; --petal-duration:25.5s; --petal-drift:-130px;"></span><span style="left:34.2%; width:7px; height:7px; opacity:0.65; --petal-delay:-7.6s; --petal-duration:29s; --petal-drift:160px;"></span><span style="left:47.5%; width:11px; height:11px; opacity:0.25; --petal-delay:-9.5s; --petal-duration:15s; --petal-drift:-40px;"></span><span style="left:39.8%; width:15px; height:15px; opacity:0.35; --petal-delay:-11.399999999999999s; --petal-duration:18.5s; --petal-drift:70px;"></span><span style="left:53.1%; width:19px; height:19px; opacity:0.45; --petal-delay:-13.299999999999999s; --petal-duration:22s; --petal-drift:-100px;"></span><span style="left:66.4%; width:7px; height:7px; opacity:0.55; --petal-delay:-15.2s; --petal-duration:25.5s; --petal-drift:130px;"></span><span style="left:58.699999999999996%; width:11px; height:11px; opacity:0.65; --petal-delay:-17.099999999999998s; --petal-duration:29s; --petal-drift:-160px;"></span><span style="left:72%; width:15px; height:15px; opacity:0.25; --petal-delay:-19s; --petal-duration:15s; --petal-drift:40px;"></span><span style="left:85.3%; width:19px; height:19px; opacity:0.35; --petal-delay:-20.9s; --petal-duration:18.5s; --petal-drift:-70px;"></span><span style="left:77.6%; width:7px; height:7px; opacity:0.45; --petal-delay:-0.7999999999999972s; --petal-duration:22s; --petal-drift:100px;"></span><span style="left:90.89999999999999%; width:11px; height:11px; opacity:0.55; --petal-delay:-2.6999999999999993s; --petal-duration:25.5s; --petal-drift:-130px;"></span><span style="left:4.200000000000003%; width:15px; height:15px; opacity:0.65; --petal-delay:-4.599999999999998s; --petal-duration:29s; --petal-drift:160px;"></span><span style="left:96.5%; width:19px; height:19px; opacity:0.25; --petal-delay:-6.5s; --petal-duration:15s; --petal-drift:-40px;"></span> </div> </div> <button id="anime-wallpaper-next" type="button" title="换一张动漫壁纸" aria-label="换一张动漫壁纸"> <span class="anime-wallpaper-icon">🌸</span> <span class="anime-wallpaper-text">换壁纸</span> </button> <div id="anime-corner-l2d" data-anime-l2d> <div id="anime-corner-bubble" class="anime-corner-bubble">
+一起看番吗？
+</div> <canvas id="anime-corner-canvas"></canvas> <button id="anime-corner-next" type="button" title="换一个看板娘" aria-label="换一个看板娘">
+🔄
+</button> </div> <div id="anime-sound-toggle" role="button" tabindex="0" aria-label="音效开关" title="音效开关（点击切换）"> <span id="anime-sound-icon" aria-hidden="true">🎵</span> <span id="anime-sound-text">音效开</span> </div>  <script>
+	(function () {
+		if (window.__animeSoundsInit) return;
+		window.__animeSoundsInit = true;
+
+		var STORAGE_KEY = "anime-sound-enabled";
+		var FILES = {
+			click: "/sounds/ui/click.wav",
+			tap: "/sounds/ui/tap.wav",
+			login: "/sounds/ui/login.wav",
+			logout: "/sounds/ui/logout.wav",
+			success: "/sounds/ui/success.wav",
+			error: "/sounds/ui/error.wav",
+			notification: "/sounds/ui/notification.wav",
+			open: "/sounds/ui/open.wav",
+			close: "/sounds/ui/close.wav",
+		};
+
+		var enabled = true;
+		try {
+			enabled = localStorage.getItem(STORAGE_KEY) !== "false";
+		} catch (e) {}
+
+		var cache = {};
+
+		function getAudio(name) {
+			if (cache[name]) return cache[name];
+			var audio = new Audio(FILES[name] || FILES.click);
+			audio.preload = "auto";
+			cache[name] = audio;
+			return audio;
+		}
+
+		function play(name, volume) {
+			if (!enabled) return null;
+			try {
+				var src = getAudio(name);
+				var audio = src.cloneNode(true);
+				audio.volume = typeof volume === "number" ? volume : 0.3;
+				var p = audio.play();
+				if (p && p.catch) p.catch(function () {});
+				return audio;
+			} catch (e) {
+				return null;
+			}
+		}
+
+		function syncUi() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			var icon = document.getElementById("anime-sound-icon");
+			var text = document.getElementById("anime-sound-text");
+			if (!toggle) return;
+			toggle.classList.toggle("is-off", !enabled);
+			toggle.setAttribute("aria-pressed", String(enabled));
+			if (icon) icon.textContent = enabled ? "🎵" : "🔇";
+			if (text) text.textContent = enabled ? "音效开" : "音效关";
+		}
+
+		function setEnabled(value) {
+			enabled = Boolean(value);
+			try {
+				localStorage.setItem(STORAGE_KEY, String(enabled));
+			} catch (e) {}
+			syncUi();
+			if (enabled) play("open", 0.25);
+		}
+
+		window.AnimeSounds = {
+			play: play,
+			setEnabled: setEnabled,
+			isEnabled: function () {
+				return enabled;
+			},
+			toggle: function () {
+				setEnabled(!enabled);
+				return enabled;
+			},
+		};
+
+		// 全局点击音效（捕获阶段，保证动态元素也能生效）
+		// 覆盖：导航、按钮、链接、标签、分类、分页、目录、卡片等所有可点击元素
+		var nearMotion =
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		var SPARKS = ["✨", "💖", "🌸", "⭐", "🎀", "💫"];
+		var lastSpark = 0;
+
+		function sparkle(x, y) {
+			if (nearMotion) return;
+			var now = Date.now();
+			if (now - lastSpark < 70) return;
+			lastSpark = now;
+			var el = document.createElement("span");
+			el.className = "anime-click-spark";
+			el.textContent = SPARKS[Math.floor(Math.random() * SPARKS.length)];
+			el.style.left = x + "px";
+			el.style.top = y + "px";
+			el.style.setProperty(
+				"--spark-x",
+				Math.round(Math.random() * 52 - 26) + "px",
+			);
+			document.body.appendChild(el);
+			setTimeout(function () {
+				el.remove();
+			}, 720);
+		}
+
+		document.addEventListener(
+			"click",
+			function (event) {
+				var target = event.target;
+				if (!target || !target.closest) return;
+				if (
+					target.closest(
+						"#anime-sound-toggle, [data-no-sound], input, textarea, select, option",
+					)
+				) {
+					return;
+				}
+				var el = target.closest(
+					'[data-sound], a, button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn, summary, label[for], .tab, .nav-item, .post-card-wrapper',
+				);
+				if (!el) return;
+
+				var custom = el.getAttribute && el.getAttribute("data-sound");
+				var isButton = el.matches(
+					'button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn',
+				);
+				play(custom || (isButton ? "click" : "tap"), isButton ? 0.22 : 0.18);
+
+				var rect =
+					target.getBoundingClientRect && target.getBoundingClientRect();
+				sparkle(
+					event.clientX ||
+						(rect ? rect.left + rect.width / 2 : window.innerWidth / 2),
+					event.clientY ||
+						(rect ? rect.top + rect.height / 2 : window.innerHeight / 2),
+				);
+			},
+			true,
+		);
+
+		function bindToggle() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			if (!toggle || toggle.dataset.bound === "1") return;
+			toggle.dataset.bound = "1";
+			syncUi();
+			toggle.addEventListener("click", function (event) {
+				event.stopPropagation();
+				if (window.AnimeSounds) window.AnimeSounds.toggle();
+			});
+			toggle.addEventListener("keydown", function (event) {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					if (window.AnimeSounds) window.AnimeSounds.toggle();
+				}
+			});
+		}
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", bindToggle);
+		} else {
+			bindToggle();
+		}
+		document.addEventListener("swup:page:view", bindToggle);
+	})();
+</script>  <script>(function(){const desktop = ["/anime-wallpaper/desktop-01.avif","/anime-wallpaper/desktop-02.avif","/anime-wallpaper/desktop-03.avif","/anime-wallpaper/desktop-04.avif","/anime-wallpaper/desktop-05.avif"];
+const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.avif","/anime-wallpaper/mobile-03.avif","/anime-wallpaper/mobile-04.avif","/anime-wallpaper/mobile-05.avif"];
+
+	(function () {
+		if (window.__animeBackdropReady) return;
+		window.__animeBackdropReady = true;
+
+		var img = document.getElementById("anime-backdrop-img");
+		if (!img || !Array.isArray(desktop) || !desktop.length) return;
+
+		var STORAGE_KEY = "anime-wallpaper-index";
+		var reduceMotion =
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+		var index = -1;
+		try {
+			index = parseInt(localStorage.getItem(STORAGE_KEY) || "-1", 10);
+		} catch (e) {}
+		if (isNaN(index) || index < 0) {
+			index = Math.floor(Math.random() * desktop.length);
+		}
+
+		var wasMobile = window.innerWidth < 768;
+
+		function currentList() {
+			return window.innerWidth < 768 ? mobile : desktop;
+		}
+
+		function apply(fade) {
+			var list = currentList();
+			if (!list || !list.length) return;
+			var src = list[index % list.length];
+
+			if (!fade) {
+				img.src = src;
+				return;
+			}
+
+			img.style.opacity = "0";
+			var done = function () {
+				img.style.opacity = "1";
+				img.onload = null;
+			};
+			img.onload = done;
+			img.src = src;
+			// 兜底：图片已缓存时 onload 可能不触发
+			setTimeout(done, 900);
+		}
+
+		apply(false);
+
+		// 预加载其余壁纸，切换更顺滑
+		desktop.concat(mobile).forEach(function (src) {
+			var preload = new Image();
+			preload.src = src;
+		});
+
+		var btn = document.getElementById("anime-wallpaper-next");
+		if (btn) {
+			btn.addEventListener("click", function () {
+				index = (index + 1) % desktop.length;
+				try {
+					localStorage.setItem(STORAGE_KEY, String(index));
+				} catch (e) {}
+				apply(true);
+				btn.classList.add("is-switching");
+				setTimeout(function () {
+					btn.classList.remove("is-switching");
+				}, 520);
+				if (window.AnimeSounds) window.AnimeSounds.play("open", 0.22);
+			});
+		}
+
+		// 滚动视差：壁纸随页面缓慢移动，而不是一整块死图
+		if (!reduceMotion) {
+			var ticking = false;
+			var update = function () {
+				ticking = false;
+				var y = window.scrollY || document.documentElement.scrollTop || 0;
+				var shift = Math.min(y * 0.08, 72);
+				img.style.transform =
+					"translate3d(0," + shift.toFixed(1) + "px,0) scale(1.03)";
+			};
+			window.addEventListener(
+				"scroll",
+				function () {
+					if (!ticking) {
+						ticking = true;
+						requestAnimationFrame(update);
+					}
+				},
+				{ passive: true },
+			);
+			update();
+		}
+
+		var resizeTimer = null;
+		window.addEventListener("resize", function () {
+			if (resizeTimer) clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(function () {
+				var isMobile = window.innerWidth < 768;
+				if (isMobile !== wasMobile) {
+					wasMobile = isMobile;
+					apply(false);
+				}
+			}, 200);
+		});
+	})();
+})();</script>  <script src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script> <script src="/Firefly-live2d-main/load/pixi.min.js"></script> <script src="/Firefly-live2d-main/load/cubism4.min.js"></script> <script>
+				(function () {
+					if (window.__animeCornerL2DInit) return;
+					window.__animeCornerL2DInit = true;
+
+					var wrap = document.getElementById("anime-corner-l2d");
+					var canvas = document.getElementById("anime-corner-canvas");
+					if (!wrap || !canvas) return;
+					if (window.innerWidth < 900) return;
+
+					var bubble = document.getElementById("anime-corner-bubble");
+					var nextBtn = document.getElementById("anime-corner-next");
+
+					var LINES = [
+						"今天也要元气满满哦～",
+						"要不要一起看番？",
+						"嘿嘿，被你发现了～",
+						"这个壁纸好看吗？",
+						"记得多喝水呀！",
+						"再摸我就要害羞了…",
+						"新的一天，新的番剧！",
+					];
+
+					var bubbleTimer = null;
+					function say(text) {
+						if (!bubble) return;
+						bubble.textContent = text || LINES[Math.floor(Math.random() * LINES.length)];
+						bubble.classList.add("is-show");
+						if (bubbleTimer) clearTimeout(bubbleTimer);
+						bubbleTimer = setTimeout(function () {
+							bubble.classList.remove("is-show");
+						}, 3600);
+					}
+
+					var app = null;
+					var model = null;
+					var pool = [];
+					var voices = [];
+					var idx = -1;
+					var loading = false;
+					var baseX = 0;
+					var baseY = 0;
+					var curX = 0;
+					var curY = 0;
+					var targetX = 0;
+					var targetY = 0;
+
+					function layout() {
+						if (!app || !model) return;
+						var w = wrap.clientWidth || 260;
+						var h = wrap.clientHeight || 340;
+						app.renderer.resize(w, h);
+						var bounds = model.getLocalBounds();
+						var scale = (h * 0.98) / (bounds.height || 1);
+						model.anchor.set(0.5, 1);
+						model.scale.set(scale);
+						baseX = w / 2;
+						baseY = h + 6;
+						model.x = baseX + curX;
+						model.y = baseY + curY;
+					}
+
+					function voiceEnabled() {
+						if (window.AnimeSounds && !window.AnimeSounds.isEnabled()) return false;
+						return true;
+					}
+
+					function playVoice() {
+						if (!voices.length || !voiceEnabled()) return;
+						try {
+							var audio = new Audio(voices[Math.floor(Math.random() * voices.length)]);
+							audio.volume = 0.55;
+							var p = audio.play();
+							if (p && p.catch) p.catch(function () {});
+						} catch (e) {}
+					}
+
+					function playMotion() {
+						if (!model) return;
+						try {
+							var defs = model.internalModel?.motionManager?.definitions || {};
+							var groups = Object.keys(defs).filter(function (group) {
+								return group !== "idle" && Array.isArray(defs[group]) && defs[group].length;
+							});
+							if (groups.length) {
+								model.motion(groups[Math.floor(Math.random() * groups.length)]);
+							}
+						} catch (e) {}
+					}
+
+					async function show(startIndex) {
+						if (loading || !app || !pool.length) return false;
+						loading = true;
+
+						if (model) {
+							try {
+								app.stage.removeChild(model);
+							} catch (e) {}
+							try {
+								model.destroy();
+							} catch (e) {}
+							model = null;
+						}
+
+						var tries = Math.min(pool.length, 14);
+						for (var n = 0; n < tries; n++) {
+							var target = (startIndex + n) % pool.length;
+							try {
+								var loaded = await PIXI.live2d.Live2DModel.from(pool[target]);
+								model = loaded;
+								idx = target;
+								app.stage.addChild(loaded);
+								layout();
+								try {
+									loaded.motion("idle");
+								} catch (e) {}
+								wrap.classList.add("is-ready");
+								loading = false;
+								return true;
+							} catch (err) {
+								console.warn("[anime-l2d] 模型加载失败:", pool[target], err);
+							}
+						}
+						loading = false;
+						return false;
+					}
+
+					async function boot() {
+						try {
+							var res = await fetch("/models-list.json");
+							pool = await res.json();
+						} catch (e) {
+							console.warn("[anime-l2d] models-list.json 加载失败", e);
+							return;
+						}
+						if (!Array.isArray(pool) || !pool.length) return;
+
+						try {
+							var vres = await fetch("/voices-list.json");
+							voices = await vres.json();
+						} catch (e) {}
+
+						if (window.PIXI?.live2d?.config) {
+							PIXI.live2d.config.sound = false;
+							PIXI.live2d.config.motionSync = true;
+						}
+
+						app = new PIXI.Application({
+							view: canvas,
+							width: wrap.clientWidth || 260,
+							height: wrap.clientHeight || 340,
+							transparent: true,
+							backgroundAlpha: 0,
+							antialias: true,
+							autoDensity: true,
+							resolution: Math.min(window.devicePixelRatio || 1, 2),
+						});
+
+						await show(Math.floor(Math.random() * pool.length));
+
+						document.addEventListener("mousemove", function (event) {
+							targetX = (event.clientX / window.innerWidth) * 2 - 1;
+							targetY = (event.clientY / window.innerHeight) * 2 - 1;
+						});
+
+						(function tick() {
+							requestAnimationFrame(tick);
+							if (!model) return;
+							try {
+								model.focus(targetX * 1.4, -targetY * 1.4);
+							} catch (e) {}
+							curX += (targetX * 10 - curX) * 0.06;
+							curY += (targetY * 6 - curY) * 0.06;
+							model.x = baseX + curX;
+							model.y = baseY + curY;
+						})();
+
+						canvas.addEventListener("click", function () {
+							playMotion();
+							playVoice();
+							say();
+						});
+
+						if (nextBtn) {
+							nextBtn.addEventListener("click", async function (event) {
+								event.stopPropagation();
+								say("换一个新朋友～");
+								await show((idx + 1) % pool.length);
+							});
+						}
+
+						window.addEventListener("resize", layout);
+					}
+
+					var wait = setInterval(function () {
+						if (window.PIXI && PIXI.live2d) {
+							clearInterval(wait);
+							boot();
+						}
+					}, 200);
+					setTimeout(function () {
+						clearInterval(wait);
+					}, 15000);
+				})();
+			</script>  <div class="container" data-astro-cid-qkjl6s6s> <h1 data-astro-cid-qkjl6s6s>写文章</h1> <div class="sub" data-astro-cid-qkjl6s6s>提交后需要管理员审核，审核通过后才会公开</div> <form id="postForm" data-astro-cid-qkjl6s6s> <label data-astro-cid-qkjl6s6s>标题</label> <input type="text" id="title" required maxlength="100" placeholder="文章标题" data-astro-cid-qkjl6s6s> <label data-astro-cid-qkjl6s6s>封面图（可选）</label> <div class="upload-row" data-astro-cid-qkjl6s6s> <button type="button" id="coverBtn" class="btn-ghost" data-astro-cid-qkjl6s6s>🖼 上传封面</button> <input type="file" id="coverInput" accept="image/*" style="display: none;" data-astro-cid-qkjl6s6s> <span id="coverStatus" class="upload-status" data-astro-cid-qkjl6s6s></span> </div> <input type="hidden" id="cover" data-astro-cid-qkjl6s6s> <img id="coverPreview" style="display: none; max-width: 100%; border-radius: 10px; margin-bottom: 20px;" data-astro-cid-qkjl6s6s> <label data-astro-cid-qkjl6s6s>正文</label> <div class="upload-row" data-astro-cid-qkjl6s6s> <button type="button" id="uploadBtn" class="btn-ghost" data-astro-cid-qkjl6s6s>📷 上传图片</button> <input type="file" id="fileInput" accept="image/*" style="display: none;" data-astro-cid-qkjl6s6s> <span id="uploadStatus" class="upload-status" data-astro-cid-qkjl6s6s></span> </div> <textarea id="content" required placeholder="支持 Markdown 语法，图片会自动插入到光标处…" data-astro-cid-qkjl6s6s></textarea> <div class="hint" data-astro-cid-qkjl6s6s>图片限制 5MB，支持 JPG / PNG / GIF / WebP</div> <div class="actions" data-astro-cid-qkjl6s6s> <button type="submit" class="btn-primary" id="submitBtn" data-astro-cid-qkjl6s6s>提交审核</button> <a href="/dashboard/" class="btn-ghost" data-astro-cid-qkjl6s6s>返回</a> </div> </form> <div class="msg" id="msg" data-astro-cid-qkjl6s6s></div> </div> <script>
+    const form = document.getElementById('postForm');
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('submitBtn');
+
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.className = 'msg ' + type;
+    }
+
+    // ===== 图片上传 =====
+    const uploadBtn = document.getElementById('uploadBtn');
+        // ===== 封面上传 =====
+    const coverBtn = document.getElementById('coverBtn');
+    const coverInput = document.getElementById('coverInput');
+    const coverStatus = document.getElementById('coverStatus');
+    const coverEl = document.getElementById('cover');
+    const coverPreview = document.getElementById('coverPreview');
+
+    coverBtn.addEventListener('click', () => coverInput.click());
+
+    coverInput.addEventListener('change', async () => {
+      const file = coverInput.files && coverInput.files[0];
+      if (!file) return;
+      coverStatus.textContent = '上传中…';
+      coverStatus.className = 'upload-status';
+      coverBtn.disabled = true;
+
+      const fd = new FormData();
+      fd.append('file', file);
+
+      try {
+        const res = await fetch('/api/upload/', { method: 'POST', credentials: 'include', body: fd });
+        const data = await res.json();
+        if (data.ok) {
+          coverEl.value = data.url;
+          coverPreview.src = data.url;
+          coverPreview.style.display = 'block';
+          coverStatus.textContent = '✅ 已上传';
+          coverStatus.className = 'upload-status ok';
+        } else {
+          coverStatus.textContent = '❌ ' + (data.error || '失败');
+          coverStatus.className = 'upload-status err';
+        }
+      } catch (e) {
+        coverStatus.textContent = '❌ 网络错误';
+        coverStatus.className = 'upload-status err';
+      } finally {
+        coverBtn.disabled = false;
+        coverInput.value = '';
+      }
+    });
+    const fileInput = document.getElementById('fileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const contentEl = document.getElementById('content');
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+
+      uploadStatus.textContent = '上传中…';
+      uploadStatus.className = 'upload-status';
+      uploadBtn.disabled = true;
+
+      const fd = new FormData();
+      fd.append('file', file);
+
+      try {
+        const res = await fetch('/api/upload/', {
+          method: 'POST',
+          credentials: 'include',
+          body: fd,
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          const md = `![${file.name}](${data.url})`;
+          const start = contentEl.selectionStart ?? contentEl.value.length;
+          const end = contentEl.selectionEnd ?? contentEl.value.length;
+          const text = contentEl.value;
+          contentEl.value = text.slice(0, start) + md + text.slice(end);
+          contentEl.focus();
+          contentEl.selectionStart = contentEl.selectionEnd = start + md.length;
+
+          uploadStatus.textContent = '✅ 已插入';
+          uploadStatus.className = 'upload-status ok';
+          setTimeout(() => {
+            uploadStatus.textContent = '';
+            uploadStatus.className = 'upload-status';
+          }, 2500);
+        } else {
+          uploadStatus.textContent = '❌ ' + (data.error || '上传失败');
+          uploadStatus.className = 'upload-status err';
+        }
+      } catch (err) {
+        uploadStatus.textContent = '❌ 网络错误';
+        uploadStatus.className = 'upload-status err';
+      } finally {
+        uploadBtn.disabled = false;
+        fileInput.value = '';
+      }
+    });
+
+    // ===== 提交文章 =====
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = '提交中…';
+      msg.className = 'msg';
+
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+
+      try {
+        const res = await fetch('/api/posts/create/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ title, content, cover: coverEl.value }),
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          showMsg('提交成功！等待管理员审核', 'ok');
+          setTimeout(() => { location.href = '/dashboard/'; }, 1200);
+        } else {
+          showMsg(data.error || '提交失败', 'err');
+          btn.disabled = false;
+          btn.textContent = '提交审核';
+        }
+      } catch (err) {
+        showMsg('网络错误，请重试', 'err');
+        btn.disabled = false;
+        btn.textContent = '提交审核';
+      }
+    });
+  </script> </body> </html>

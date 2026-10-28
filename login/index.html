@@ -1,0 +1,460 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-sgpqyurt> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>登录 - 我的动漫小屋</title><link rel="icon" type="image/svg+xml" href="/favicon/anime.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon/anime-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon/anime-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/favicon/anime-180.png"><link rel="shortcut icon" href="/favicon/anime.ico"><meta name="theme-color" content="#ff9ac8"><meta name="apple-mobile-web-app-title" content="我的动漫小屋"><meta name="application-name" content="我的动漫小屋"><style>#anime-sound-toggle{position:fixed;left:16px;bottom:16px;z-index:999995;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid rgba(255,154,200,.38);background:#12101c8c;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#ffd9ea;font-size:12px;line-height:1;cursor:pointer;user-select:none;box-shadow:0 6px 22px #ff8fc12e;transition:transform .2s ease,background .2s ease,opacity .2s ease}#anime-sound-toggle:hover{transform:translateY(-2px);background:#261c32bf}#anime-sound-toggle:focus-visible{outline:2px solid rgba(255,154,200,.8);outline-offset:2px}#anime-sound-toggle.is-off{opacity:.55;border-color:#ffffff2e;color:#ffffffa6}#anime-sound-icon{font-size:14px}@media(max-width:640px){#anime-sound-toggle{left:10px;bottom:10px;padding:7px 10px}#anime-sound-text{display:none}}
+</style>
+<link rel="stylesheet" href="/_astro/AnimeBackdrop.apcTOslU.css">
+<link rel="stylesheet" href="/_astro/login.Bfd0iiXp.css"><script type="module" src="/_astro/page.CiPokonQ.js"></script></head> <body data-astro-cid-sgpqyurt> <div id="anime-backdrop" aria-hidden="true"> <div class="anime-backdrop-media"> <img id="anime-backdrop-img" src="/anime-wallpaper/desktop-01.avif" alt="" loading="eager"> </div> <div class="anime-backdrop-glow"></div> <div class="anime-backdrop-veil"></div>  </div> <button id="anime-wallpaper-next" type="button" title="换一张动漫壁纸" aria-label="换一张动漫壁纸"> <span class="anime-wallpaper-icon">🌸</span> <span class="anime-wallpaper-text">换壁纸</span> </button>  <div id="anime-sound-toggle" role="button" tabindex="0" aria-label="音效开关" title="音效开关（点击切换）"> <span id="anime-sound-icon" aria-hidden="true">🎵</span> <span id="anime-sound-text">音效开</span> </div>  <script>
+	(function () {
+		if (window.__animeSoundsInit) return;
+		window.__animeSoundsInit = true;
+
+		var STORAGE_KEY = "anime-sound-enabled";
+		var FILES = {
+			click: "/sounds/ui/click.wav",
+			tap: "/sounds/ui/tap.wav",
+			login: "/sounds/ui/login.wav",
+			logout: "/sounds/ui/logout.wav",
+			success: "/sounds/ui/success.wav",
+			error: "/sounds/ui/error.wav",
+			notification: "/sounds/ui/notification.wav",
+			open: "/sounds/ui/open.wav",
+			close: "/sounds/ui/close.wav",
+		};
+
+		var enabled = true;
+		try {
+			enabled = localStorage.getItem(STORAGE_KEY) !== "false";
+		} catch (e) {}
+
+		var cache = {};
+
+		function getAudio(name) {
+			if (cache[name]) return cache[name];
+			var audio = new Audio(FILES[name] || FILES.click);
+			audio.preload = "auto";
+			cache[name] = audio;
+			return audio;
+		}
+
+		function play(name, volume) {
+			if (!enabled) return null;
+			try {
+				var src = getAudio(name);
+				var audio = src.cloneNode(true);
+				audio.volume = typeof volume === "number" ? volume : 0.3;
+				var p = audio.play();
+				if (p && p.catch) p.catch(function () {});
+				return audio;
+			} catch (e) {
+				return null;
+			}
+		}
+
+		function syncUi() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			var icon = document.getElementById("anime-sound-icon");
+			var text = document.getElementById("anime-sound-text");
+			if (!toggle) return;
+			toggle.classList.toggle("is-off", !enabled);
+			toggle.setAttribute("aria-pressed", String(enabled));
+			if (icon) icon.textContent = enabled ? "🎵" : "🔇";
+			if (text) text.textContent = enabled ? "音效开" : "音效关";
+		}
+
+		function setEnabled(value) {
+			enabled = Boolean(value);
+			try {
+				localStorage.setItem(STORAGE_KEY, String(enabled));
+			} catch (e) {}
+			syncUi();
+			if (enabled) play("open", 0.25);
+		}
+
+		window.AnimeSounds = {
+			play: play,
+			setEnabled: setEnabled,
+			isEnabled: function () {
+				return enabled;
+			},
+			toggle: function () {
+				setEnabled(!enabled);
+				return enabled;
+			},
+		};
+
+		// 全局点击音效（捕获阶段，保证动态元素也能生效）
+		// 覆盖：导航、按钮、链接、标签、分类、分页、目录、卡片等所有可点击元素
+		var nearMotion =
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		var SPARKS = ["✨", "💖", "🌸", "⭐", "🎀", "💫"];
+		var lastSpark = 0;
+
+		function sparkle(x, y) {
+			if (nearMotion) return;
+			var now = Date.now();
+			if (now - lastSpark < 70) return;
+			lastSpark = now;
+			var el = document.createElement("span");
+			el.className = "anime-click-spark";
+			el.textContent = SPARKS[Math.floor(Math.random() * SPARKS.length)];
+			el.style.left = x + "px";
+			el.style.top = y + "px";
+			el.style.setProperty(
+				"--spark-x",
+				Math.round(Math.random() * 52 - 26) + "px",
+			);
+			document.body.appendChild(el);
+			setTimeout(function () {
+				el.remove();
+			}, 720);
+		}
+
+		document.addEventListener(
+			"click",
+			function (event) {
+				var target = event.target;
+				if (!target || !target.closest) return;
+				if (
+					target.closest(
+						"#anime-sound-toggle, [data-no-sound], input, textarea, select, option",
+					)
+				) {
+					return;
+				}
+				var el = target.closest(
+					'[data-sound], a, button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn, summary, label[for], .tab, .nav-item, .post-card-wrapper',
+				);
+				if (!el) return;
+
+				var custom = el.getAttribute && el.getAttribute("data-sound");
+				var isButton = el.matches(
+					'button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn',
+				);
+				play(custom || (isButton ? "click" : "tap"), isButton ? 0.22 : 0.18);
+
+				var rect =
+					target.getBoundingClientRect && target.getBoundingClientRect();
+				sparkle(
+					event.clientX ||
+						(rect ? rect.left + rect.width / 2 : window.innerWidth / 2),
+					event.clientY ||
+						(rect ? rect.top + rect.height / 2 : window.innerHeight / 2),
+				);
+			},
+			true,
+		);
+
+		function bindToggle() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			if (!toggle || toggle.dataset.bound === "1") return;
+			toggle.dataset.bound = "1";
+			syncUi();
+			toggle.addEventListener("click", function (event) {
+				event.stopPropagation();
+				if (window.AnimeSounds) window.AnimeSounds.toggle();
+			});
+			toggle.addEventListener("keydown", function (event) {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					if (window.AnimeSounds) window.AnimeSounds.toggle();
+				}
+			});
+		}
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", bindToggle);
+		} else {
+			bindToggle();
+		}
+		document.addEventListener("swup:page:view", bindToggle);
+	})();
+</script>  <script>(function(){const desktop = ["/anime-wallpaper/desktop-01.avif","/anime-wallpaper/desktop-02.avif","/anime-wallpaper/desktop-03.avif","/anime-wallpaper/desktop-04.avif","/anime-wallpaper/desktop-05.avif"];
+const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.avif","/anime-wallpaper/mobile-03.avif","/anime-wallpaper/mobile-04.avif","/anime-wallpaper/mobile-05.avif"];
+
+	(function () {
+		if (window.__animeBackdropReady) return;
+		window.__animeBackdropReady = true;
+
+		var img = document.getElementById("anime-backdrop-img");
+		if (!img || !Array.isArray(desktop) || !desktop.length) return;
+
+		var STORAGE_KEY = "anime-wallpaper-index";
+		var reduceMotion =
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+		var index = -1;
+		try {
+			index = parseInt(localStorage.getItem(STORAGE_KEY) || "-1", 10);
+		} catch (e) {}
+		if (isNaN(index) || index < 0) {
+			index = Math.floor(Math.random() * desktop.length);
+		}
+
+		var wasMobile = window.innerWidth < 768;
+
+		function currentList() {
+			return window.innerWidth < 768 ? mobile : desktop;
+		}
+
+		function apply(fade) {
+			var list = currentList();
+			if (!list || !list.length) return;
+			var src = list[index % list.length];
+
+			if (!fade) {
+				img.src = src;
+				return;
+			}
+
+			img.style.opacity = "0";
+			var done = function () {
+				img.style.opacity = "1";
+				img.onload = null;
+			};
+			img.onload = done;
+			img.src = src;
+			// 兜底：图片已缓存时 onload 可能不触发
+			setTimeout(done, 900);
+		}
+
+		apply(false);
+
+		// 预加载其余壁纸，切换更顺滑
+		desktop.concat(mobile).forEach(function (src) {
+			var preload = new Image();
+			preload.src = src;
+		});
+
+		var btn = document.getElementById("anime-wallpaper-next");
+		if (btn) {
+			btn.addEventListener("click", function () {
+				index = (index + 1) % desktop.length;
+				try {
+					localStorage.setItem(STORAGE_KEY, String(index));
+				} catch (e) {}
+				apply(true);
+				btn.classList.add("is-switching");
+				setTimeout(function () {
+					btn.classList.remove("is-switching");
+				}, 520);
+				if (window.AnimeSounds) window.AnimeSounds.play("open", 0.22);
+			});
+		}
+
+		// 滚动视差：壁纸随页面缓慢移动，而不是一整块死图
+		if (!reduceMotion) {
+			var ticking = false;
+			var update = function () {
+				ticking = false;
+				var y = window.scrollY || document.documentElement.scrollTop || 0;
+				var shift = Math.min(y * 0.08, 72);
+				img.style.transform =
+					"translate3d(0," + shift.toFixed(1) + "px,0) scale(1.03)";
+			};
+			window.addEventListener(
+				"scroll",
+				function () {
+					if (!ticking) {
+						ticking = true;
+						requestAnimationFrame(update);
+					}
+				},
+				{ passive: true },
+			);
+			update();
+		}
+
+		var resizeTimer = null;
+		window.addEventListener("resize", function () {
+			if (resizeTimer) clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(function () {
+				var isMobile = window.innerWidth < 768;
+				if (isMobile !== wasMobile) {
+					wasMobile = isMobile;
+					apply(false);
+				}
+			}, 200);
+		});
+	})();
+})();</script>  <div id="login-l2d" data-astro-cid-sgpqyurt></div> <div class="petals" id="petals" data-astro-cid-sgpqyurt></div> <div class="card" data-astro-cid-sgpqyurt> <div class="logo" data-astro-cid-sgpqyurt> <div class="logo-icon" data-astro-cid-sgpqyurt>🌸</div> </div> <h1 data-astro-cid-sgpqyurt>欢迎回来</h1> <div class="sub" data-astro-cid-sgpqyurt>おかえりなさい</div> <form id="loginForm" data-astro-cid-sgpqyurt> <label data-astro-cid-sgpqyurt>用户名</label> <input type="text" id="username" required placeholder="你的用户名" autocomplete="username" data-astro-cid-sgpqyurt> <label data-astro-cid-sgpqyurt>密码</label> <input type="password" id="password" required placeholder="你的密码" autocomplete="current-password" data-astro-cid-sgpqyurt> <button type="submit" id="submitBtn" data-astro-cid-sgpqyurt>登 录</button> </form> <div class="msg" id="msg" data-astro-cid-sgpqyurt></div> <div class="links" data-astro-cid-sgpqyurt>
+还没有账号？<a href="/register/" data-astro-cid-sgpqyurt>去注册</a> <span class="divider" data-astro-cid-sgpqyurt>·</span> <a href="/" data-astro-cid-sgpqyurt>返回首页</a> </div> </div> <script src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script> <script src="/Firefly-live2d-main/load/pixi.min.js"></script> <script src="/Firefly-live2d-main/load/cubism4.min.js"></script> <script>
+    // ===== 樱花 =====
+    (function() {
+      const wrap = document.getElementById('petals');
+      if (!wrap) return;
+      for (let i = 0; i < 10; i++) {
+        const p = document.createElement('span');
+        p.className = 'petal';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (3 + Math.random() * 3) + 's';
+        p.style.animationDelay = (Math.random() * 4) + 's';
+        wrap.appendChild(p);
+      }
+    })();
+
+    // ============================================================
+    // 只在这里挑你要的模型（可选）
+    // 留空数组 [] 则从全部模型里随机加载，自动跳过失败的
+    // ============================================================
+    const PREFERRED_MODELS = [
+      // '/pio/models/live2d/Azue Lane(JP)/ailunsamuna_2_hx/ailunsamuna_2_hx.model3.json',
+      // '/pio/models/live2d/Azue Lane(JP)/aimudeng_2_hx/aimudeng_2_hx.model3.json',
+    ];
+
+    // ===== Live2D 全屏背景 =====
+    (async () => {
+      const stage = document.getElementById('login-l2d');
+      if (!stage) return;
+      if (typeof PIXI === 'undefined' || !PIXI.live2d) {
+        console.warn('Live2D 库未加载');
+        return;
+      }
+
+      // 选出模型池
+      let pool = [];
+      if (PREFERRED_MODELS.length > 0) {
+        pool = PREFERRED_MODELS.slice();
+      } else {
+        try {
+          const res = await fetch('/models-list.json');
+          const all = await res.json();
+          pool = Array.isArray(all) ? all.slice() : [];
+        } catch (e) {
+          console.warn('读取模型清单失败', e);
+          return;
+        }
+      }
+      if (!pool.length) return;
+
+      // 随机挑，加载失败自动换下一个
+      const start = Math.floor(Math.random() * pool.length);
+      let model = null;
+      for (let i = 0; i < pool.length; i++) {
+        const path = pool[(start + i) % pool.length];
+        try {
+          model = await PIXI.live2d.Live2DModel.from(path);
+          console.log('✅ 登录页加载:', path);
+          break;
+        } catch (e) {
+          console.warn('✗ 跳过:', path);
+        }
+      }
+      if (!model) {
+        console.warn('所有模型加载失败');
+        return;
+      }
+
+      const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+      const app = new PIXI.Application({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        resolution: DPR,
+        autoDensity: true,
+        antialias: true,
+        transparent: true,
+        backgroundColor: 0x000000,
+        backgroundAlpha: 0,
+      });
+      stage.appendChild(app.view);
+
+      app.stage.addChild(model);
+
+      // ===== 记录模型原始尺寸（一次就好，不会因为 scale 变化而变）=====
+      const bounds = model.getLocalBounds();
+      const ORIG_H = bounds.height || 1;
+
+      model.anchor.set(0.5, 1);
+      model.scale.set(1);
+
+      // ===== 布局：基于原始尺寸，稳定不失控 =====
+      function layoutModel() {
+        const W = window.innerWidth;
+        const H = window.innerHeight;
+
+        app.renderer.resize(W, H);
+
+        const s = (H * 0.95) / ORIG_H;
+        model.scale.set(s);
+
+        const isMobile = W < 900;
+        model.x = isMobile ? W / 2 : W * 0.3;
+        model.y = H + 20;
+      }
+
+      layoutModel();
+
+      // ===== resize 节流：150ms 内只重排一次 =====
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(layoutModel, 150);
+      });
+
+      // 待机动作
+      try { model.motion('idle'); } catch (e) {}
+
+      // 眼睛跟随鼠标
+      document.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth) * 2 - 1;
+        const y = (e.clientY / window.innerHeight) * 2 - 1;
+        try { model.focus(x * 1.2, -y * 1.2); } catch (e) {}
+      });
+    })();
+
+    // ===== 登录 =====
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('submitBtn');
+
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.className = 'msg ' + type;
+    }
+
+    function playWelcomeVoice() {
+      try {
+        const audio = new Audio('/tts/Nanami/0.mp3');
+        audio.volume = 0.9;
+        const p = audio.play();
+        if (p && p.catch) p.catch(() => {});
+      } catch (e) {}
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = '登录中…';
+      msg.className = 'msg';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/auth/login/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          showMsg('欢迎回来，' + (data.user?.username || '') + '！', 'ok');
+          if (window.AnimeSounds) window.AnimeSounds.play('login', 0.45);
+          playWelcomeVoice();
+          setTimeout(() => { location.href = '/'; }, 1500);
+        } else {
+          showMsg(data.error || '登录失败', 'err');
+          if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
+          btn.disabled = false;
+          btn.textContent = '登 录';
+        }
+      } catch (err) {
+        showMsg('网络错误，请重试', 'err');
+        if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
+        btn.disabled = false;
+        btn.textContent = '登 录';
+      }
+    });
+  </script> </body> </html>
