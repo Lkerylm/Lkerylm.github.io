@@ -1,9 +1,159 @@
 [
   {
+    "name": "1 (2)",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/1_2/senko.model3.json",
+    "mb": 7.8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "abeikelongbi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/abeikelongbi_3/abeikelongbi_3.model3.json",
+    "mb": 8.7,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "abeikelongbi_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/abeikelongbi_3_hx/abeikelongbi_3_hx.model3.json",
+    "mb": 7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "adaerbote_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/adaerbote_2/adaerbote_2.model3.json",
+    "mb": 11.4,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "adaerbote_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/adaerbote_3/adaerbote_3.model3.json",
+    "mb": 20.8,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "aerbien_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/aerbien_3/aerbien_3.model3.json",
+    "mb": 30.1,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "aersasi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/aersasi_2/aersasi_2.model3.json",
+    "mb": 24.9,
+    "repo": "firefly-live2d-3"
+  },
+  {
     "name": "aersasi_3",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/aersasi_3/aersasi_3.model3.json",
     "mb": 47.1,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "aidang_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/aidang_2/aidang_2.model3.json",
+    "mb": 5.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "aierdeliqi_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/aierdeliqi_4/aierdeliqi_4.model3.json",
+    "mb": 6.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "aierdeliqi_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/aierdeliqi_5/aierdeliqi_5.model3.json",
+    "mb": 7.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "aijier_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/aijier_2/aijier_2.model3.json",
+    "mb": 22.1,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "aijier_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/aijier_3/aijier_3.model3.json",
+    "mb": 29.6,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "aijier_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/aijier_3_hx/aijier_3_hx.model3.json",
+    "mb": 20.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "aijier_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/aijier_4/aijier_4.model3.json",
+    "mb": 25.1,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "ailunsamuna_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/ailunsamuna_2/ailunsamuna_2.model3.json",
+    "mb": 8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "ailunsamuna_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/ailunsamuna_2_hx/ailunsamuna_2_hx.model3.json",
+    "mb": 6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "aimierbeierding_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/aimierbeierding_2/aimierbeierding_2.model3.json",
+    "mb": 5.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "aimierbeierding_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/aimierbeierding_3/aimierbeierding_3.model3.json",
+    "mb": 8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "aimierbeierding_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/aimierbeierding_3_hx/aimierbeierding_3_hx.model3.json",
+    "mb": 6.9,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "aimudeng_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/aimudeng_2/aimudeng_2.model3.json",
+    "mb": 24.1,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "aimudeng_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/aimudeng_2_hx/aimudeng_2_hx.model3.json",
+    "mb": 16.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "aisaikesi_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/aisaikesi_4/aisaikesi_4.model3.json",
+    "mb": 8.7,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "ankeleiqi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/ankeleiqi_2/ankeleiqi_2.model3.json",
+    "mb": 22.8,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "ankeleiqi_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/ankeleiqi_2_hx/ankeleiqi_2_hx.model3.json",
+    "mb": 17.6,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "ankeleiqi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/ankeleiqi_3/ankeleiqi_3.model3.json",
+    "mb": 26.5,
+    "repo": "firefly-live2d-2"
   },
   {
     "name": "ankeleiqi_4",
@@ -12,10 +162,304 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "anninvwang_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/anninvwang_2/anninvwang_2.model3.json",
+    "mb": 36.3,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "baerdimo_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/baerdimo_5/baerdimo_5.model3.json",
+    "mb": 6.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "baerdimo_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/baerdimo_6/baerdimo_6.model3.json",
+    "mb": 18.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "baifeng_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/baifeng_2/baifeng_2.model3.json",
+    "mb": 32.8,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "bailong_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/bailong_3/bailong_3.model3.json",
+    "mb": 9.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "banerwei_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/banerwei_3/banerwei_3.model3.json",
+    "mb": 24.6,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "banrenma_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/banrenma_2/banrenma_2.model3.json",
+    "mb": 6.5,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "beierfasite_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/beierfasite_2/beierfasite_2.model3.json",
+    "mb": 6.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "beikaluolaina_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/beikaluolaina_2/beikaluolaina_2.model3.json",
+    "mb": 7.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "beikaluolaina_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/beikaluolaina_2_hx/beikaluolaina_2_hx.model3.json",
+    "mb": 6.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
     "name": "beilaosenlin_2",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/beilaosenlin_2/beilaosenlin_2.model3.json",
     "mb": 44.8,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "biaoqiang",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/biaoqiang/biaoqiang.model3.json",
+    "mb": 2.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "biaoqiang_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/biaoqiang_3/biaoqiang_3.model3.json",
+    "mb": 2.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "bisimai_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/bisimai_2/bisimai_2.model3.json",
+    "mb": 3.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "bisimai_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/bisimai_2_hx/bisimai_2_hx.model3.json",
+    "mb": 4.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "bisimai_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/bisimai_4/bisimai_4.model3.json",
+    "mb": 21.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "bola_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/bola_2/bola_2.model3.json",
+    "mb": 11.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "boyixi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/boyixi_2/boyixi_2.model3.json",
+    "mb": 7.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "bulaimodun_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/bulaimodun_2/bulaimodun_2.model3.json",
+    "mb": 6.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "bulaimodun_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/bulaimodun_4/bulaimodun_4.model3.json",
+    "mb": 8.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "bulaimodun_4_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/bulaimodun_4_hx/bulaimodun_4_hx.model3.json",
+    "mb": 6.6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "bulaimodun_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/bulaimodun_5/bulaimodun_5.model3.json",
+    "mb": 8.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "buleisite_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/buleisite_2/buleisite_2.model3.json",
+    "mb": 22.3,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "buleisite_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/buleisite_3/buleisite_3.model3.json",
+    "mb": 23.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "chaijun_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/chaijun_3/chaijun_3.model3.json",
+    "mb": 9.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "chaijun_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/chaijun_4/chaijun_4.model3.json",
+    "mb": 13.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "chaijun_4_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/chaijun_4_hx/chaijun_4_hx.model3.json",
+    "mb": 11.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "chaijun_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/chaijun_5/chaijun_5.model3.json",
+    "mb": 20.8,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "chicheng_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/chicheng_5/chicheng_5.model3.json",
+    "mb": 12.4,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "chuixue_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/chuixue_3/chuixue_3.model3.json",
+    "mb": 4.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "chuyue_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/chuyue_2/chuyue_2.model3.json",
+    "mb": 15.6,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "dafeng_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/dafeng_2/dafeng_2.model3.json",
+    "mb": 5.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "dafeng_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/dafeng_2_hx/dafeng_2_hx.model3.json",
+    "mb": 4.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "dafeng_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/dafeng_3/dafeng_3.model3.json",
+    "mb": 8.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "dafeng_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/dafeng_4/dafeng_4.model3.json",
+    "mb": 4.5,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "dafeng_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/dafeng_6/dafeng_6.model3.json",
+    "mb": 27.3,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "dafeng_7",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/dafeng_7/dafeng_7.model3.json",
+    "mb": 27.2,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "daofeng_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/daofeng_4/daofeng_4.model3.json",
+    "mb": 9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "daofeng_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/daofeng_5/daofeng_5.model3.json",
+    "mb": 23.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "daofeng_5_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/daofeng_5_hx/daofeng_5_hx.model3.json",
+    "mb": 17.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "dewenjun_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/dewenjun_2/dewenjun_2.model3.json",
+    "mb": 18.8,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "deyizhi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/deyizhi_3/deyizhi_3.model3.json",
+    "mb": 4.9,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "dujiaoshou_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/dujiaoshou_4/dujiaoshou_4.model3.json",
+    "mb": 3.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "dujiaoshou_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/dujiaoshou_6/dujiaoshou_6.model3.json",
+    "mb": 8.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "dulianglai_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/dulianglai_2/dulianglai_2.model3.json",
+    "mb": 26.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "dunkeerke_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/dunkeerke_2/dunkeerke_2.model3.json",
+    "mb": 3.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "edu_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/edu_3/edu_3.model3.json",
+    "mb": 4.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "edu_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/edu_3_hx/edu_3_hx.model3.json",
+    "mb": 3.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "edu_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/edu_4/edu_4.model3.json",
+    "mb": 7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "feiteliedadi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/feiteliedadi_3/feiteliedadi_3.model3.json",
+    "mb": 17.6,
+    "repo": "firefly-live2d-4"
   },
   {
     "name": "feiteliedadi_4",
@@ -24,10 +468,46 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "feiteliekaer_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/feiteliekaer_3/feiteliekaer_3.model3.json",
+    "mb": 30.2,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "fengyun_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/fengyun_4/fengyun_4.model3.json",
+    "mb": 8.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "fulici_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/fulici_2/fulici_2.model3.json",
+    "mb": 22,
+    "repo": "firefly-live2d-3"
+  },
+  {
     "name": "gaoxiong_7",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/gaoxiong_7/gaoxiong_7.model3.json",
     "mb": 45.2,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "geliqiya_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/geliqiya_2/geliqiya_2.model3.json",
+    "mb": 23.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "genaisennao_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/genaisennao_2/genaisennao_2.model3.json",
+    "mb": 5.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "guandao_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/guandao_2/guandao_2.model3.json",
+    "mb": 13.2,
+    "repo": "firefly-live2d-4"
   },
   {
     "name": "guandao_3",
@@ -36,10 +516,118 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "guanghui_7",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/guanghui_7/guanghui_7.model3.json",
+    "mb": 27.9,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "guangrong_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/guangrong_3/guangrong_3.model3.json",
+    "mb": 9.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "hailunna_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/hailunna_4/hailunna_4.model3.json",
+    "mb": 9.4,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "heitaizi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/heitaizi_2/heitaizi_2.model3.json",
+    "mb": 7.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "hemin_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/hemin_2/hemin_2.model3.json",
+    "mb": 8.8,
+    "repo": "firefly-live2d-4"
+  },
+  {
     "name": "hemin_3",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/hemin_3/hemin_3.model3.json",
     "mb": 5.7,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "huangjiafangzhou_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/huangjiafangzhou_3/huangjiafangzhou_3.model3.json",
+    "mb": 7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "huonululu_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/huonululu_3/huonululu_3.model3.json",
+    "mb": 3.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "huonululu_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/huonululu_5/huonululu_5.model3.json",
+    "mb": 7.8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "jialisuoniye_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/jialisuoniye_3/jialisuoniye_3.model3.json",
+    "mb": 9.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "jialisuoniye_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/jialisuoniye_3_hx/jialisuoniye_3_hx.model3.json",
+    "mb": 7.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "jialisuoniye_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/jialisuoniye_4/jialisuoniye_4.model3.json",
+    "mb": 4.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "jian_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/jian_3/jian_3.model3.json",
+    "mb": 15.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "jianwu_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/jianwu_2/jianwu_2.model3.json",
+    "mb": 23.8,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "jianye_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/jianye_2/jianye_2.model3.json",
+    "mb": 5.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "jianye_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/jianye_2_hx/jianye_2_hx.model3.json",
+    "mb": 5.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "jianye_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/jianye_3/jianye_3.model3.json",
+    "mb": 22.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "jianye_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/jianye_4/jianye_4.model3.json",
+    "mb": 19.8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "jiluofu_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/jiluofu_3/jiluofu_3.model3.json",
+    "mb": 12.9,
+    "repo": "firefly-live2d-4"
   },
   {
     "name": "jinjiang_2",
@@ -48,10 +636,124 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "jinluhao_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/jinluhao_2/jinluhao_2.model3.json",
+    "mb": 19.5,
+    "repo": "firefly-live2d-4"
+  },
+  {
     "name": "jinshi_2",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/jinshi_2/jinshi_2.model3.json",
     "mb": 42.4,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "jiuyun_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/jiuyun_2/jiuyun_2.model3.json",
+    "mb": 8.6,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "junhe_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/junhe_4/junhe_4.model3.json",
+    "mb": 10.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "junhe_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/junhe_5/junhe_5.model3.json",
+    "mb": 5.5,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "junzhu_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/junzhu_5/junzhu_5.model3.json",
+    "mb": 21.6,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "kalangshitade_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/kalangshitade_2/kalangshitade_2.model3.json",
+    "mb": 7.6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "kalvbudisi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/kalvbudisi_2/kalvbudisi_2.model3.json",
+    "mb": 8.5,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "kebensi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/kebensi_2/kebensi_2.model3.json",
+    "mb": 35.2,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "kelaimengsuo_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/kelaimengsuo_2/kelaimengsuo_2.model3.json",
+    "mb": 17.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "kelifulan_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/kelifulan_3/kelifulan_3.model3.json",
+    "mb": 6.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "kelifulan_8",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/kelifulan_8/kelifulan_8.model3.json",
+    "mb": 8.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "kewei_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/kewei_4/kewei_4.model3.json",
+    "mb": 18.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "kewei_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/kewei_6/kewei_6.model3.json",
+    "mb": 36.1,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "kubo_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/kubo_2/kubo_2.model3.json",
+    "mb": 4.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "kuersike_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/kuersike_2/kuersike_2.model3.json",
+    "mb": 8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "lafei",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/lafei/lafei.model3.json",
+    "mb": 3.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "lafei_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/lafei_4/lafei_4.model3.json",
+    "mb": 3.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "lafeier_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/lafeier_2/lafeier_2.model3.json",
+    "mb": 28.7,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "lafeiii_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/lafeiii_3/lafeiii_3.model3.json",
+    "mb": 28.3,
+    "repo": "firefly-live2d-2"
   },
   {
     "name": "liekexingdunII_2",
@@ -60,10 +762,172 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "lingbo",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/lingbo/lingbo.model3.json",
+    "mb": 2.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "lingbo_10",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/lingbo_10/lingbo_10.model3.json",
+    "mb": 6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "linuo_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/linuo_3/linuo_3.model3.json",
+    "mb": 8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "linuo_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/linuo_3_hx/linuo_3_hx.model3.json",
+    "mb": 6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "lisailiu_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/lisailiu_2/lisailiu_2.model3.json",
+    "mb": 8.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "lisailiu_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/lisailiu_3/lisailiu_3.model3.json",
+    "mb": 6.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "longfeng_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/longfeng_2/longfeng_2.model3.json",
+    "mb": 8.8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "longfeng_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/longfeng_2_hx/longfeng_2_hx.model3.json",
+    "mb": 7.7,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "longwu_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/longwu_2/longwu_2.model3.json",
+    "mb": 27.5,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "luoen_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/luoen_4/luoen_4.model3.json",
+    "mb": 17.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "luoma_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/luoma_2/luoma_2.model3.json",
+    "mb": 23.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "lupuleixite_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/lupuleixite_2/lupuleixite_2.model3.json",
+    "mb": 23.7,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "luyijiushi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/luyijiushi_2/luyijiushi_2.model3.json",
+    "mb": 8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "lvzuofu_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/lvzuofu_2/lvzuofu_2.model3.json",
+    "mb": 8.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "maliluosi_3_doa",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/maliluosi_3_doa/maliluosi_3_doa.model3.json",
+    "mb": 29,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "masaina_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/masaina_2/masaina_2.model3.json",
+    "mb": 24.6,
+    "repo": "firefly-live2d-3"
+  },
+  {
     "name": "meikelunbao_2",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/meikelunbao_2/meikelunbao_2.model3.json",
     "mb": 36.8,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "meiyinci_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/meiyinci_3/meiyinci_3.model3.json",
+    "mb": 27.3,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "mingshi",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/mingshi/mingshi.model3.json",
+    "mb": 1.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "mojiaduoer_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/mojiaduoer_2/mojiaduoer_2.model3.json",
+    "mb": 16.8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "mojiaduoer_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/mojiaduoer_3/mojiaduoer_3.model3.json",
+    "mb": 27.4,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "nabulesi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/nabulesi_2/nabulesi_2.model3.json",
+    "mb": 27.1,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "naximofu_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/naximofu_2/naximofu_2.model3.json",
+    "mb": 25.2,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "nengdai_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/nengdai_2/nengdai_2.model3.json",
+    "mb": 7.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "ninghai_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/ninghai_4/ninghai_4.model3.json",
+    "mb": 5.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "ougen_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/ougen_5/ougen_5.model3.json",
+    "mb": 8.1,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "ougen_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/ougen_6/ougen_6.model3.json",
+    "mb": 7.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "ougen_6_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/ougen_6_hx/ougen_6_hx.model3.json",
+    "mb": 5.9,
+    "repo": "firefly-live2d-5"
   },
   {
     "name": "ougen_8",
@@ -72,10 +936,172 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "ouruola_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/ouruola_4/ouruola_4.model3.json",
+    "mb": 7.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "pinghai_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/pinghai_4/pinghai_4.model3.json",
+    "mb": 5.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "pinghai_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/pinghai_6/pinghai_6.model3.json",
+    "mb": 7.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "pizibao_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/pizibao_2/pizibao_2.model3.json",
+    "mb": 22.1,
+    "repo": "firefly-live2d-3"
+  },
+  {
     "name": "qianjian_2",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/qianjian_2/qianjian_2.model3.json",
     "mb": 51.7,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "qianwei_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/qianwei_2/qianwei_2.model3.json",
+    "mb": 21.5,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "qibolin_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/qibolin_2/qibolin_2.model3.json",
+    "mb": 6.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "qiershazhi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/qiershazhi_2/qiershazhi_2.model3.json",
+    "mb": 25.8,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "qisheng_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/qisheng_2/qisheng_2.model3.json",
+    "mb": 14,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "qiye_10",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/qiye_10/qiye_10.model3.json",
+    "mb": 36.1,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "qiye_7",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/qiye_7/qiye_7.model3.json",
+    "mb": 7.6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "qiye_7_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/qiye_7_hx/qiye_7_hx.model3.json",
+    "mb": 6.6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "qiye_9",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/qiye_9/qiye_9.model3.json",
+    "mb": 26.5,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "rangbaer_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/rangbaer_3/rangbaer_3.model3.json",
+    "mb": 5.6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "rangbaer_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/rangbaer_4/rangbaer_4.model3.json",
+    "mb": 9.4,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "rangbaer_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/rangbaer_5/rangbaer_5.model3.json",
+    "mb": 26.7,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "shengluy2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/shengluy2/shengluyisi_5.model3.json",
+    "mb": 20.5,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "shengluyisi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/shengluyisi_2/shengluyisi_2.model3.json",
+    "mb": 4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "shengluyisi_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/shengluyisi_2_hx/shengluyisi_2_hx.model3.json",
+    "mb": 3.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "shengluyisi_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/shengluyisi_2_hx_2/shengluyisi_2_hx.model3.json",
+    "mb": 3.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "shengluyisi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/shengluyisi_3/shengluyisi_3.model3.json",
+    "mb": 5.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "shengluyisi_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/shengluyisi_4/shengluyisi_4.model3.json",
+    "mb": 4.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "shengluyisi_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/shengluyisi_5/shengluyisi_5.model3.json",
+    "mb": 20.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "shi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/shi_2/shi_2.model3.json",
+    "mb": 26.5,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "shitelasai_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/shitelasai_2/shitelasai_2.model3.json",
+    "mb": 9.2,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "sipeibojue_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/sipeibojue_5/sipeibojue_5.model3.json",
+    "mb": 4.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "sitelasibao_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/sitelasibao_2/sitelasibao_2.model3.json",
+    "mb": 24.8,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "sitelasibao_2_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/sitelasibao_2_hx/sitelasibao_2_hx.model3.json",
+    "mb": 24.8,
+    "repo": "firefly-live2d-3"
   },
   {
     "name": "siwanshi_3",
@@ -84,10 +1110,148 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "suweiaitongmeng_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/suweiaitongmeng_2/suweiaitongmeng_2.model3.json",
+    "mb": 13.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
     "name": "suweiaitongmeng_3",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/suweiaitongmeng_3/suweiaitongmeng_3.model3.json",
     "mb": 69,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "taiyuan_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/taiyuan_2/taiyuan_2.model3.json",
+    "mb": 3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "telafaerjia_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/telafaerjia_2/telafaerjia_2.model3.json",
+    "mb": 19.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "tiancheng_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/tiancheng_3/tiancheng_3.model3.json",
+    "mb": 9.4,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "tiancheng_cv_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/tiancheng_cv_2/tiancheng_cv_2.model3.json",
+    "mb": 24.9,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "tianlangxing_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/tianlangxing_3/tianlangxing_3.model3.json",
+    "mb": 4.1,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "tianlangxing_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/tianlangxing_5/tianlangxing_5.model3.json",
+    "mb": 23,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "tierbici_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/tierbici_2/tierbici_2.model3.json",
+    "mb": 4.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "weineituo_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/weineituo_2/weineituo_2.model3.json",
+    "mb": 10.4,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "weixi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/weixi_2/weixi_2.model3.json",
+    "mb": 9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "weiyan_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/weiyan_2/weiyan_2.model3.json",
+    "mb": 3.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "weiyan_4_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/weiyan_4_hx/weiyan_4_hx.model3.json",
+    "mb": 7.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "weiyan_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/weiyan_6/weiyan_6.model3.json",
+    "mb": 5.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "weizhang_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/weizhang_3/weizhang_3.model3.json",
+    "mb": 19.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "wuerlixi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/wuerlixi_2/wuerlixi_2.model3.json",
+    "mb": 7.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "wuerlixi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/wuerlixi_3/wuerlixi_3.model3.json",
+    "mb": 13.7,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "wuqi_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/wuqi_2/wuqi_2.model3.json",
+    "mb": 6.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "wuqi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/wuqi_3/wuqi_3.model3.json",
+    "mb": 28.2,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "wuqi_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/wuqi_3_hx/wuqi_3_hx.model3.json",
+    "mb": 28.2,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "wuzang_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/wuzang_3/wuzang_3.model3.json",
+    "mb": 34.6,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "xiafei_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/xiafei_4/xiafei_4.model3.json",
+    "mb": 20.3,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "xianghe_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/xianghe_2/xianghe_2.model3.json",
+    "mb": 7.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "xingdengbao_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/xingdengbao_2/xingdengbao_2.model3.json",
+    "mb": 12.9,
+    "repo": "firefly-live2d-4"
   },
   {
     "name": "xingdengbao_3",
@@ -96,10 +1260,118 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "xinnong_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/xinnong_3/xinnong_3.model3.json",
+    "mb": 21.9,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "xinnong_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/xinnong_3_hx/xinnong_3_hx.model3.json",
+    "mb": 15.5,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "xinnong_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/xinnong_4/xinnong_4.model3.json",
+    "mb": 21.4,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "xinnong_5",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/xinnong_5/xinnong_5.model3.json",
+    "mb": 29.4,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "xinnong_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/xinnong_6/xinnong_6.model3.json",
+    "mb": 31.1,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "xinzexi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/xinzexi_3/xinzexi_3.model3.json",
+    "mb": 24.4,
+    "repo": "firefly-live2d-3"
+  },
+  {
     "name": "xinzexi_5",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/xinzexi_5/xinzexi_5.model3.json",
     "mb": 41.1,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "xixuegui_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/xixuegui_4/xixuegui_4.model3.json",
+    "mb": 5.4,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "xuefeng",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/xuefeng/xuefeng.model3.json",
+    "mb": 2.2,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "xuefeng_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/xuefeng_3/xuefeng_3.model3.json",
+    "mb": 4.3,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "xukufu_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/xukufu_2/xukufu_2.model3.json",
+    "mb": 3.8,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "xukufu_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/xukufu_3/xukufu_3.model3.json",
+    "mb": 9.6,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "xukufu_3_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/xukufu_3_hx/xukufu_3_hx.model3.json",
+    "mb": 9.6,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "yanusi_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/yanusi_3/yanusi_3.model3.json",
+    "mb": 8.9,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "yibei_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/yibei_3/yibei_3.model3.json",
+    "mb": 31.7,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "yichui_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/yichui_2/yichui_2.model3.json",
+    "mb": 8.4,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "yilishabai_6",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/yilishabai_6/yilishabai_6.model3.json",
+    "mb": 10.8,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "yingrui_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/yingrui_3/yingrui_3.model3.json",
+    "mb": 8.3,
+    "repo": "firefly-live2d-4"
+  },
+  {
+    "name": "yingxianzuo_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/yingxianzuo_3/yingxianzuo_3.model3.json",
+    "mb": 14.1,
+    "repo": "firefly-live2d-4"
   },
   {
     "name": "yuanchou_3",
@@ -108,10 +1380,82 @@
     "repo": "firefly-live2d-1"
   },
   {
+    "name": "yuekechengII_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/yuekechengII_3/yuekechengII_3.model3.json",
+    "mb": 35.2,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "yunxian_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/yunxian_2/yunxian_2.model3.json",
+    "mb": 22.3,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "yunxian_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/yunxian_3/yunxian_3.model3.json",
+    "mb": 23.4,
+    "repo": "firefly-live2d-3"
+  },
+  {
+    "name": "z13_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/z13_2/z13_2.model3.json",
+    "mb": 30.6,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "z23",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/z23/z23.model3.json",
+    "mb": 1.9,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "z23_hx",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/z23_hx/z23_hx.model3.json",
+    "mb": 1.6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "z46_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/z46_2/z46_2.model3.json",
+    "mb": 6.6,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "z46_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/z46_3/z46_3.model3.json",
+    "mb": 4.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "z46_4",
+    "url": "https://lkerylm.github.io/firefly-live2d-5/models/z46_4/z46_4.model3.json",
+    "mb": 7.7,
+    "repo": "firefly-live2d-5"
+  },
+  {
+    "name": "zengkehaijunshangjiang_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-2/models/zengkehaijunshangjiang_2/zengkehaijunshangjiang_2.model3.json",
+    "mb": 26.6,
+    "repo": "firefly-live2d-2"
+  },
+  {
+    "name": "zhala_2",
+    "url": "https://lkerylm.github.io/firefly-live2d-3/models/zhala_2/zhala_2.model3.json",
+    "mb": 22.6,
+    "repo": "firefly-live2d-3"
+  },
+  {
     "name": "zhangwu_2",
     "url": "https://lkerylm.github.io/firefly-live2d-1/models/zhangwu_2/zhangwu_2.model3.json",
     "mb": 39.1,
     "repo": "firefly-live2d-1"
+  },
+  {
+    "name": "zhaohe_3",
+    "url": "https://lkerylm.github.io/firefly-live2d-4/models/zhaohe_3/zhaohe_3.model3.json",
+    "mb": 20.2,
+    "repo": "firefly-live2d-4"
   },
   {
     "name": "zhenzhuhao_2",

@@ -350,11 +350,14 @@ const size = config.size || { width: 600, height: 700 };
 			const idx = pool.indexOf(url);
 			const ok = await loadFrom(idx);
 			if (ok) {
+				pinnedModel = true;
 				try { localStorage.setItem(MODEL_KEY, url); } catch (e) {}
 				setModelStatus("已切换到 " + (name || "所选模型"));
 				if (modelPanel) modelPanel.style.display = "none";
 			} else {
-				setModelStatus("载入失败，换一个试试");
+				setModelStatus(isRemoteUrl(url)
+					? "载入失败：模型资源下载超时（网络较慢或被拦截），换一个试试"
+					: "载入失败，换一个试试");
 			}
 		}
 
@@ -376,6 +379,7 @@ const size = config.size || { width: 600, height: 700 };
 			}
 			if (modelDefaultBtn) {
 				modelDefaultBtn.addEventListener("click", () => {
+					pinnedModel = false;
 					try { localStorage.removeItem(MODEL_KEY); } catch (e) {}
 					setModelStatus("已恢复默认");
 					if (modelPanel) modelPanel.style.display = "none";
@@ -400,6 +404,8 @@ const size = config.size || { width: 600, height: 700 };
 		let currentIdx = -1;
 		let lastClickTime = 0;
 		let loading = false;
+		let pinnedModel = false;
+		let failedUrls = new Set();
 		let clickTimer = null;
 		let isFullscreen = false;
 		let fullscreenDone = false;
@@ -497,28 +503,64 @@ const size = config.size || { width: 600, height: 700 };
 			} catch (e) {}
 		}
 
+		function isRemoteUrl(u) {
+			try { return new URL(u, location.href).origin !== location.origin; } catch (e) { return false; }
+		}
+
+		// 包一层超时：远端模型放在 GitHub Pages，弱网/被墙时会一直挂着不 resolve，
+		// 没有超时的话 loading 永远为 true，看板娘就再也不出来了。
+		function withTimeout(promise, ms, onLate) {
+			return new Promise((resolve, reject) => {
+				let done = false;
+				const timer = setTimeout(() => {
+					if (done) return;
+					done = true;
+					reject(new Error("timeout " + ms + "ms"));
+					Promise.resolve(promise).then(
+						(v) => { try { onLate && onLate(v); } catch (e) {} },
+						() => {}
+					);
+				}, ms);
+				Promise.resolve(promise).then(
+					(v) => { if (done) return; done = true; clearTimeout(timer); resolve(v); },
+					(e) => { if (done) return; done = true; clearTimeout(timer); reject(e); }
+				);
+			});
+		}
+
 		async function tryLoad(idx) {
 			if (loading) return false;
 			if (!PIXI || !PIXI.live2d || !pool.length) return false;
 			if (idx < 0 || idx >= pool.length) return false;
 			loading = true;
-			if (model) {
-				try { app.stage.removeChild(model); } catch (e) {}
-				try { model.destroy(); } catch (e) {}
-				model = null;
-			}
+			const src = pool[idx];
+			// 已经超时/失败的模型不再重试，否则每次“换一个”都会白等 15~25 秒
+			if (failedUrls.has(src)) return false;
+			const remote = isRemoteUrl(src);
+			const timeoutMs = remote ? 25000 : 15000;
 			try {
-				model = await PIXI.live2d.Live2DModel.from(pool[idx]);
+				// 远端模型的贴图是跨域的，不加 crossOrigin 会污染 canvas，WebGL 上传贴图时抛 SecurityError
+				const next = await withTimeout(
+					PIXI.live2d.Live2DModel.from(src, { crossOrigin: "anonymous" }),
+					timeoutMs,
+					(late) => { try { late.destroy(); } catch (e) {} }
+				);
+				const prev = model;
+				model = next;
 				currentIdx = idx;
-				console.log("[live2d] loaded:", pool[idx]);
+				console.log("[live2d] loaded:", src);
 				app.stage.addChild(model);
 				layout();
 				try { model.motion("idle"); } catch (e) {}
+				// 新模型就绪后再释放旧模型，避免加载失败时看板娘直接消失
+				if (prev) {
+					try { app.stage.removeChild(prev); } catch (e) {}
+					try { prev.destroy(); } catch (e) {}
+				}
 				loading = false;
 				return true;
 			} catch (e) {
-				console.warn("[live2d] load failed:", pool[idx], e);
-				model = null;
+				console.warn("[live2d] load failed:", src, e && e.message ? e.message : e);
 				loading = false;
 				return false;
 			}
@@ -563,7 +605,8 @@ const size = config.size || { width: 600, height: 700 };
 				}
 				hideLoading();
 				if (!model) { console.log("[live2d] 手机加载超时"); return; }
-			} else {
+			} else if (!pinnedModel) {
+				// 用户没有在模型库里固定过模型时，开场随机展示一个；固定过就尊重用户选择
 				const targetIdx = pickRandom();
 				if (targetIdx !== currentIdx) await loadFrom(targetIdx);
 			}
@@ -707,6 +750,7 @@ const size = config.size || { width: 600, height: 700 };
 			// 记住用户上次在模型库里选的模型；没有则用默认池（流萤）
 			let savedModel = null;
 			try { savedModel = localStorage.getItem(MODEL_KEY); } catch (e) {}
+			pinnedModel = !!savedModel;
 			if (savedModel && pool.indexOf(savedModel) === -1) pool.push(savedModel);
 
 			await loadFrom(savedModel ? pool.indexOf(savedModel) : pickRandom());
