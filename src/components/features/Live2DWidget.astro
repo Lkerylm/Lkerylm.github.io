@@ -295,6 +295,10 @@ const size = config.size || { width: 600, height: 700 };
 		const CATALOG_URL = "/models-catalog.json";
 		// 官方免费素材（Live2D Inc. 示例模型，依 Live2D Free Material License 通过网页加载展示）
 		const SAFE_CATALOG_URL = "/models-safe-catalog.json";
+		// 备用加速线路：GitHub Pages 在部分网络下只有 10~30KB/s，jsDelivr 的 gh 镜像通常快得多。
+		// 镜像代理的仍是本仓库 / 模型分片仓库里的同一份文件，内容不做任何改动。
+		const MIRROR_SITE = "https://fastly.jsdelivr.net/gh/Lkerylm/Lkerylm.github.io@main/public";
+		const MIRROR_GH = "https://fastly.jsdelivr.net/gh/Lkerylm/";
 		const modelBtn = document.getElementById("live2d-model-btn");
 		const modelPanel = document.getElementById("l2d-model-panel");
 		const modelSearch = document.getElementById("l2d-model-search");
@@ -344,14 +348,20 @@ const size = config.size || { width: 600, height: 700 };
 			catalogLoading = true;
 			setModelStatus("正在载入模型列表…");
 			const loadList = async (url) => {
-				try {
-					const res = await fetch(url, { cache: "force-cache" });
-					if (!res.ok) return [];
-					const data = await res.json();
-					return (Array.isArray(data) ? data : data.models || []).filter((m) => m && m.url);
-				} catch (e) {
-					return [];
-				}
+				const readList = async (target) => {
+					try {
+						const res = await fetch(target, { cache: "force-cache" });
+						if (!res.ok) return null;
+						const data = await res.json();
+						return (Array.isArray(data) ? data : data.models || []).filter((m) => m && m.url);
+					} catch (e) {
+						return null;
+					}
+				};
+				// 主站（GitHub Pages）慢或被拦截时，自动改用镜像线路再取一次
+				let list = await readList(url);
+				if (!list || !list.length) list = await readList(MIRROR_SITE + url);
+				return list || [];
 			};
 			// 官方免费素材排在最前；原有模型库内容完全保留、顺序不变
 			const [official, legacy] = await Promise.all([
@@ -403,7 +413,15 @@ const size = config.size || { width: 600, height: 700 };
 				if (open) { modelPanel.style.display = "none"; return; }
 				modelPanel.style.display = "flex";
 				const list = await ensureCatalog();
-				if (list) renderCatalog(modelSearch ? modelSearch.value : "");
+				if (list) {
+					renderCatalog(modelSearch ? modelSearch.value : "");
+					// 用户和管理都能在面板里直接看到“模型数量 + 运行库是否就绪”
+					const libReady = !!(window.PIXI && window.PIXI.live2d && window.PIXI.live2d.Live2DModel);
+					setModelStatus(
+						list.length + " 个模型可选 · " +
+						(libReady ? "运行库已就绪" : "运行库加载中，网络较慢请稍候")
+					);
+				}
 			});
 			modelPanel.addEventListener("click", (e) => e.stopPropagation());
 			document.addEventListener("click", () => {
@@ -544,6 +562,14 @@ const size = config.size || { width: 600, height: 700 };
 			try { return new URL(u, location.href).origin !== location.origin; } catch (e) { return false; }
 		}
 
+		// 模型主线路（GitHub Pages）→ 镜像线路（jsDelivr gh）的映射，取不到就返回空字符串
+		function mirrorOfModel(u) {
+			const m = /^https?:\/\/lkerylm\.github\.io\/([^\/?#]+)\/(.+)$/i.exec(u || "");
+			// firefly-live2d-safe 单仓库体积超过 jsDelivr 上限，只能走 GitHub Pages
+			if (!m || m[1] === "firefly-live2d-safe") return "";
+			return MIRROR_GH + m[1] + "@main/" + m[2];
+		}
+
 		// 包一层超时：远端模型放在 GitHub Pages，弱网/被墙时会一直挂着不 resolve，
 		// 没有超时的话 loading 永远为 true，看板娘就再也不出来了。
 		function withTimeout(promise, ms, onLate) {
@@ -575,18 +601,35 @@ const size = config.size || { width: 600, height: 700 };
 			loading = true;
 			const remote = isRemoteUrl(src);
 			// patience：用户手动选择时给的耐心更足（模型平均 16MB，弱网首屏确实要几十秒）
-			const timeoutMs = remote ? (patience ? 60000 : 25000) : 20000;
+			const timeoutMs = remote ? (patience ? 60000 : 25000) : 25000;
+			// 主线路（GitHub Pages）慢或被拦截时，同一份文件再从镜像线路取一次
+			const mirror = mirrorOfModel(src);
+			const sources = mirror ? [src, mirror] : [src];
 			try {
-				// 远端模型的贴图是跨域的，不加 crossOrigin 会污染 canvas，WebGL 上传贴图时抛 SecurityError
-				const next = await withTimeout(
-					PIXI.live2d.Live2DModel.from(src, { crossOrigin: "anonymous" }),
-					timeoutMs,
-					(late) => { try { late.destroy(); } catch (e) {} }
-				);
+				let next = null;
+				let usedSrc = "";
+				for (let i = 0; i < sources.length; i++) {
+					const cand = sources[i];
+					// 镜像线路是备用，超时给短一点，避免用户等太久
+					const waitMs = i === 0 ? timeoutMs : 30000;
+					try {
+						// 远端模型的贴图是跨域的，不加 crossOrigin 会污染 canvas，WebGL 上传贴图时抛 SecurityError
+						next = await withTimeout(
+							PIXI.live2d.Live2DModel.from(cand, { crossOrigin: "anonymous" }),
+							waitMs,
+							(late) => { try { late.destroy(); } catch (e) {} }
+						);
+						usedSrc = cand;
+						break;
+					} catch (err) {
+						console.warn("[live2d] source failed:", cand, err && err.message ? err.message : err);
+					}
+				}
+				if (!next) throw new Error("all sources failed");
 				const prev = model;
 				model = next;
 				currentIdx = idx;
-				console.log("[live2d] loaded:", src);
+				console.log("[live2d] loaded:", usedSrc === src ? "primary" : "mirror", src);
 				failedUrls.delete(src);
 				app.stage.addChild(model);
 				layout();
@@ -696,14 +739,83 @@ const size = config.size || { width: 600, height: 700 };
 			}, 600);
 		}
 
+		// ===== 加载状态提示 + 备用线路自救 =====
+		let bootTip = null;
+		function showBootTip(text) {
+			if (!bootTip) {
+				bootTip = document.createElement("div");
+				bootTip.id = "l2d-boot-tip";
+				bootTip.style.cssText =
+					"position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);" +
+					"z-index:1000002;padding:9px 18px;border-radius:999px;pointer-events:none;" +
+					"background:rgba(20,20,30,0.86);border:1px solid rgba(255,154,200,0.45);" +
+					"color:#fff;font-size:12.5px;font-family:inherit;backdrop-filter:blur(12px);" +
+					"opacity:0;transition:opacity .4s ease,transform .4s ease;max-width:86vw;text-align:center;";
+				document.body.appendChild(bootTip);
+			}
+			bootTip.textContent = text;
+			bootTip.style.opacity = "1";
+			bootTip.style.transform = "translateX(-50%) translateY(0)";
+		}
+		function hideBootTip() {
+			if (!bootTip) return;
+			bootTip.style.opacity = "0";
+			bootTip.style.transform = "translateX(-50%) translateY(12px)";
+		}
+
+		function injectScript(src) {
+			return new Promise((resolve, reject) => {
+				const s = document.createElement("script");
+				s.src = src;
+				s.async = false;
+				s.onload = () => resolve(true);
+				s.onerror = () => reject(new Error("script error: " + src));
+				document.head.appendChild(s);
+				setTimeout(() => reject(new Error("script timeout: " + src)), 60000);
+			});
+		}
+
+		// 主线路（GitHub Pages）迟迟拉不到运行库时，自动换镜像线路再试，
+		// 否则一旦超过等待时间，看板娘就永远不会出现（用户看到的就是“没加载出来”）。
+		let libRescueStarted = false;
+		async function rescueLibs() {
+			if (libRescueStarted) return;
+			libRescueStarted = true;
+			const base = MIRROR_SITE + "/Firefly-live2d-main/load/";
+			showBootTip("主线路较慢，正在切换备用加速线路…");
+			try {
+				if (!window.Live2DCubismCore) await injectScript(base + "live2dcubismcore.min.js");
+				if (!window.PIXI) await injectScript(base + "pixi.min.js");
+				if (!(window.PIXI && window.PIXI.live2d && window.PIXI.live2d.Live2DModel)) {
+					await injectScript(base + "cubism4.min.js");
+				}
+				// 极端情况下主线路的 pixi 后到会把 window.PIXI 换掉，这里补一次
+				if (window.PIXI && !window.PIXI.live2d) await injectScript(base + "cubism4.min.js");
+				console.log("[live2d] 备用线路加载完成");
+			} catch (e) {
+				console.warn("[live2d] 备用线路加载失败", e && e.message ? e.message : e);
+				showBootTip("Live2D 资源加载失败，请检查网络后刷新页面");
+				setTimeout(hideBootTip, 6000);
+			}
+		}
+
 		function waitForPixi(cb, timeout) {
-			const maxWait = isMobile ? 60000 : (timeout || 15000);
+			// GitHub Pages 在国内可能要 15~40 秒才把 pixi/core/cubism 拉完，
+			// 之前桌面端只等 15 秒，超时就直接放弃 —— 看板娘自然“永远不出现”。
+			const maxWait = timeout || (isMobile ? 120000 : 90000);
 			const start = Date.now();
+			let tipShown = false;
 			const t = setInterval(() => {
 				if (typeof PIXI !== "undefined" && PIXI.live2d) {
-					clearInterval(t); cb();
+					clearInterval(t);
+					hideBootTip();
+					cb();
 				} else if (Date.now() - start > maxWait) {
 					clearInterval(t);
+					hideBootTip();
+				} else if (!tipShown && Date.now() - start > 6000) {
+					tipShown = true;
+					showBootTip("Live2D 正在加载…首次可能需要 30~60 秒");
 				}
 			}, 100);
 		}
@@ -883,10 +995,15 @@ const size = config.size || { width: 600, height: 700 };
 		const timer = setInterval(() => {
 			if (typeof PIXI !== "undefined" && PIXI.live2d) {
 				clearInterval(timer);
+				hideBootTip();
 				init();
 			}
 		}, 200);
-		// 慢网络下 pixi/cubism 脚本可能要十几秒才就绪，给足 60 秒，避免直接放弃导致没有看板娘
-		setTimeout(() => clearInterval(timer), 60000);
+		// 慢网络下 pixi/cubism 脚本可能要几十秒才就绪：
+		// 8 秒还没影子就自动切备用镜像，最多等 3 分钟，避免时间一到看板娘就永远不出现。
+		setTimeout(() => {
+			if (!(window.PIXI && window.PIXI.live2d && window.PIXI.live2d.Live2DModel)) rescueLibs();
+		}, 8000);
+		setTimeout(() => clearInterval(timer), 180000);
 	})();
 </script>
