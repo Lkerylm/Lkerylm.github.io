@@ -347,6 +347,8 @@ const size = config.size || { width: 600, height: 700 };
 			if (!url || loading) return;
 			setModelStatus("正在载入 " + (name || "模型") + "…（首次加载需要下载资源）");
 			if (pool.indexOf(url) === -1) pool.push(url);
+			// 用户手动重选同一个模型时允许重试（之前可能是网络抖动导致的失败）
+			failedUrls.delete(url);
 			const idx = pool.indexOf(url);
 			const ok = await loadFrom(idx);
 			if (ok) {
@@ -549,6 +551,7 @@ const size = config.size || { width: 600, height: 700 };
 				model = next;
 				currentIdx = idx;
 				console.log("[live2d] loaded:", src);
+				failedUrls.delete(src);
 				app.stage.addChild(model);
 				layout();
 				try { model.motion("idle"); } catch (e) {}
@@ -561,6 +564,7 @@ const size = config.size || { width: 600, height: 700 };
 				return true;
 			} catch (e) {
 				console.warn("[live2d] load failed:", src, e && e.message ? e.message : e);
+				failedUrls.add(src);
 				loading = false;
 				return false;
 			}
@@ -753,7 +757,13 @@ const size = config.size || { width: 600, height: 700 };
 			pinnedModel = !!savedModel;
 			if (savedModel && pool.indexOf(savedModel) === -1) pool.push(savedModel);
 
-			await loadFrom(savedModel ? pool.indexOf(savedModel) : pickRandom());
+			const initialIdx = savedModel ? pool.indexOf(savedModel) : pickRandom();
+			const okInit = await loadFrom(initialIdx);
+			// 上次选的模型这次没加载成功（下载超时/被拦截）：清掉记录，下次直接用默认模型，不再白等
+			if (savedModel && (!okInit || currentIdx !== pool.indexOf(savedModel))) {
+				try { localStorage.removeItem(MODEL_KEY); } catch (e) {}
+				pinnedModel = false;
+			}
 
 			widget.style.display = "block";
 
