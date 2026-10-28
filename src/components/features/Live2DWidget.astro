@@ -99,7 +99,7 @@ const size = config.size || { width: 600, height: 700 };
 	display: none; align-items: center; justify-content: center;
 	transition: opacity 0.6s ease;
 ">
-	<video id="l2d-welcome-video" src="/welcome.mp4" playsinline preload="auto"
+	<video id="l2d-welcome-video" src="/welcome.mp4" playsinline preload="metadata"
 		style="max-width: 100%; max-height: 100%; object-fit: contain;"></video>
 	<button id="l2d-video-skip" style="
 		position: absolute; top: 24px; right: 24px;
@@ -477,8 +477,18 @@ const size = config.size || { width: 600, height: 700 };
 				const isFirstVisit = !sessionStorage.getItem(VISITED_KEY);
 				sessionStorage.setItem(VISITED_KEY, "1");
 
-				if (isFirstVisit) {
+				// 弱网 / 省流模式直接跳过开场视频：4.6MB 视频会挤占带宽，导致 Live2D 迟迟不出现
+				const conn = navigator.connection || {};
+				const slowNet = !!conn.saveData || /(^|-)(slow-)?2g$|(^|-)3g$/.test(conn.effectiveType || "");
+
+				if (isFirstVisit && !slowNet) {
 					videoWrap.style.display = "flex";
+					// 兜底：视频 8 秒内仍未真正开始播放，就直接跳过，避免整站被视频盖住
+					const videoWatchdog = setTimeout(() => {
+						try { videoEl.pause(); } catch (e) {}
+						finishVideo();
+					}, 8000);
+					videoEl.addEventListener("playing", () => clearTimeout(videoWatchdog), { once: true });
 					videoEl.addEventListener("ended", finishVideo);
 					videoSkip.addEventListener("click", () => {
 						videoEl.pause();
@@ -539,9 +549,12 @@ const size = config.size || { width: 600, height: 700 };
 				resolution: Math.min(window.devicePixelRatio || 1, 2),
 			});
 
+			// 先显示容器，模型（贴图 5MB）加载期间也能看到位置，避免"什么都没有"
+			widget.style.display = "block";
+
 			await loadFrom(pickRandom());
 
-			if (!isMobile) widget.style.display = "block";
+			widget.style.display = "block";
 
 			document.addEventListener("mousemove", (e) => {
 				mouseTargetX = (e.clientX / window.innerWidth) * 2 - 1;
@@ -622,6 +635,7 @@ const size = config.size || { width: 600, height: 700 };
 				init();
 			}
 		}, 200);
-		setTimeout(() => clearInterval(timer), 15000);
+		// 慢网络下 pixi/cubism 脚本可能要十几秒才就绪，给足 60 秒，避免直接放弃导致没有看板娘
+		setTimeout(() => clearInterval(timer), 60000);
 	})();
 </script>
