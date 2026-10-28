@@ -74,6 +74,18 @@ const size = config.size || { width: 600, height: 700 };
 		">默认</button>
 	</div>
 	<div id="l2d-model-list" style="flex: 1; overflow-y: auto; padding: 6px;"></div>
+	<div style="
+		padding: 7px 12px 8px; font-size: 10.5px; line-height: 1.55;
+		color: rgba(255,255,255,0.42);
+		border-top: 1px solid rgba(255,255,255,0.1);
+	">
+		标注「官方」的模型为 <b style="color:rgba(255,255,255,0.62);font-weight:600;">Live2D Inc.</b>
+		公开示例素材，版权归 Live2D Inc. 所有，依
+		<a href="https://www.live2d.com/eula/live2d-free-material-license-agreement_cn.html"
+			target="_blank" rel="noopener noreferrer"
+			style="color:#ffb3d9;text-decoration:none;">Live2D Free Material License</a>
+		仅通过浏览器加载展示，本站不提供素材文件下载。
+	</div>
 	<div id="l2d-model-status" style="
 		display: none; padding: 8px 12px; font-size: 12px;
 		color: rgba(255,255,255,0.65);
@@ -281,6 +293,8 @@ const size = config.size || { width: 600, height: 700 };
 		// ===== 模型库面板（远端 250 个模型，托管在 GitHub Pages 分片仓库） =====
 		const MODEL_KEY = "l2d_model_url";
 		const CATALOG_URL = "/models-catalog.json";
+		// 官方免费素材（Live2D Inc. 示例模型，依 Live2D Free Material License 通过网页加载展示）
+		const SAFE_CATALOG_URL = "/models-safe-catalog.json";
 		const modelBtn = document.getElementById("live2d-model-btn");
 		const modelPanel = document.getElementById("l2d-model-panel");
 		const modelSearch = document.getElementById("l2d-model-search");
@@ -307,7 +321,7 @@ const size = config.size || { width: 600, height: 700 };
 				const item = document.createElement("button");
 				item.type = "button";
 				item.dataset.url = m.url;
-				item.textContent = m.name + "  ·  " + (m.mb || 0) + "MB";
+				item.textContent = m.name + "  ·  " + (m.mb || 0) + "MB" + (m.lic ? "  ·  官方" : "");
 				item.style.cssText =
 					"display:block;width:100%;text-align:left;padding:7px 10px;margin:0 0 4px;" +
 					"background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);" +
@@ -329,17 +343,32 @@ const size = config.size || { width: 600, height: 700 };
 			if (catalogLoading) return null;
 			catalogLoading = true;
 			setModelStatus("正在载入模型列表…");
-			try {
-				const res = await fetch(CATALOG_URL, { cache: "force-cache" });
-				const data = await res.json();
-				catalog = (Array.isArray(data) ? data : data.models || []).filter((m) => m && m.url);
-			} catch (e) {
-				setModelStatus("模型列表加载失败：" + (e && e.message ? e.message : e));
+			const loadList = async (url) => {
+				try {
+					const res = await fetch(url, { cache: "force-cache" });
+					if (!res.ok) return [];
+					const data = await res.json();
+					return (Array.isArray(data) ? data : data.models || []).filter((m) => m && m.url);
+				} catch (e) {
+					return [];
+				}
+			};
+			// 官方免费素材排在最前；原有模型库内容完全保留、顺序不变
+			const [official, legacy] = await Promise.all([
+				loadList(SAFE_CATALOG_URL),
+				loadList(CATALOG_URL),
+			]);
+			if (!official.length && !legacy.length) {
+				setModelStatus("模型列表加载失败：请检查网络后重试");
 				catalogLoading = false;
 				return null;
 			}
+			catalog = official.concat(legacy);
 			catalogLoading = false;
-			setModelStatus(catalog.length + " 个模型可选");
+			setModelStatus(
+				catalog.length + " 个模型可选" +
+				(official.length ? "（含 " + official.length + " 个 Live2D 官方免费素材）" : "")
+			);
 			return catalog;
 		}
 

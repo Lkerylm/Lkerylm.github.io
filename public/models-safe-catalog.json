@@ -1,0 +1,149 @@
+[
+  {
+    "name": "Epsilon 艾普西隆（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/epsilon/Epsilon.model3.json",
+    "mb": 2.6,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Epsilon（免费版）（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/epsilon_free/Epsilon_free.model3.json",
+    "mb": 2.8,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Gantzert Felixander（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/gantzert_felixander/Gantzert_Felixander.model3.json",
+    "mb": 13.8,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Haru 春（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/haru/haru.model3.json",
+    "mb": 5.9,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Haru Greeter 迎宾春（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/haru_greeter_t05/haru_greeter_t05.model3.json",
+    "mb": 3.4,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Haruto 阳斗（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/haruto/haruto.model3.json",
+    "mb": 1.5,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Hibiki 响（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/hibiki/hibiki.model3.json",
+    "mb": 4,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Hijiki 羊栖菜（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/hijiki/hijiki.model3.json",
+    "mb": 1.3,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Kei 圭（基础版）（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/kei_basic_free/kei_basic_free.model3.json",
+    "mb": 12.9,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Kei 圭（元音版）（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/kei_vowels_pro/kei_vowels_pro.model3.json",
+    "mb": 12.9,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Koharu 小春（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/koharu/koharu.model3.json",
+    "mb": 1.8,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Mao 真央（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/mao_pro/mao_pro.model3.json",
+    "mb": 8.9,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Mark 马克（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/mark_free_t04/mark_free_t04.model3.json",
+    "mb": 0.7,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Miara 米亚拉（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/miara_pro_t03/miara_pro_t03.model3.json",
+    "mb": 13.5,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "ni-j（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/ni-j/ni-j.model3.json",
+    "mb": 11.2,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Ren 莲（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/ren/ren.model3.json",
+    "mb": 5.1,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Rice 米饭（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/rice_pro_t03/rice_pro_t03.model3.json",
+    "mb": 3,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Shizuku 雫（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/shizuku/shizuku.model3.json",
+    "mb": 5,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Simple 简易示例（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/simple/simple.model3.json",
+    "mb": 0.2,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Tororo 山药泥（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/tororo/tororo.model3.json",
+    "mb": 1.3,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "wanko_touch（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/wanko_touch/wanko_touch.model3.json",
+    "mb": 0.8,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  }
+]
