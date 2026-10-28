@@ -12,9 +12,9 @@ permissions:
   contents: write
 
 # 站点地址：仓库 Settings → Secrets and variables → Actions → Variables 里新增 SITE_URL
-# 例如 https://你的用户名.github.io 或 https://你的域名
-# 注意：本工作流只适用于「用户名.github.io」仓库或绑定了自定义域名的 Pages；
-#       普通项目仓库（/仓库名/ 路径）请改用 Vercel 部署，见 DEPLOY.md
+# 当前值：https://lkerylm.github.io （仓库名必须是「用户名.github.io」才会落在根路径）
+# 注意：本工作流适用于「用户名.github.io」仓库或绑定了自定义域名的 Pages；
+#       普通项目仓库（/仓库名/ 路径）请改用 Vercel / Netlify 部署，见 DEPLOY.md
 env:
   SITE_URL: ${{ vars.SITE_URL }}
 

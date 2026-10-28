@@ -12,7 +12,22 @@ pnpm preview    # 本地预览 http://localhost:4321
 
 `pnpm build` 会依次执行：生成图标 → `astro build` → `pagefind --site dist`。
 
-## 二、部署到 Vercel（推荐，仓库里已带 vercel.json）
+## 二、部署到 GitHub Pages（当前使用，无需任何新账号）
+
+线上地址：**<https://lkerylm.github.io/>**，全程只用 GitHub 账号，不需要 Vercel、不需要手机验证。
+
+- 仓库：`Lkerylm/Lkerylm.github.io`（仓库名必须是 `<用户名>.github.io`，这样网址落在根路径 `/`，
+  站内所有绝对路径 `/Firefly-live2d-main/...`、`/_astro/...` 都不用改）
+- 发布源：**分支 `pages` 的根目录**（Settings → Pages → Source: Deploy from a branch → `pages` / `/ (root)`）
+- 构建方式：`.github/workflows/deploy.yml` 在 push 到 `main` 后执行 `pnpm build`，
+  再用 `JamesIves/github-pages-deploy-action` 把 `dist` 推到 `pages` 分支，Pages 自动发布
+- 站点地址：Settings → Secrets and variables → Actions → **Variables** → `SITE_URL = https://lkerylm.github.io`
+  （没有它，canonical / sitemap / robots 会退回 `http://localhost:4321`）
+- 手动重跑：Actions → `Deploy to Pages Branch` → **Run workflow**
+- 换域名 / 换用户名：改 Variables 里的 `SITE_URL`，再重跑一次工作流
+
+## 三、部署到 Vercel（可选，仓库里已带 vercel.json）
+
 
 1. 把项目推到 GitHub / GitLab。
 2. 打开 <https://vercel.com/new>，选择该仓库。
@@ -25,14 +40,17 @@ pnpm preview    # 本地预览 http://localhost:4321
 > 绑定自定义域名后，**务必**把 `SITE_URL` 改成最终域名再重新部署一次，
 > 这样 canonical、sitemap、robots、JSON-LD 里的地址才是对的。
 
-## 三、部署到 Netlify / Cloudflare Pages
+## 四、部署到 Netlify / Cloudflare Pages
 
 - Netlify：Build command `pnpm build`，Publish directory `dist`，环境变量同上。
 - Cloudflare Pages：Framework preset 选 Astro，Build command `pnpm build`，Output `dist`。
 
-## 四、让 Bing 收录（只做 Bing 的完整流程）
+## 五、让 Bing 收录（只做 Bing 的完整流程）
 
-### 1. 添加站点并验证
+> **不想注册任何账号也能被收录**：直接执行 `pnpm indexnow` 即可（本项目已内置，返回 `202 Accepted`
+> 就代表 Bing 已收到）。下面的 Bing Webmaster Tools 只是用来查看收录数据、提交 sitemap，**可选**。
+
+### 1. 添加站点并验证（可选）
 
 1. 打开 <https://www.bing.com/webmasters>，用 Microsoft 账号登录；
 2. **添加网站** → 填写部署后的地址，如 `https://firefly-blog-xxxx.vercel.app`；
@@ -100,12 +118,12 @@ site:你的域名
 - 首页 `WebSite` + `SearchAction` 结构化数据；文章页 `BlogPosting` 结构化数据
 - Pagefind 站内搜索（`/search/`）
 
-## 五、内容更新
+## 六、内容更新
 
 在 `src/content/posts/` 新建 `.md` / `.mdx` 文件（参考 `welcome-to-anime-home.md` 的 frontmatter），
 提交后重新部署即可；无需数据库。
 
-## 六、关于后台 / 社区 / 登录功能
+## 七、关于后台 / 社区 / 登录功能
 
 这些功能依赖服务器 + SQLite（`node:sqlite`），已从静态构建中移出，代码完整保留在：
 
