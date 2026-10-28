@@ -579,10 +579,13 @@ const size = config.size || { width: 600, height: 700 };
 
 		async function loadFrom(startIdx, patience) {
 			const total = isMobile ? Math.min(pool.length, 5) : Math.min(pool.length, 20);
+			// 总时限：极端慢网下逐个尝试会拖到几分钟，这里兜底，超时就放弃（旧模型仍在）
+			const deadline = Date.now() + (patience ? 75000 : 50000);
 			let i = startIdx;
 			for (let n = 0; n < total; n++) {
 				// 只有用户选中的那个模型享受耐心值，后续回落的模型用默认超时
 				if (await tryLoad(i, patience && n === 0)) return true;
+				if (Date.now() > deadline) break;
 				i = (i + 1) % pool.length;
 			}
 			return false;
