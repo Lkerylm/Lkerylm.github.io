@@ -345,21 +345,25 @@ const size = config.size || { width: 600, height: 700 };
 
 		async function selectModel(url, name) {
 			if (!url || loading) return;
-			setModelStatus("正在载入 " + (name || "模型") + "…（首次加载需要下载资源）");
+			setModelStatus("正在载入 " + (name || "模型") + "…（首次加载需下载资源，大模型可能要几十秒）");
 			if (pool.indexOf(url) === -1) pool.push(url);
 			// 用户手动重选同一个模型时允许重试（之前可能是网络抖动导致的失败）
 			failedUrls.delete(url);
 			const idx = pool.indexOf(url);
-			const ok = await loadFrom(idx);
-			if (ok) {
+			// 手动选择由用户主动等待，给更长的耐心值
+			const ok = await loadFrom(idx, true);
+			// 只有真的切到用户选的模型才算成功；回落到其它模型时不能把它写进 localStorage
+			const applied = ok && pool[currentIdx] === url;
+			if (applied) {
 				pinnedModel = true;
 				try { localStorage.setItem(MODEL_KEY, url); } catch (e) {}
 				setModelStatus("已切换到 " + (name || "所选模型"));
 				if (modelPanel) modelPanel.style.display = "none";
 			} else {
+				// 没换成：保留当前模型（旧模型不会被销毁），并提示失败原因
 				setModelStatus(isRemoteUrl(url)
-					? "载入失败：模型资源下载超时（网络较慢或被拦截），换一个试试"
-					: "载入失败，换一个试试");
+					? "“" + (name || "该模型") + "”下载超时（网络较慢或被拦截），已保留当前模型"
+					: "载入失败，已保留当前模型");
 			}
 		}
 
@@ -380,12 +384,14 @@ const size = config.size || { width: 600, height: 700 };
 				modelSearch.addEventListener("input", () => renderCatalog(modelSearch.value));
 			}
 			if (modelDefaultBtn) {
-				modelDefaultBtn.addEventListener("click", () => {
+				modelDefaultBtn.addEventListener("click", async () => {
 					pinnedModel = false;
 					try { localStorage.removeItem(MODEL_KEY); } catch (e) {}
-					setModelStatus("已恢复默认");
 					if (modelPanel) modelPanel.style.display = "none";
-					if (pool.length) loadFrom(0);
+					if (!pool.length) return;
+					setModelStatus("正在载入默认模型…");
+					const ok = await loadFrom(0);
+					setModelStatus(ok ? "已恢复默认" : "默认模型载入失败，请刷新页面重试");
 				});
 			}
 		}
@@ -530,16 +536,17 @@ const size = config.size || { width: 600, height: 700 };
 			});
 		}
 
-		async function tryLoad(idx) {
+		async function tryLoad(idx, patience) {
 			if (loading) return false;
 			if (!PIXI || !PIXI.live2d || !pool.length) return false;
 			if (idx < 0 || idx >= pool.length) return false;
-			loading = true;
 			const src = pool[idx];
 			// 已经超时/失败的模型不再重试，否则每次“换一个”都会白等 15~25 秒
 			if (failedUrls.has(src)) return false;
+			loading = true;
 			const remote = isRemoteUrl(src);
-			const timeoutMs = remote ? 25000 : 15000;
+			// patience：用户手动选择时给的耐心更足（模型平均 16MB，弱网首屏确实要几十秒）
+			const timeoutMs = remote ? (patience ? 60000 : 25000) : 20000;
 			try {
 				// 远端模型的贴图是跨域的，不加 crossOrigin 会污染 canvas，WebGL 上传贴图时抛 SecurityError
 				const next = await withTimeout(
@@ -570,11 +577,12 @@ const size = config.size || { width: 600, height: 700 };
 			}
 		}
 
-		async function loadFrom(startIdx) {
+		async function loadFrom(startIdx, patience) {
 			const total = isMobile ? Math.min(pool.length, 5) : Math.min(pool.length, 20);
 			let i = startIdx;
 			for (let n = 0; n < total; n++) {
-				if (await tryLoad(i)) return true;
+				// 只有用户选中的那个模型享受耐心值，后续回落的模型用默认超时
+				if (await tryLoad(i, patience && n === 0)) return true;
 				i = (i + 1) % pool.length;
 			}
 			return false;
