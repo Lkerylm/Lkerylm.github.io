@@ -56,6 +56,13 @@
     "lic": "Live2D Inc. - Live2D Free Material License"
   },
   {
+    "name": "Izumi 泉（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/izumi_illust/izumi_illust.model3.json",
+    "mb": 6.5,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
     "name": "Kei 圭（基础版）（官方）",
     "url": "https://lkerylm.github.io/firefly-live2d-safe/models/kei_basic_free/kei_basic_free.model3.json",
     "mb": 12.9,
@@ -98,7 +105,14 @@
     "lic": "Live2D Inc. - Live2D Free Material License"
   },
   {
-    "name": "ni-j（官方）",
+    "name": "Natori 名取（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/natori_pro_t06/natori_pro_t06.model3.json",
+    "mb": 7.6,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Nito 二兔（官方）",
     "url": "https://lkerylm.github.io/firefly-live2d-safe/models/ni-j/ni-j.model3.json",
     "mb": 11.2,
     "repo": "firefly-live2d-safe",
@@ -140,7 +154,14 @@
     "lic": "Live2D Inc. - Live2D Free Material License"
   },
   {
-    "name": "wanko_touch（官方）",
+    "name": "Tsumiki 木通（官方）",
+    "url": "https://lkerylm.github.io/firefly-live2d-safe/models/tsumiki/tsumiki.model3.json",
+    "mb": 3.7,
+    "repo": "firefly-live2d-safe",
+    "lic": "Live2D Inc. - Live2D Free Material License"
+  },
+  {
+    "name": "Wanko 小狗（官方）",
     "url": "https://lkerylm.github.io/firefly-live2d-safe/models/wanko_touch/wanko_touch.model3.json",
     "mb": 0.8,
     "repo": "firefly-live2d-safe",
