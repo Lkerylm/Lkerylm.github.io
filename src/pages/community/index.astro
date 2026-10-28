@@ -1,0 +1,87 @@
+---
+import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
+import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>社区文章 - 我的动漫小屋</title>
+  <AnimeHeadMeta />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
+      font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
+      color: #fff; padding: 40px 20px;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 26px; }
+    .sub { color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 28px; }
+    .post-list { display: flex; flex-direction: column; gap: 12px; }
+    .post-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+    .post-item:hover {
+      background: rgba(255,255,255,0.07);
+      transform: translateY(-1px);
+      border-color: rgba(255,154,200,0.3);
+    }
+    .post-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+    .post-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .empty { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
+    .links { margin-top: 32px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.5); }
+    .links a { color: #ff9ac8; text-decoration: none; margin: 0 12px; }
+  </style>
+</head>
+<body>
+  <AnimeBackdrop />
+  <div class="container">
+    <h1>社区文章</h1>
+    <div class="sub">来自用户的投稿</div>
+    <div id="list" class="empty">加载中…</div>
+    <div class="links">
+      <a href="/">首页</a>
+      <a href="/dashboard/">用户中心</a>
+      <a href="/dashboard/new/">写文章</a>
+    </div>
+  </div>
+
+  <script is:inline>
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    (async () => {
+      const res = await fetch('/api/posts/public/');
+      const data = await res.json();
+      const list = document.getElementById('list');
+
+      if (!data.ok || !data.posts || data.posts.length === 0) {
+        list.textContent = '还没有公开的文章';
+        return;
+      }
+
+      list.className = 'post-list';
+      list.innerHTML = data.posts.map(p => {
+        const date = new Date(p.created_at * 1000).toLocaleDateString('zh-CN');
+        return `<a class="post-item" href="/community/${encodeURIComponent(p.slug)}/">
+          <div class="post-title">${escapeHtml(p.title)}</div>
+          <div class="post-meta">${escapeHtml(p.author)} · ${date}</div>
+        </a>`;
+      }).join('');
+    })();
+  </script>
+</body>
+</html>

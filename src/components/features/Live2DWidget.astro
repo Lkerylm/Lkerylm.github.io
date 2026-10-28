@@ -1,0 +1,627 @@
+---
+interface Props {
+	config: any;
+}
+const { config } = Astro.props;
+const size = config.size || { width: 600, height: 700 };
+---
+
+<div
+	id="live2d-widget"
+	style={`
+		position: fixed;
+		bottom: 0px;
+		right: 0px;
+		width: ${size.width ?? 600}px;
+		height: ${size.height ?? 700}px;
+		z-index: 999999; /* 提到极高，防止被任何东西遮挡 */
+		pointer-events: auto;
+		display: none;
+	`}
+>
+	<canvas id="live2d-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+	<button
+		id="live2d-next"
+		title="换一个"
+		style={`
+			position: absolute; top: 6px; right: 6px;
+			width: 34px; height: 34px;
+			border: none; border-radius: 50%;
+			background: rgba(0, 0, 0, 0.35); color: #fff;
+			font-size: 16px; cursor: pointer; z-index: 10;
+			display: flex; align-items: center; justify-content: center;
+			opacity: 0.75; transition: all 0.2s; font-family: inherit; padding: 0;
+		`}
+	>🔄</button>
+</div>
+
+<div id="l2d-loading" style="
+	position: fixed; inset: 0; z-index: 9999999;
+	background: radial-gradient(circle at 50% 40%, #22254a 0%, #0a0b12 70%, #050609 100%);
+	display: none; align-items: center; justify-content: center; flex-direction: column;
+	transition: opacity 0.7s ease; font-family: inherit; color: #fff;
+">
+	<div style="
+		font-size: 32px; font-weight: 700; letter-spacing: 0.15em;
+		background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+		-webkit-background-clip: text; background-clip: text; color: transparent;
+		margin-bottom: 20px;
+	">coollk</div>
+	<div style="font-size: 13px; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; margin-bottom: 16px;">
+		加载中…
+	</div>
+	<div style="width: 100px; height: 2px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;">
+		<div style="
+			width: 40%; height: 100%;
+			background: linear-gradient(90deg, #ff9ac8, #a78bfa);
+			animation: l2d-loading-anim 1.6s ease-in-out infinite;
+		"></div>
+	</div>
+</div>
+
+<div id="l2d-sound-tip" style="
+	position: fixed; bottom: 40px; left: 50%;
+	transform: translateX(-50%) translateY(20px);
+	z-index: 1000001; pointer-events: none;
+	opacity: 0; transition: all 0.5s ease;
+	background: rgba(20, 20, 30, 0.85);
+	border: 1px solid rgba(255, 154, 200, 0.5);
+	border-radius: 24px; padding: 10px 24px;
+	color: #fff; font-size: 14px; font-weight: 500;
+	backdrop-filter: blur(12px);
+	font-family: inherit; display: none;
+">🔊 点击任意处开启声音</div>
+
+<div id="l2d-splash" style="
+	position: fixed; inset: 0; z-index: 9999999;
+	background: radial-gradient(circle at 50% 40%, #22254a 0%, #0a0b12 70%, #050609 100%);
+	display: none; align-items: center; justify-content: center; flex-direction: column;
+	transition: opacity 0.7s ease; font-family: inherit;
+">
+	<div style="
+		font-size: 40px; font-weight: 700; letter-spacing: 0.15em;
+		background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+		-webkit-background-clip: text; background-clip: text; color: transparent;
+		margin-bottom: 24px;
+	">coollk</div>
+	<div style="width: 140px; height: 2px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;">
+		<div id="l2d-bar" style="
+			width: 0%; height: 100%;
+			background: linear-gradient(90deg, #ff9ac8, #a78bfa);
+			transition: width 1s linear;
+		"></div>
+	</div>
+</div>
+
+<div id="l2d-video-wrap" style="
+	position: fixed; inset: 0; z-index: 9999998;
+	background: #000;
+	display: none; align-items: center; justify-content: center;
+	transition: opacity 0.6s ease;
+">
+	<video id="l2d-welcome-video" src="/welcome.mp4" playsinline preload="auto"
+		style="max-width: 100%; max-height: 100%; object-fit: contain;"></video>
+	<button id="l2d-video-skip" style="
+		position: absolute; top: 24px; right: 24px;
+		width: 44px; height: 44px; border-radius: 50%;
+		border: 1px solid rgba(255,255,255,0.25);
+		background: rgba(0,0,0,0.5); color: #fff;
+		font-size: 18px; cursor: pointer;
+	">✕</button>
+</div>
+
+<div id="l2d-welcome" style="
+	position: fixed; top: 15%; left: 50%;
+	transform: translateX(-50%) translateY(-20px);
+	z-index: 9999997; pointer-events: none;
+	opacity: 0; transition: all 0.6s ease;
+	background: rgba(20, 20, 30, 0.8);
+	border: 1px solid rgba(255, 154, 200, 0.3);
+	border-radius: 16px; padding: 14px 32px;
+	color: #fff; font-size: 18px; font-weight: 500;
+	backdrop-filter: blur(16px); font-family: inherit;
+">🌸 ようこそ</div>
+
+<style is:global>
+	@keyframes l2d-fade-in {
+		from { opacity: 0; transform: translateY(10px); }
+		to   { opacity: 1; transform: translateY(0); }
+	}
+	@keyframes l2d-loading-anim {
+		0% { margin-left: -40%; }
+		100% { margin-left: 100%; }
+	}
+</style>
+
+<script is:inline src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script>
+<script is:inline src="/Firefly-live2d-main/load/pixi.min.js"></script>
+<script is:inline src="/Firefly-live2d-main/load/cubism4.min.js"></script>
+
+<script is:inline>
+	(function () {
+		// ⭐ 核心修复：将 Live2D 相关元素移到 body 下，彻底摆脱父容器 overflow 和 transform 的影响
+		function moveElementsToBody() {
+			const ids = ['live2d-widget', 'l2d-loading', 'l2d-sound-tip', 'l2d-splash', 'l2d-video-wrap', 'l2d-welcome'];
+			ids.forEach(id => {
+				const el = document.getElementById(id);
+				if (el && el.parentElement !== document.body) {
+					document.body.appendChild(el);
+				}
+			});
+		}
+
+		const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+		// 页面加载时立刻搬家
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', moveElementsToBody);
+		} else {
+			moveElementsToBody();
+		}
+
+		const loadingEl = document.getElementById("l2d-loading");
+		const soundTip = document.getElementById("l2d-sound-tip");
+		const splash = document.getElementById("l2d-splash");
+		const bar = document.getElementById("l2d-bar");
+		const welcome = document.getElementById("l2d-welcome");
+		const videoWrap = document.getElementById("l2d-video-wrap");
+		const videoEl = document.getElementById("l2d-welcome-video");
+		const videoSkip = document.getElementById("l2d-video-skip");
+
+		let soundUnlocked = false;
+		let pendingWelcomeVoice = false;
+
+		function playRandomVoice(volume) {
+			const voicePool = window.__l2dVoicePool || [];
+			if (!Array.isArray(voicePool) || !voicePool.length) return false;
+			const file = voicePool[Math.floor(Math.random() * voicePool.length)];
+			try {
+				const audio = new Audio(file);
+				audio.volume = volume || 0.75;
+				const p = audio.play();
+				if (p && p.catch) {
+					p.catch(() => {
+						pendingWelcomeVoice = true;
+						showSoundTip();
+					});
+				}
+				return true;
+			} catch (e) { return false; }
+		}
+		window.__l2dPlayVoice = playRandomVoice;
+
+		function showSoundTip() {
+			if (!soundTip) return;
+			soundTip.style.display = "block";
+			setTimeout(() => {
+				soundTip.style.opacity = "1";
+				soundTip.style.transform = "translateX(-50%) translateY(0)";
+			}, 50);
+		}
+		function hideSoundTip() {
+			if (!soundTip) return;
+			soundTip.style.opacity = "0";
+			soundTip.style.transform = "translateX(-50%) translateY(20px)";
+			setTimeout(() => { soundTip.style.display = "none"; }, 500);
+		}
+		function unlockSound() {
+			if (soundUnlocked) return;
+			soundUnlocked = true;
+			hideSoundTip();
+			if (videoEl && !videoEl.paused) { videoEl.muted = false; videoEl.volume = 1.0; }
+			if (pendingWelcomeVoice) {
+				pendingWelcomeVoice = false;
+				setTimeout(() => playRandomVoice(0.75), 100);
+			}
+		}
+		document.addEventListener("click", unlockSound, { once: true, capture: true });
+		document.addEventListener("touchstart", unlockSound, { once: true, capture: true });
+		document.addEventListener("keydown", unlockSound, { once: true, capture: true });
+
+		try {
+			const t = new Audio();
+			t.volume = 0;
+			const p = t.play();
+			if (p && p.then) p.then(() => { soundUnlocked = true; }).catch(() => {});
+		} catch (e) {}
+
+		if (location.pathname.includes("/login") || location.pathname.includes("/register")) return;
+
+		const widget = document.getElementById("live2d-widget");
+		const canvas = document.getElementById("live2d-canvas");
+		const nextBtn = document.getElementById("live2d-next");
+		if (!widget || !canvas || !nextBtn) return;
+
+		// 手机上 widget 变小：200×250
+		let baseW = 600, baseH = 700;
+		if (isMobile) {
+			baseW = 200;
+			baseH = 250;
+			widget.style.width = baseW + "px";
+			widget.style.height = baseH + "px";
+		}
+
+		let pool = [];
+		let voicePool = [];
+		let model = null;
+		let app = null;
+		let currentIdx = -1;
+		let lastClickTime = 0;
+		let loading = false;
+		let clickTimer = null;
+		let isFullscreen = false;
+		let fullscreenDone = false;
+
+		let mouseTargetX = 0;
+		let mouseTargetY = 0;
+		let curOffsetX = 0;
+		let curOffsetY = 0;
+		let baseX = 0;
+		let baseY = 0;
+
+		function layout() {
+			if (!app || !model) return;
+			let W, H;
+			if (isFullscreen) {
+				W = window.innerWidth;
+				H = window.innerHeight;
+			} else {
+				W = baseW;
+				H = baseH;
+			}
+			app.renderer.resize(W, H);
+			const b = model.getLocalBounds();
+			const origH = b.height || 1;
+			const s = (H * (isFullscreen ? 0.95 : 1.08)) / origH;
+			model.anchor.set(0.5, 1);
+			model.scale.set(s);
+			baseX = W / 2;
+			baseY = H + (isFullscreen ? 20 : 5);
+			model.x = baseX;
+			model.y = baseY;
+		}
+
+		function enterFullscreen() {
+			isFullscreen = true;
+			widget.style.width = window.innerWidth + "px";
+			widget.style.height = window.innerHeight + "px";
+			widget.style.top = "0px";
+			widget.style.left = "0px";
+			widget.style.right = "auto";
+			widget.style.bottom = "auto";
+			widget.style.zIndex = "9999996"; // 调整全屏时的层级
+			widget.style.display = "block";
+			widget.style.background = "radial-gradient(circle at 50% 40%, #22254a 0%, #0a0b12 70%, #050609 100%)";
+			nextBtn.style.display = "none";
+			setTimeout(layout, 50);
+		}
+
+		function exitFullscreen() {
+			isFullscreen = false;
+			widget.style.top = "auto";
+			widget.style.left = "auto";
+			widget.style.right = "0px";
+			widget.style.bottom = "0px";
+			widget.style.width = baseW + "px";
+			widget.style.height = baseH + "px";
+			widget.style.zIndex = "999999"; // 保证退出全屏后依然最高
+			widget.style.background = "transparent";
+			widget.style.display = "block";
+			nextBtn.style.display = "flex";
+			setTimeout(layout, 50);
+			setTimeout(layout, 300);
+		}
+
+		function getMotionGroups() {
+			if (!model) return [];
+			const defs = model.internalModel?.motionManager?.definitions || {};
+			return Object.keys(defs).filter((g) => Array.isArray(defs[g]) && defs[g].length > 0);
+		}
+
+		async function playRandomMotion() {
+			if (!model) return false;
+			const groups = getMotionGroups().filter((g) => g !== "idle");
+			if (!groups.length) return false;
+			const g = groups[Math.floor(Math.random() * groups.length)];
+			try { await model.motion(g); return true; } catch (e) {}
+			return false;
+		}
+
+		async function tryMotionGroups(names) {
+			if (!model) return false;
+			const groups = getMotionGroups();
+			for (const n of names) {
+				if (groups.includes(n)) {
+					try { const ok = await model.motion(n); if (ok !== false) return true; } catch (e) {}
+				}
+			}
+			return false;
+		}
+
+		async function playRandomExpression() {
+			if (!model) return;
+			try {
+				if (model.internalModel?.motionManager?.expressionManager) await model.expression();
+			} catch (e) {}
+		}
+
+		async function tryLoad(idx) {
+			if (loading) return false;
+			if (!PIXI || !PIXI.live2d || !pool.length) return false;
+			if (idx < 0 || idx >= pool.length) return false;
+			loading = true;
+			if (model) {
+				try { app.stage.removeChild(model); } catch (e) {}
+				try { model.destroy(); } catch (e) {}
+				model = null;
+			}
+			try {
+				model = await PIXI.live2d.Live2DModel.from(pool[idx]);
+				currentIdx = idx;
+				console.log("[live2d] loaded:", pool[idx]);
+				app.stage.addChild(model);
+				layout();
+				try { model.motion("idle"); } catch (e) {}
+				loading = false;
+				return true;
+			} catch (e) {
+				console.warn("[live2d] load failed:", pool[idx], e);
+				model = null;
+				loading = false;
+				return false;
+			}
+		}
+
+		async function loadFrom(startIdx) {
+			const total = isMobile ? Math.min(pool.length, 5) : Math.min(pool.length, 20);
+			let i = startIdx;
+			for (let n = 0; n < total; n++) {
+				if (await tryLoad(i)) return true;
+				i = (i + 1) % pool.length;
+			}
+			return false;
+		}
+
+		function pickNext() { return (currentIdx + 1) % pool.length; }
+		function pickRandom() {
+			if (pool.length <= 1) return 0;
+			let idx;
+			do { idx = Math.floor(Math.random() * pool.length); } while (idx === currentIdx);
+			return idx;
+		}
+
+		function hideLoading() {
+			if (!loadingEl) return;
+			loadingEl.style.opacity = "0";
+			setTimeout(() => { loadingEl.style.display = "none"; }, 700);
+		}
+
+		async function playFullscreenAnimation() {
+			if (fullscreenDone) return;
+			fullscreenDone = true;
+
+			if (isMobile) {
+				if (loadingEl) {
+					loadingEl.style.display = "flex";
+					loadingEl.style.opacity = "1";
+				}
+				const start = Date.now();
+				while (!model && Date.now() - start < 60000) {
+					await new Promise((r) => setTimeout(r, 300));
+				}
+				hideLoading();
+				if (!model) { console.log("[live2d] 手机加载超时"); return; }
+			} else {
+				const targetIdx = pickRandom();
+				if (targetIdx !== currentIdx) await loadFrom(targetIdx);
+			}
+
+			enterFullscreen();
+			const actionTimer = setInterval(() => {
+				if (isFullscreen) playRandomMotion();
+			}, 1500);
+
+			if (soundUnlocked) {
+				setTimeout(() => playRandomVoice(0.7), 300);
+			} else {
+				pendingWelcomeVoice = true;
+				showSoundTip();
+			}
+
+			const duration = isMobile ? 5000 : 3500;
+			setTimeout(() => {
+				clearInterval(actionTimer);
+				exitFullscreen();
+			}, duration);
+		}
+
+		const isAuthPage = location.pathname.includes("/login") || location.pathname.includes("/register");
+
+		function tryUnmuteVideo() {
+			videoEl.muted = false;
+			videoEl.volume = 1.0;
+			const p = videoEl.play();
+			if (p && p.catch) {
+				p.catch(() => {
+					videoEl.muted = true;
+					videoEl.play().catch(() => {});
+				});
+			}
+		}
+
+		function finishVideo() {
+			videoWrap.style.opacity = "0";
+			setTimeout(() => {
+				videoWrap.style.display = "none";
+				waitForPixi(() => playFullscreenAnimation());
+			}, 600);
+		}
+
+		function waitForPixi(cb, timeout) {
+			const maxWait = isMobile ? 60000 : (timeout || 15000);
+			const start = Date.now();
+			const t = setInterval(() => {
+				if (typeof PIXI !== "undefined" && PIXI.live2d) {
+					clearInterval(t); cb();
+				} else if (Date.now() - start > maxWait) {
+					clearInterval(t);
+				}
+			}, 100);
+		}
+
+		if (!isAuthPage) {
+			if (isMobile) {
+				waitForPixi(() => playFullscreenAnimation());
+			} else {
+				const VISITED_KEY = "l2d_visited_session";
+				const isFirstVisit = !sessionStorage.getItem(VISITED_KEY);
+				sessionStorage.setItem(VISITED_KEY, "1");
+
+				if (isFirstVisit) {
+					videoWrap.style.display = "flex";
+					videoEl.addEventListener("ended", finishVideo);
+					videoSkip.addEventListener("click", () => {
+						videoEl.pause();
+						finishVideo();
+					});
+					videoEl.addEventListener("playing", () => {
+						setTimeout(() => {
+							if (!soundUnlocked) { pendingWelcomeVoice = true; }
+							playRandomVoice(0.6);
+						}, 800);
+					}, { once: true });
+					tryUnmuteVideo();
+				} else {
+					splash.style.display = "flex";
+					setTimeout(() => { if (bar) bar.style.width = "100%"; }, 50);
+					setTimeout(() => {
+						splash.style.opacity = "0";
+						setTimeout(() => {
+							splash.style.display = "none";
+							welcome.style.opacity = "1";
+							welcome.style.transform = "translateX(-50%) translateY(0)";
+							setTimeout(() => {
+								welcome.style.opacity = "0";
+								welcome.style.transform = "translateX(-50%) translateY(-20px)";
+							}, 2200);
+							waitForPixi(() => playFullscreenAnimation());
+						}, 700);
+					}, 1100);
+				}
+			}
+		}
+
+		async function init() {
+			if (window.PIXI && PIXI.live2d && PIXI.live2d.config) {
+				PIXI.live2d.config.sound = true;
+				PIXI.live2d.config.motionSync = true;
+			}
+
+			try {
+				const res = await fetch("/models-list.json");
+				pool = await res.json();
+			} catch (e) { console.warn("[live2d] models-list 加载失败", e); return; }
+			if (!Array.isArray(pool) || !pool.length) return;
+
+			try {
+				const vres = await fetch("/voices-list.json");
+				voicePool = await vres.json();
+				window.__l2dVoicePool = voicePool;
+				console.log("[live2d] voices:", voicePool.length);
+			} catch (e) { console.warn("[live2d] voices-list 加载失败", e); }
+
+			app = new PIXI.Application({
+				view: canvas,
+				width: baseW,
+				height: baseH,
+				transparent: true, backgroundAlpha: 0,
+				antialias: true, autoDensity: true,
+				resolution: Math.min(window.devicePixelRatio || 1, 2),
+			});
+
+			await loadFrom(pickRandom());
+
+			if (!isMobile) widget.style.display = "block";
+
+			document.addEventListener("mousemove", (e) => {
+				mouseTargetX = (e.clientX / window.innerWidth) * 2 - 1;
+				mouseTargetY = (e.clientY / window.innerHeight) * 2 - 1;
+			});
+			document.addEventListener("touchmove", (e) => {
+				if (!e.touches || !e.touches.length) return;
+				const t = e.touches[0];
+				mouseTargetX = (t.clientX / window.innerWidth) * 2 - 1;
+				mouseTargetY = (t.clientY / window.innerHeight) * 2 - 1;
+			}, { passive: true });
+
+			function tickFollow() {
+				requestAnimationFrame(tickFollow);
+				if (!model) return;
+				try { model.focus(mouseTargetX * 1.5, -mouseTargetY * 1.5); } catch (e) {}
+				curOffsetX += (mouseTargetX * 20 - curOffsetX) * 0.08;
+				curOffsetY += (mouseTargetY * 12 - curOffsetY) * 0.08;
+				model.x = baseX + curOffsetX;
+				model.y = baseY + curOffsetY;
+			}
+			tickFollow();
+
+			canvas.addEventListener("click", (e) => {
+				if (isFullscreen) return;
+				if (clickTimer) {
+					clearTimeout(clickTimer);
+					clickTimer = null;
+					handleDoubleClick();
+				} else {
+					clickTimer = setTimeout(() => {
+						clickTimer = null;
+						handleSingleClick(e);
+					}, 250);
+				}
+			});
+
+			nextBtn.addEventListener("click", async (e) => {
+				e.stopPropagation();
+				nextBtn.style.transform = "rotate(360deg)";
+				setTimeout(() => { nextBtn.style.transform = "rotate(0deg)"; }, 400);
+				await loadFrom(pickNext());
+			});
+
+			window.addEventListener("resize", () => {
+				if (isFullscreen) layout();
+			});
+		}
+
+		async function handleSingleClick(e) {
+			if (!model || loading || isFullscreen) return;
+			if (!soundUnlocked) { unlockSound(); return; }
+			const now = Date.now();
+			if (now - lastClickTime < 300) return;
+			lastClickTime = now;
+
+			let hitNames = [];
+			try {
+				const rect = canvas.getBoundingClientRect();
+				hitNames = model.hitTest(e.clientX - rect.left, e.clientY - rect.top) || [];
+			} catch (err) {}
+
+			const tryOrder = [...hitNames, "tap_body", "tap", "flick_head", "flick"];
+			const played = await tryMotionGroups(tryOrder);
+			if (!played) await playRandomMotion();
+			if (Math.random() < 0.5) playRandomExpression();
+			playRandomVoice(0.75);
+		}
+
+		async function handleDoubleClick() {
+			if (!model || loading || isFullscreen) return;
+			await loadFrom(pickNext());
+		}
+
+		const timer = setInterval(() => {
+			if (typeof PIXI !== "undefined" && PIXI.live2d) {
+				clearInterval(timer);
+				init();
+			}
+		}, 200);
+		setTimeout(() => clearInterval(timer), 15000);
+	})();
+</script>

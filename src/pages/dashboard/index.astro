@@ -1,0 +1,230 @@
+---
+import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
+import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>用户中心 - 我的动漫小屋</title>
+  <AnimeHeadMeta />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
+      font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    h1 { margin: 0; font-size: 26px; }
+    .user-info { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 6px; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    a, button {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+      color: #fff;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(255,154,200,0.3); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.15); }
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    .post-list { display: flex; flex-direction: column; gap: 12px; }
+    .post-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .post-item:hover { background: rgba(255,255,255,0.07); }
+    .post-title { font-size: 15px; font-weight: 500; }
+    .post-meta { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .status {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .status.pending  { background: rgba(255,200,80,0.15); color: #ffd060; border: 1px solid rgba(255,200,80,0.3); }
+    .status.approved { background: rgba(100,255,150,0.15); color: #a8ffc4; border: 1px solid rgba(100,255,150,0.3); }
+    .status.rejected { background: rgba(255,80,80,0.15);  color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <AnimeBackdrop />
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>用户中心</h1>
+        <div class="user-info" id="userInfo">加载中…</div>
+      </div>
+        <div class="actions">
+        <a href="/dashboard/new/" class="btn-primary">+ 写文章</a>
+        <a href="/dashboard/profile/" class="btn-ghost">个人资料</a>
+        <a href="/" class="btn-ghost">返回首页</a>
+        <button class="btn-ghost" id="logoutBtn">退出登录</button>
+      </div>
+      
+     <div class="notif-box" id="notifBox" style="display: none; margin-bottom: 24px;">
+      <h2 style="font-size: 18px; margin: 0 0 16px;">🔔 通知 <span id="notifCount" style="font-size: 13px; color: #ff9ac8;"></span></h2>
+      <div id="notifList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+    </div>
+    <div id="list" class="loading">加载中…</div>
+  </div>
+
+  <script is:inline>
+    async function loadMe() {
+      const res = await fetch('/api/auth/me/', { credentials: 'include' });
+      const data = await res.json();
+      if (!data.ok) { location.href = '/login/'; return null; }
+      document.getElementById('userInfo').textContent =
+        data.user.username + ' · ' + data.user.email + (data.user.role === 'admin' ? ' · 管理员' : '');
+      return data.user;
+    }
+
+    async function loadPosts() {
+      const res = await fetch('/api/posts/list/', { credentials: 'include' });
+      const data = await res.json();
+      const list = document.getElementById('list');
+
+      if (!data.ok || !data.posts || data.posts.length === 0) {
+        list.className = 'empty';
+        list.textContent = '还没有文章，点右上角"写文章"开始吧';
+        return;
+      }
+
+            list.innerHTML = data.posts.map(p => {
+        const date = new Date(p.created_at * 1000).toLocaleDateString('zh-CN');
+        const statusText = p.status === 'approved' ? '已发布' : p.status === 'rejected' ? '已拒绝' : '待审核';
+        return `<div class="post-item">
+          <div style="flex:1; min-width:0;">
+            <div class="post-title">${escapeHtml(p.title)}</div>
+            <div class="post-meta">${date}</div>
+          </div>
+          <span class="status ${p.status}">${statusText}</span>
+          <div style="display: flex; gap: 6px; flex-shrink: 0;">
+            <a href="/dashboard/posts/${p.id}/edit/" class="btn-ghost" style="padding: 6px 12px; font-size: 12px; text-decoration: none; border-radius: 6px; background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15);">编辑</a>
+            <button class="btn-ghost post-delete-btn" data-id="${p.id}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); cursor: pointer;">删除</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      // 绑定删除按钮
+      list.querySelectorAll('.post-delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('确定删除这篇文章？此操作不可恢复。')) return;
+          const pid = Number(btn.dataset.id);
+          btn.disabled = true;
+          const res = await fetch('/api/posts/delete/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ postId: pid }),
+          });
+          const d = await res.json();
+          if (d.ok) {
+            loadPosts();
+          } else {
+            alert(d.error || '删除失败');
+            btn.disabled = false;
+          }
+        });
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      if (window.AnimeSounds) window.AnimeSounds.play('logout', 0.5);
+      document.getElementById('logoutBtn').disabled = true;
+      await fetch('/api/auth/logout/', { method: 'POST', credentials: 'include' });
+      setTimeout(() => { location.href = '/'; }, 700);
+    });
+
+        async function loadNotifications() {
+      try {
+        const res = await fetch('/api/notifications/list/', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok || !data.list || data.list.length === 0) return;
+
+        const box = document.getElementById('notifBox');
+        const list = document.getElementById('notifList');
+        const count = document.getElementById('notifCount');
+
+        box.style.display = 'block';
+        count.textContent = data.unread > 0 ? '(' + data.unread + ' 条未读)' : '';
+
+        list.innerHTML = data.list.slice(0, 10).map(n => {
+          const date = new Date(n.created_at * 1000).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const style = n.is_read ? 'opacity: 0.6;' : 'border-color: rgba(255,154,200,0.35); background: rgba(255,154,200,0.06);';
+          const inner = '<div style="font-size: 13.5px; margin-bottom: 2px;">' + escapeHtml(n.title) + '</div>' +
+            '<div style="font-size: 11.5px; color: rgba(255,255,255,0.45);">' + date + '</div>';
+          return n.link
+            ? '<a href="' + n.link + '" style="padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); text-decoration: none; color: inherit; display: block; ' + style + '">' + inner + '</a>'
+            : '<div style="padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); ' + style + '">' + inner + '</div>';
+        }).join('');
+
+        // 2 秒后标记已读
+        if (data.unread > 0) {
+          setTimeout(() => {
+            fetch('/api/notifications/read/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({}),
+            });
+          }, 2000);
+        }
+      } catch (e) {}
+    }
+
+    (async () => {
+      const user = await loadMe();
+      if (user) {
+        await loadPosts();
+        await loadNotifications();
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Netlify 会自动把 URL 环境变量设为站点地址，astro.config.mjs 已自动读取
+# 如果你想绑定自定义域名，在 Site settings → Environment variables 里加：
+#   SITE_URL = https://你的域名
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"

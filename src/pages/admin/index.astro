@@ -1,0 +1,402 @@
+---
+import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
+import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理后台 - 我的动漫小屋</title>
+  <AnimeHeadMeta />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
+      font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
+      color: #fff; padding: 32px 20px;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .head h1 { margin: 0; font-size: 26px; }
+    .head .links a { color: #ff9ac8; text-decoration: none; font-size: 13px; margin-left: 16px; }
+    .head .links a:hover { text-decoration: underline; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
+    .tab {
+      padding: 10px 20px; font-size: 14px;
+      background: none; border: none;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer; border-radius: 8px 8px 0 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .tab:hover { color: #fff; background: rgba(255,255,255,0.04); }
+    .tab.active { color: #ff9ac8; border-bottom-color: #ff9ac8; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* 统计卡片 */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .stat-card {
+      padding: 22px 24px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      transition: all 0.2s;
+    }
+    .stat-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); }
+    .stat-card .label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .stat-card .value { font-size: 32px; font-weight: 700; color: #ff9ac8; }
+    .stat-card .unit { font-size: 14px; color: rgba(255,255,255,0.4); margin-left: 4px; }
+
+    /* 列表 */
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .item {
+      display: flex; justify-content: space-between;
+      align-items: center; gap: 16px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      transition: all 0.2s;
+      flex-wrap: wrap;
+    }
+    .item:hover { background: rgba(255,255,255,0.07); }
+    .item-info { flex: 1; min-width: 200px; }
+    .item-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
+    .item-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    button.act {
+      padding: 7px 14px; font-size: 13px;
+      border-radius: 8px; cursor: pointer; border: none;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .act-approve { background: linear-gradient(135deg, #64ff96, #22c55e); color: #fff; }
+    .act-reject  { background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    .act-promote { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }
+    .act-demote  { background: rgba(255,200,80,0.15); color: #ffd060; border: 1px solid rgba(255,200,80,0.3); }
+    .act-delete  { background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    .act:hover:not(:disabled) { transform: translateY(-1px); }
+    .act:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .badge-admin    { background: rgba(167,139,250,0.2); color: #c4b5fd; }
+    .badge-pending  { background: rgba(255,200,80,0.15); color: #ffd060; }
+    .badge-approved { background: rgba(100,255,150,0.15); color: #a8ffc4; }
+    .badge-rejected { background: rgba(255,80,80,0.15); color: #ffb0b0; }
+
+    .empty { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); font-size: 14px; }
+    .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+
+    @media (max-width: 640px) {
+      .item { flex-direction: column; align-items: flex-start; }
+      .item-actions { width: 100%; }
+      button.act { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <AnimeBackdrop />
+  <div class="container">
+    <div class="head">
+      <h1>🛠 管理后台</h1>
+      <div class="links">
+        <a href="/dashboard/">用户中心</a>
+        <a href="/admin/review/">审核文章</a>
+        <a href="/">返回首页</a>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="dashboard">📊 仪表盘</button>
+      <button class="tab" data-tab="users">👥 用户管理</button>
+      <button class="tab" data-tab="posts">📝 文章管理</button>
+      <button class="tab" data-tab="comments">💬 评论管理</button>
+    </div>
+
+    <div class="panel active" id="panel-dashboard">
+      <div class="stats" id="statsBox">
+        <div class="loading">加载中…</div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-users">
+      <div class="list" id="userList"><div class="loading">加载中…</div></div>
+    </div>
+
+    <div class="panel" id="panel-posts">
+      <div class="list" id="postList"><div class="loading">加载中…</div></div>
+    </div>
+
+    <div class="panel" id="panel-comments">
+      <div class="list" id="commentList"><div class="loading">加载中…</div></div>
+    </div>
+  </div>
+
+  <script is:inline>
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+    function fmtDate(ts) {
+      return new Date(ts * 1000).toLocaleString('zh-CN', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    // ===== 权限检查 =====
+    async function checkAdmin() {
+      const res = await fetch('/api/auth/me/', { credentials: 'include' });
+      const data = await res.json();
+      if (!data.ok || data.user.role !== 'admin') {
+        alert('需要管理员权限');
+        location.href = '/login/';
+        return null;
+      }
+      return data.user;
+    }
+
+    // ===== 仪表盘 =====
+    async function loadStats() {
+      const box = document.getElementById('statsBox');
+      try {
+        const res = await fetch('/api/admin/stats/', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        const s = data.stats;
+        box.innerHTML = `
+          <div class="stat-card">
+            <div class="label">用户总数</div>
+            <div class="value">${s.userCount}<span class="unit">人</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">文章总数</div>
+            <div class="value">${s.postCount}<span class="unit">篇</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">待审核文章</div>
+            <div class="value" style="color:#ffd060;">${s.pendingCount}<span class="unit">篇</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">评论总数</div>
+            <div class="value">${s.commentCount}<span class="unit">条</span></div>
+          </div>
+        `;
+      } catch (err) {
+        box.innerHTML = '<div class="empty">加载失败</div>';
+      }
+    }
+
+    // ===== 用户管理 =====
+    async function loadUsers() {
+      const list = document.getElementById('userList');
+      try {
+        const res = await fetch('/api/admin/users/', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        if (!data.users || data.users.length === 0) {
+          list.innerHTML = '<div class="empty">暂无用户</div>';
+          return;
+        }
+
+        list.innerHTML = data.users.map(u => {
+          const isAdmin = u.role === 'admin';
+          const roleBadge = isAdmin ? '<span class="badge badge-admin">管理员</span>' : '';
+          return `<div class="item">
+            <div class="item-info">
+              <div class="item-title">${escapeHtml(u.username)}${roleBadge}</div>
+              <div class="item-meta">${escapeHtml(u.email)} · 注册于 ${fmtDate(u.created_at)} · 文章 ${u.post_count} · 评论 ${u.comment_count}</div>
+            </div>
+            <div class="item-actions">
+              <button class="act ${isAdmin ? 'act-demote' : 'act-promote'}"
+                data-action="${isAdmin ? 'demote' : 'promote'}"
+                data-id="${u.id}">${isAdmin ? '降为普通用户' : '设为管理员'}</button>
+              <button class="act act-delete" data-action="delete" data-id="${u.id}">删除</button>
+            </div>
+          </div>`;
+        }).join('');
+
+        list.querySelectorAll('button.act').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const action = btn.dataset.action;
+            const uid = Number(btn.dataset.id);
+            const names = { promote: '设为管理员', demote: '降为普通用户', delete: '删除用户（会连带删除其文章和评论）' };
+            if (!confirm('确定要「' + names[action] + '」？')) return;
+
+            btn.disabled = true;
+            const res = await fetch('/api/admin/user-update/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ userId: uid, action }),
+            });
+            const d = await res.json();
+            if (d.ok) {
+              loadUsers();
+              loadStats();
+            } else {
+              alert(d.error || '操作失败');
+              btn.disabled = false;
+            }
+          });
+        });
+      } catch (err) {
+        list.innerHTML = '<div class="empty">加载失败</div>';
+      }
+    }
+
+    // ===== 文章管理 =====
+    async function loadPosts() {
+      const list = document.getElementById('postList');
+      try {
+        const res = await fetch('/api/posts/list/', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        if (!data.posts || data.posts.length === 0) {
+          list.innerHTML = '<div class="empty">暂无文章</div>';
+          return;
+        }
+
+        list.innerHTML = data.posts.map(p => {
+          const statusText = p.status === 'approved' ? '已发布' : p.status === 'rejected' ? '已拒绝' : '待审核';
+          const badge = `<span class="badge badge-${p.status}">${statusText}</span>`;
+          const actions = p.status === 'pending'
+            ? `<button class="act act-approve" data-id="${p.id}" data-action="approve">通过</button>
+               <button class="act act-reject" data-id="${p.id}" data-action="reject">拒绝</button>`
+            : p.status === 'approved'
+              ? `<a class="act act-reject" style="text-decoration:none;display:inline-block;" href="/community/${encodeURIComponent(p.slug)}/" target="_blank">查看</a>
+                 <button class="act act-reject" data-id="${p.id}" data-action="reject">下架</button>`
+              : `<button class="act act-approve" data-id="${p.id}" data-action="approve">恢复通过</button>`;
+          return `<div class="item">
+            <div class="item-info">
+              <div class="item-title">${escapeHtml(p.title)}${badge}</div>
+              <div class="item-meta">ID: ${p.id} · ${fmtDate(p.created_at)}</div>
+            </div>
+            <div class="item-actions">${actions}</div>
+          </div>`;
+        }).join('');
+
+        list.querySelectorAll('button[data-action]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const pid = Number(btn.dataset.id);
+            const action = btn.dataset.action;
+            btn.disabled = true;
+            const res = await fetch('/api/posts/review/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ postId: pid, action }),
+            });
+            const d = await res.json();
+            if (d.ok) {
+              loadPosts();
+              loadStats();
+            } else {
+              alert(d.error || '操作失败');
+              btn.disabled = false;
+            }
+          });
+        });
+      } catch (err) {
+        list.innerHTML = '<div class="empty">加载失败</div>';
+      }
+    }
+
+    // ===== 评论管理 =====
+    async function loadComments() {
+      const list = document.getElementById('commentList');
+      try {
+        const res = await fetch('/api/admin/comments/', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        if (!data.comments || data.comments.length === 0) {
+          list.innerHTML = '<div class="empty">暂无评论</div>';
+          return;
+        }
+
+        list.innerHTML = data.comments.map(c => {
+          return `<div class="item">
+            <div class="item-info">
+              <div class="item-title">${escapeHtml(c.content.slice(0, 120))}${c.content.length > 120 ? '…' : ''}</div>
+              <div class="item-meta">作者 ${escapeHtml(c.author)} · 于《${escapeHtml(c.post_title)}》 · ${fmtDate(c.created_at)}</div>
+            </div>
+            <div class="item-actions">
+              <a class="act act-reject" style="text-decoration:none;display:inline-block;" href="/community/${encodeURIComponent(c.post_slug)}/" target="_blank">查看</a>
+              <button class="act act-delete" data-id="${c.id}">删除</button>
+            </div>
+          </div>`;
+        }).join('');
+
+        list.querySelectorAll('button.act-delete').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            if (!confirm('确定删除这条评论？')) return;
+            const cid = Number(btn.dataset.id);
+            btn.disabled = true;
+            const res = await fetch('/api/comments/delete/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ commentId: cid }),
+            });
+            const d = await res.json();
+            if (d.ok) {
+              loadComments();
+              loadStats();
+            } else {
+              alert(d.error || '删除失败');
+              btn.disabled = false;
+            }
+          });
+        });
+      } catch (err) {
+        list.innerHTML = '<div class="empty">加载失败</div>';
+      }
+    }
+
+    // ===== Tab 切换 =====
+    function initTabs() {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const name = tab.dataset.tab;
+          document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+          document.querySelectorAll('.panel').forEach(p => {
+            p.classList.toggle('active', p.id === 'panel-' + name);
+          });
+
+          if (name === 'dashboard') loadStats();
+          if (name === 'users') loadUsers();
+          if (name === 'posts') loadPosts();
+          if (name === 'comments') loadComments();
+        });
+      });
+    }
+
+    // ===== 启动 =====
+    (async () => {
+      const user = await checkAdmin();
+      if (!user) return;
+      initTabs();
+      loadStats();
+    })();
+  </script>
+</body>
+</html>

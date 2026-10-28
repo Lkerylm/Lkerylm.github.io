@@ -1,0 +1,364 @@
+---
+export const prerender = false;
+import { db } from "@/lib/db";
+import { marked } from "marked";
+import sanitizeHtml from "sanitize-html";
+
+const { slug } = Astro.params;
+const post = db
+  .prepare(
+    `SELECT p.*, u.username as author, u.avatar as author_avatar
+     FROM posts p JOIN users u ON u.id = p.author_id
+     WHERE p.slug = ? AND p.status = 'approved'`
+  )
+  .get(slug) as any;
+
+if (!post) {
+  return Astro.redirect("/community/");
+}
+
+const rawHtml = await marked.parse(post.content);
+const htmlContent = sanitizeHtml(rawHtml, {
+  allowedTags: [
+    ...sanitizeHtml.defaults.allowedTags,
+    "img", "h1", "h2", "h3", "h4", "h5", "h6",
+    "pre", "code", "hr", "br",
+  ],
+  allowedAttributes: {
+    ...sanitizeHtml.defaults.allowedAttributes,
+    img: ["src", "alt", "title"],
+    a: ["href", "title", "target", "rel"],
+    code: ["class"],
+    pre: ["class"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+});
+---
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{post.title} - coollk</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
+      font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
+      color: #fff; padding: 40px 20px;
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    h1.post-title { margin: 0 0 12px; font-size: 30px; line-height: 1.3; }
+    .meta {
+      color: rgba(255,255,255,0.55); font-size: 13px;
+      margin-bottom: 32px; padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .meta .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+      background-size: cover; background-position: center;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+    }
+    .content {
+      font-size: 15.5px; line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+      word-wrap: break-word;
+    }
+    .content h1, .content h2, .content h3 { color: #fff; margin: 1.8em 0 0.8em; line-height: 1.35; }
+    .content h1 { font-size: 1.9em; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.3em; }
+    .content h2 { font-size: 1.55em; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.25em; }
+    .content h3 { font-size: 1.3em; }
+    .content p { margin: 0 0 1.2em; }
+    .content a { color: #ff9ac8; text-decoration: none; border-bottom: 1px dashed rgba(255,154,200,0.5); }
+    .content a:hover { border-bottom-style: solid; }
+    .content ul, .content ol { margin: 0 0 1.2em; padding-left: 1.6em; }
+    .content ul li::marker { color: #ff9ac8; }
+    .content ol li::marker { color: #a78bfa; font-weight: 600; }
+    .content blockquote {
+      margin: 1.2em 0; padding: 0.8em 1.2em;
+      border-left: 3px solid #ff9ac8;
+      background: rgba(255,154,200,0.06);
+      border-radius: 0 8px 8px 0;
+      color: rgba(255,255,255,0.85);
+    }
+    .content code {
+      background: rgba(255,255,255,0.1); padding: 0.15em 0.4em;
+      border-radius: 4px; font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em; color: #ffd0e0;
+    }
+    .content pre {
+      background: rgba(0,0,0,0.4); padding: 1em 1.2em;
+      border-radius: 10px; overflow-x: auto;
+      margin: 1.2em 0; border: 1px solid rgba(255,255,255,0.08);
+    }
+    .content pre code { background: none; padding: 0; color: rgba(255,255,255,0.9); font-size: 0.88em; }
+    .content img { max-width: 100%; height: auto; border-radius: 10px; margin: 1.2em 0; display: block; }
+    .content hr { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 2em 0; }
+
+    .comments-section {
+      margin-top: 56px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .comments-title {
+      font-size: 18px; font-weight: 600;
+      margin: 0 0 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .comments-title span {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      font-weight: 400;
+    }
+    .comment-form {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .comment-form textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: #fff; font-size: 14px;
+      outline: none; font-family: inherit;
+      resize: vertical; min-height: 70px;
+    }
+    .comment-form textarea:focus { border-color: #ff9ac8; }
+    .comment-form .row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-top: 10px; gap: 12px;
+    }
+    .comment-form .info { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .comment-form button {
+      padding: 8px 18px; font-size: 13px; font-weight: 500;
+      border-radius: 8px; border: none;
+      background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+      color: #fff; cursor: pointer; transition: all 0.2s;
+      font-family: inherit;
+    }
+    .comment-form button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(255,154,200,0.3); }
+    .comment-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .comment-list { display: flex; flex-direction: column; gap: 16px; }
+    .comment-item {
+      display: flex; gap: 12px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+    }
+    .comment-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+      background-size: cover; background-position: center;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .comment-body { flex: 1; min-width: 0; }
+    .comment-head {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 6px;
+      gap: 12px;
+    }
+    .comment-author { font-size: 14px; font-weight: 600; }
+    .comment-time { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .comment-content {
+      font-size: 14px; line-height: 1.6;
+      color: rgba(255,255,255,0.85);
+      word-wrap: break-word; white-space: pre-wrap;
+    }
+    .comment-delete {
+      font-size: 12px; color: rgba(255,80,80,0.7);
+      background: none; border: none; cursor: pointer;
+      padding: 2px 6px; border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .comment-delete:hover { color: #ff8080; background: rgba(255,80,80,0.1); }
+    .comment-empty {
+      text-align: center; padding: 32px 20px;
+      color: rgba(255,255,255,0.4); font-size: 13px;
+    }
+    .back {
+      display: inline-block; margin-top: 40px;
+      color: #ff9ac8; text-decoration: none; font-size: 14px;
+    }
+    .back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="post-title">{post.title}</h1>
+    <div class="meta">
+      <div class="avatar" id="authorAvatar" data-avatar={post.author_avatar || ""}>
+        {post.author.charAt(0).toUpperCase()}
+      </div>
+      <span>作者：{post.author}</span>
+      <span style="color: rgba(255,255,255,0.3);">·</span>
+      <span>{new Date(post.created_at * 1000).toLocaleDateString("zh-CN")}</span>
+    </div>
+
+    <div class="content" set:html={htmlContent}></div>
+
+    <div class="comments-section">
+      <h2 class="comments-title">💬 评论 <span id="commentCount">(0)</span></h2>
+
+      <div class="comment-form" id="commentForm" style="display: none;">
+        <textarea id="commentContent" placeholder="说点什么…（最多 1000 字）" maxlength="1000"></textarea>
+        <div class="row">
+          <div class="info" id="commentInfo">已登录</div>
+          <button id="submitCommentBtn">发表评论</button>
+        </div>
+      </div>
+      <div class="comment-form" id="loginPrompt" style="display: none; text-align: center; padding: 20px;">
+        <div style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 12px;">登录后参与讨论</div>
+        <a href="/login/" style="display: inline-block; padding: 8px 24px; border-radius: 8px;
+           background: linear-gradient(135deg, #ff9ac8, #a78bfa); color: #fff;
+           text-decoration: none; font-size: 13px; font-weight: 500;">去登录</a>
+      </div>
+
+      <div class="comment-list" id="commentList">
+        <div class="comment-empty">加载中…</div>
+      </div>
+    </div>
+
+    <a href="/community/" class="back">← 返回列表</a>
+  </div>
+
+  <!-- 把 post.id 放在 HTML data 属性里，脚本再从 DOM 读 -->
+  <div id="post-data" data-post-id={post.id} style="display: none;"></div>
+
+  <script is:inline>
+    const POST_ID = Number(document.getElementById('post-data').dataset.postId);
+    let currentUser = null;
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    const authorAvatar = document.getElementById('authorAvatar');
+    if (authorAvatar && authorAvatar.dataset.avatar) {
+      authorAvatar.style.backgroundImage = `url(${authorAvatar.dataset.avatar})`;
+      authorAvatar.textContent = '';
+    }
+
+    async function loadMe() {
+      try {
+        const res = await fetch('/api/auth/me/', { credentials: 'include' });
+        const data = await res.json();
+        if (data.ok) {
+          currentUser = data.user;
+          document.getElementById('commentForm').style.display = 'block';
+          document.getElementById('loginPrompt').style.display = 'none';
+        } else {
+          document.getElementById('commentForm').style.display = 'none';
+          document.getElementById('loginPrompt').style.display = 'block';
+        }
+      } catch (e) {
+        document.getElementById('loginPrompt').style.display = 'block';
+      }
+    }
+
+    async function loadComments() {
+      const list = document.getElementById('commentList');
+      try {
+        const res = await fetch('/api/comments/list/?postId=' + POST_ID);
+        const data = await res.json();
+        if (!data.ok) throw new Error();
+
+        const arr = data.comments || [];
+        document.getElementById('commentCount').textContent = '(' + arr.length + ')';
+
+        if (arr.length === 0) {
+          list.innerHTML = '<div class="comment-empty">还没有评论，来抢沙发～</div>';
+          return;
+        }
+
+        list.innerHTML = arr.map(c => {
+          const date = new Date(c.created_at * 1000).toLocaleString('zh-CN');
+          const canDelete = currentUser && (currentUser.id === c.author_id || currentUser.role === 'admin');
+          const avatarHtml = c.avatar
+            ? `<div class="comment-avatar" style="background-image: url(${escapeHtml(c.avatar)});"></div>`
+            : `<div class="comment-avatar">${escapeHtml(c.author.charAt(0).toUpperCase())}</div>`;
+          return `<div class="comment-item">
+            ${avatarHtml}
+            <div class="comment-body">
+              <div class="comment-head">
+                <span class="comment-author">${escapeHtml(c.author)}</span>
+                <span class="comment-time">${date}</span>
+              </div>
+              <div class="comment-content">${escapeHtml(c.content)}</div>
+              ${canDelete ? `<div style="margin-top: 6px; text-align: right;">
+                <button class="comment-delete" data-id="${c.id}">删除</button>
+              </div>` : ''}
+            </div>
+          </div>`;
+        }).join('');
+
+        list.querySelectorAll('.comment-delete').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            if (!confirm('确定删除这条评论？')) return;
+            const cid = Number(btn.dataset.id);
+            const res = await fetch('/api/comments/delete/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ commentId: cid }),
+            });
+            const d = await res.json();
+            if (d.ok) loadComments();
+            else alert(d.error || '删除失败');
+          });
+        });
+      } catch (e) {
+        list.innerHTML = '<div class="comment-empty">加载失败</div>';
+      }
+    }
+
+    document.getElementById('submitCommentBtn').addEventListener('click', async () => {
+      const ta = document.getElementById('commentContent');
+      const content = ta.value.trim();
+      if (!content) return;
+
+      const btn = document.getElementById('submitCommentBtn');
+      btn.disabled = true;
+      btn.textContent = '发表中…';
+
+      try {
+        const res = await fetch('/api/comments/create/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ postId: POST_ID, content }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          ta.value = '';
+          loadComments();
+        } else {
+          alert(data.error || '评论失败');
+        }
+      } catch (e) {
+        alert('网络错误');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '发表评论';
+      }
+    });
+
+    (async () => {
+      await loadMe();
+      await loadComments();
+    })();
+  </script>
+</body>
+</html>

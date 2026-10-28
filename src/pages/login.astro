@@ -1,0 +1,440 @@
+---
+import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
+import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登录 - 我的动漫小屋</title>
+  <AnimeHeadMeta />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 40%, #22254a 0%, #0a0b12 70%, #050609 100%);
+      font-family: "Noto Sans SC", system-ui, -apple-system, sans-serif;
+      color: #fff;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      width: 80vmin;
+      height: 80vmin;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 154, 200, 0.25) 0%, rgba(150, 130, 255, 0.12) 40%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== 全屏 Live2D 背景层 ===== */
+    #login-l2d {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    #login-l2d canvas {
+      background: transparent !important;
+      display: block !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+    }
+
+    /* 樱花 */
+    .petals {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .petal {
+      position: absolute;
+      top: -5%;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #ffc0d9 0%, #ff7ab8 60%, transparent 70%);
+      border-radius: 50% 0 50% 50%;
+      opacity: 0.85;
+      filter: blur(0.3px);
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translate3d(0, -5vh, 0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.9; }
+      100% { transform: translate3d(30px, 110vh, 0) rotate(360deg); opacity: 0; }
+    }
+
+    /* ===== 登录卡片 ===== */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: 8vw;
+      background: rgba(20, 20, 30, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 40px 34px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 60px rgba(255, 154, 200, 0.1);
+      animation: cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .logo { text-align: center; margin-bottom: 6px; }
+    .logo-icon {
+      display: inline-block;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+      box-shadow: 0 10px 30px rgba(255, 154, 200, 0.4);
+      font-size: 26px; line-height: 52px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .sub {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      margin-bottom: 26px;
+      letter-spacing: 0.1em;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: rgba(255, 255, 255, 0.75);
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      margin-bottom: 18px;
+      outline: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    input:focus {
+      border-color: #ff9ac8;
+      background: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 0 4px rgba(255, 154, 200, 0.12);
+    }
+    input::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+      letter-spacing: 0.1em;
+      transition: all 0.25s;
+      font-family: inherit;
+      box-shadow: 0 10px 24px rgba(255, 154, 200, 0.25);
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(255, 154, 200, 0.4);
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .msg {
+      margin-top: 16px;
+      padding: 11px 15px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+    }
+    .msg.err { display: block; background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    .msg.ok  { display: block; background: rgba(100,255,150,0.15); color: #a8ffc4; border: 1px solid rgba(100,255,150,0.3); }
+
+    .links {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .links a {
+      color: #ff9ac8;
+      text-decoration: none;
+      margin: 0 6px;
+      transition: all 0.2s;
+    }
+    .links a:hover { color: #fff; }
+    .divider { color: rgba(255, 255, 255, 0.2); margin: 0 4px; }
+
+    @media (max-width: 900px) {
+      .card {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #login-l2d {
+        opacity: 0.35;
+      }
+    }
+  </style>
+</head>
+<body>
+  <AnimeBackdrop live2d="none" petals={false} />
+  <div id="login-l2d"></div>
+  <div class="petals" id="petals"></div>
+
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon">🌸</div>
+    </div>
+    <h1>欢迎回来</h1>
+    <div class="sub">おかえりなさい</div>
+
+    <form id="loginForm">
+      <label>用户名</label>
+      <input type="text" id="username" required placeholder="你的用户名" autocomplete="username" />
+
+      <label>密码</label>
+      <input type="password" id="password" required placeholder="你的密码" autocomplete="current-password" />
+
+      <button type="submit" id="submitBtn">登 录</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="links">
+      还没有账号？<a href="/register/">去注册</a>
+      <span class="divider">·</span>
+      <a href="/">返回首页</a>
+    </div>
+  </div>
+
+  <script is:inline src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script>
+  <script is:inline src="/Firefly-live2d-main/load/pixi.min.js"></script>
+  <script is:inline src="/Firefly-live2d-main/load/cubism4.min.js"></script>
+
+  <script is:inline>
+    // ===== 樱花 =====
+    (function() {
+      const wrap = document.getElementById('petals');
+      if (!wrap) return;
+      for (let i = 0; i < 10; i++) {
+        const p = document.createElement('span');
+        p.className = 'petal';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (3 + Math.random() * 3) + 's';
+        p.style.animationDelay = (Math.random() * 4) + 's';
+        wrap.appendChild(p);
+      }
+    })();
+
+    // ============================================================
+    // 只在这里挑你要的模型（可选）
+    // 留空数组 [] 则从全部模型里随机加载，自动跳过失败的
+    // ============================================================
+    const PREFERRED_MODELS = [
+      // '/pio/models/live2d/Azue Lane(JP)/ailunsamuna_2_hx/ailunsamuna_2_hx.model3.json',
+      // '/pio/models/live2d/Azue Lane(JP)/aimudeng_2_hx/aimudeng_2_hx.model3.json',
+    ];
+
+    // ===== Live2D 全屏背景 =====
+    (async () => {
+      const stage = document.getElementById('login-l2d');
+      if (!stage) return;
+      if (typeof PIXI === 'undefined' || !PIXI.live2d) {
+        console.warn('Live2D 库未加载');
+        return;
+      }
+
+      // 选出模型池
+      let pool = [];
+      if (PREFERRED_MODELS.length > 0) {
+        pool = PREFERRED_MODELS.slice();
+      } else {
+        try {
+          const res = await fetch('/models-list.json');
+          const all = await res.json();
+          pool = Array.isArray(all) ? all.slice() : [];
+        } catch (e) {
+          console.warn('读取模型清单失败', e);
+          return;
+        }
+      }
+      if (!pool.length) return;
+
+      // 随机挑，加载失败自动换下一个
+      const start = Math.floor(Math.random() * pool.length);
+      let model = null;
+      for (let i = 0; i < pool.length; i++) {
+        const path = pool[(start + i) % pool.length];
+        try {
+          model = await PIXI.live2d.Live2DModel.from(path);
+          console.log('✅ 登录页加载:', path);
+          break;
+        } catch (e) {
+          console.warn('✗ 跳过:', path);
+        }
+      }
+      if (!model) {
+        console.warn('所有模型加载失败');
+        return;
+      }
+
+      const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+      const app = new PIXI.Application({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        resolution: DPR,
+        autoDensity: true,
+        antialias: true,
+        transparent: true,
+        backgroundColor: 0x000000,
+        backgroundAlpha: 0,
+      });
+      stage.appendChild(app.view);
+
+      app.stage.addChild(model);
+
+      // ===== 记录模型原始尺寸（一次就好，不会因为 scale 变化而变）=====
+      const bounds = model.getLocalBounds();
+      const ORIG_H = bounds.height || 1;
+
+      model.anchor.set(0.5, 1);
+      model.scale.set(1);
+
+      // ===== 布局：基于原始尺寸，稳定不失控 =====
+      function layoutModel() {
+        const W = window.innerWidth;
+        const H = window.innerHeight;
+
+        app.renderer.resize(W, H);
+
+        const s = (H * 0.95) / ORIG_H;
+        model.scale.set(s);
+
+        const isMobile = W < 900;
+        model.x = isMobile ? W / 2 : W * 0.3;
+        model.y = H + 20;
+      }
+
+      layoutModel();
+
+      // ===== resize 节流：150ms 内只重排一次 =====
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(layoutModel, 150);
+      });
+
+      // 待机动作
+      try { model.motion('idle'); } catch (e) {}
+
+      // 眼睛跟随鼠标
+      document.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth) * 2 - 1;
+        const y = (e.clientY / window.innerHeight) * 2 - 1;
+        try { model.focus(x * 1.2, -y * 1.2); } catch (e) {}
+      });
+    })();
+
+    // ===== 登录 =====
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('submitBtn');
+
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.className = 'msg ' + type;
+    }
+
+    function playWelcomeVoice() {
+      try {
+        const audio = new Audio('/tts/Nanami/0.mp3');
+        audio.volume = 0.9;
+        const p = audio.play();
+        if (p && p.catch) p.catch(() => {});
+      } catch (e) {}
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = '登录中…';
+      msg.className = 'msg';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/auth/login/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          showMsg('欢迎回来，' + (data.user?.username || '') + '！', 'ok');
+          if (window.AnimeSounds) window.AnimeSounds.play('login', 0.45);
+          playWelcomeVoice();
+          setTimeout(() => { location.href = '/'; }, 1500);
+        } else {
+          showMsg(data.error || '登录失败', 'err');
+          if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
+          btn.disabled = false;
+          btn.textContent = '登 录';
+        }
+      } catch (err) {
+        showMsg('网络错误，请重试', 'err');
+        if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
+        btn.disabled = false;
+        btn.textContent = '登 录';
+      }
+    });
+  </script>
+</body>
+</html>

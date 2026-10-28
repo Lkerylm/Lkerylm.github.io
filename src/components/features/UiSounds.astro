@@ -1,0 +1,241 @@
+---
+/**
+ * 二次元音效系统
+ * - 全局点击 / 轻触音效（铃音）
+ * - 登录、退出、成功、失败、通知等可编程音效
+ * - 左下角开关，状态保存在 localStorage
+ */
+---
+
+<div
+	id="anime-sound-toggle"
+	role="button"
+	tabindex="0"
+	aria-label="音效开关"
+	title="音效开关（点击切换）"
+>
+	<span id="anime-sound-icon" aria-hidden="true">🎵</span>
+	<span id="anime-sound-text">音效开</span>
+</div>
+
+<style is:global>
+	#anime-sound-toggle {
+		position: fixed;
+		left: 16px;
+		bottom: 16px;
+		z-index: 999995;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 7px 13px;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 154, 200, 0.38);
+		background: rgba(18, 16, 28, 0.55);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		color: #ffd9ea;
+		font-size: 12px;
+		line-height: 1;
+		cursor: pointer;
+		user-select: none;
+		box-shadow: 0 6px 22px rgba(255, 143, 193, 0.18);
+		transition:
+			transform 0.2s ease,
+			background 0.2s ease,
+			opacity 0.2s ease;
+	}
+	#anime-sound-toggle:hover {
+		transform: translateY(-2px);
+		background: rgba(38, 28, 50, 0.75);
+	}
+	#anime-sound-toggle:focus-visible {
+		outline: 2px solid rgba(255, 154, 200, 0.8);
+		outline-offset: 2px;
+	}
+	#anime-sound-toggle.is-off {
+		opacity: 0.55;
+		border-color: rgba(255, 255, 255, 0.18);
+		color: rgba(255, 255, 255, 0.65);
+	}
+	#anime-sound-icon {
+		font-size: 14px;
+	}
+	@media (max-width: 640px) {
+		#anime-sound-toggle {
+			left: 10px;
+			bottom: 10px;
+			padding: 7px 10px;
+		}
+		#anime-sound-text {
+			display: none;
+		}
+	}
+</style>
+
+<script is:inline>
+	(function () {
+		if (window.__animeSoundsInit) return;
+		window.__animeSoundsInit = true;
+
+		var STORAGE_KEY = "anime-sound-enabled";
+		var FILES = {
+			click: "/sounds/ui/click.wav",
+			tap: "/sounds/ui/tap.wav",
+			login: "/sounds/ui/login.wav",
+			logout: "/sounds/ui/logout.wav",
+			success: "/sounds/ui/success.wav",
+			error: "/sounds/ui/error.wav",
+			notification: "/sounds/ui/notification.wav",
+			open: "/sounds/ui/open.wav",
+			close: "/sounds/ui/close.wav",
+		};
+
+		var enabled = true;
+		try {
+			enabled = localStorage.getItem(STORAGE_KEY) !== "false";
+		} catch (e) {}
+
+		var cache = {};
+
+		function getAudio(name) {
+			if (cache[name]) return cache[name];
+			var audio = new Audio(FILES[name] || FILES.click);
+			audio.preload = "auto";
+			cache[name] = audio;
+			return audio;
+		}
+
+		function play(name, volume) {
+			if (!enabled) return null;
+			try {
+				var src = getAudio(name);
+				var audio = src.cloneNode(true);
+				audio.volume = typeof volume === "number" ? volume : 0.3;
+				var p = audio.play();
+				if (p && p.catch) p.catch(function () {});
+				return audio;
+			} catch (e) {
+				return null;
+			}
+		}
+
+		function syncUi() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			var icon = document.getElementById("anime-sound-icon");
+			var text = document.getElementById("anime-sound-text");
+			if (!toggle) return;
+			toggle.classList.toggle("is-off", !enabled);
+			toggle.setAttribute("aria-pressed", String(enabled));
+			if (icon) icon.textContent = enabled ? "🎵" : "🔇";
+			if (text) text.textContent = enabled ? "音效开" : "音效关";
+		}
+
+		function setEnabled(value) {
+			enabled = Boolean(value);
+			try {
+				localStorage.setItem(STORAGE_KEY, String(enabled));
+			} catch (e) {}
+			syncUi();
+			if (enabled) play("open", 0.25);
+		}
+
+		window.AnimeSounds = {
+			play: play,
+			setEnabled: setEnabled,
+			isEnabled: function () {
+				return enabled;
+			},
+			toggle: function () {
+				setEnabled(!enabled);
+				return enabled;
+			},
+		};
+
+		// 全局点击音效（捕获阶段，保证动态元素也能生效）
+		// 覆盖：导航、按钮、链接、标签、分类、分页、目录、卡片等所有可点击元素
+		var nearMotion =
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		var SPARKS = ["✨", "💖", "🌸", "⭐", "🎀", "💫"];
+		var lastSpark = 0;
+
+		function sparkle(x, y) {
+			if (nearMotion) return;
+			var now = Date.now();
+			if (now - lastSpark < 70) return;
+			lastSpark = now;
+			var el = document.createElement("span");
+			el.className = "anime-click-spark";
+			el.textContent = SPARKS[Math.floor(Math.random() * SPARKS.length)];
+			el.style.left = x + "px";
+			el.style.top = y + "px";
+			el.style.setProperty(
+				"--spark-x",
+				Math.round(Math.random() * 52 - 26) + "px",
+			);
+			document.body.appendChild(el);
+			setTimeout(function () {
+				el.remove();
+			}, 720);
+		}
+
+		document.addEventListener(
+			"click",
+			function (event) {
+				var target = event.target;
+				if (!target || !target.closest) return;
+				if (
+					target.closest(
+						"#anime-sound-toggle, [data-no-sound], input, textarea, select, option",
+					)
+				) {
+					return;
+				}
+				var el = target.closest(
+					'[data-sound], a, button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn, summary, label[for], .tab, .nav-item, .post-card-wrapper',
+				);
+				if (!el) return;
+
+				var custom = el.getAttribute && el.getAttribute("data-sound");
+				var isButton = el.matches(
+					'button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn',
+				);
+				play(custom || (isButton ? "click" : "tap"), isButton ? 0.22 : 0.18);
+
+				var rect =
+					target.getBoundingClientRect && target.getBoundingClientRect();
+				sparkle(
+					event.clientX ||
+						(rect ? rect.left + rect.width / 2 : window.innerWidth / 2),
+					event.clientY ||
+						(rect ? rect.top + rect.height / 2 : window.innerHeight / 2),
+				);
+			},
+			true,
+		);
+
+		function bindToggle() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			if (!toggle || toggle.dataset.bound === "1") return;
+			toggle.dataset.bound = "1";
+			syncUi();
+			toggle.addEventListener("click", function (event) {
+				event.stopPropagation();
+				if (window.AnimeSounds) window.AnimeSounds.toggle();
+			});
+			toggle.addEventListener("keydown", function (event) {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					if (window.AnimeSounds) window.AnimeSounds.toggle();
+				}
+			});
+		}
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", bindToggle);
+		} else {
+			bindToggle();
+		}
+		document.addEventListener("swup:page:view", bindToggle);
+	})();
+</script>

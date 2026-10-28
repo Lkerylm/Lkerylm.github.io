@@ -1,0 +1,192 @@
+---
+export const prerender = false;
+import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
+import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+import { db } from "@/lib/db";
+
+const { username } = Astro.params;
+
+const user = db
+  .prepare(`SELECT id, username, email, role, created_at,
+    (SELECT COUNT(*) FROM posts WHERE author_id = users.id AND status = 'approved') AS post_count
+    FROM users WHERE username = ?`)
+  .get(username) as any;
+
+if (!user) {
+  return Astro.redirect("/community/");
+}
+
+const rawPosts = db
+  .prepare(
+    `SELECT id, title, slug, content, created_at,
+      (SELECT COUNT(*) FROM comments c WHERE c.post_id = posts.id AND c.status = 'approved') AS comment_count
+     FROM posts
+     WHERE author_id = ? AND status = 'approved'
+     ORDER BY created_at DESC`
+  )
+  .all(user.id) as any[];
+
+// 在 frontmatter 里预先计算摘要（模板里不能算）
+const posts = rawPosts.map((p) => {
+  const raw = String(p.content)
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[#>*`_~\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return {
+    ...p,
+    excerpt: raw.slice(0, 150),
+    hasMore: raw.length > 150,
+    dateStr: new Date(p.created_at * 1000).toLocaleDateString("zh-CN"),
+  };
+});
+---
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{user.username} 的主页 - 我的动漫小屋</title>
+  <AnimeHeadMeta />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
+      font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
+      color: #fff; padding: 40px 20px;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    .user-card {
+      display: flex; align-items: center; gap: 24px;
+      padding: 28px 32px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .avatar {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 10px 30px rgba(255, 154, 200, 0.3);
+    }
+    .user-info { flex: 1; min-width: 200px; }
+    .user-name {
+      font-size: 24px; font-weight: 700;
+      margin: 0 0 8px;
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap;
+    }
+    .role-badge {
+      font-size: 12px; font-weight: 500;
+      padding: 3px 10px; border-radius: 6px;
+      background: rgba(167, 139, 250, 0.2);
+      color: #c4b5fd;
+    }
+    .user-meta {
+      font-size: 13px; color: rgba(255, 255, 255, 0.5);
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .user-meta strong { color: #ff9ac8; font-weight: 600; }
+    .section-title {
+      font-size: 18px; font-weight: 600;
+      margin: 0 0 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .posts { display: flex; flex-direction: column; gap: 12px; }
+    .post-card {
+      display: block;
+      padding: 18px 22px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      text-decoration: none; color: inherit;
+      transition: all 0.2s;
+    }
+    .post-card:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 154, 200, 0.3);
+      transform: translateX(4px);
+    }
+    .post-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: #fff; }
+    .post-excerpt {
+      font-size: 13px; line-height: 1.6;
+      color: rgba(255, 255, 255, 0.55);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .post-meta {
+      font-size: 12px; color: rgba(255, 255, 255, 0.4);
+      display: flex; gap: 12px;
+    }
+    .post-comments { color: rgba(255, 154, 200, 0.85); }
+    .empty {
+      text-align: center; padding: 60px 20px;
+      color: rgba(255, 255, 255, 0.4); font-size: 14px;
+    }
+    .back {
+      display: inline-block; margin-top: 32px;
+      color: #ff9ac8; text-decoration: none; font-size: 14px;
+    }
+    .back:hover { text-decoration: underline; }
+    @media (max-width: 640px) {
+      .user-card { padding: 20px; }
+      .avatar { width: 64px; height: 64px; font-size: 26px; }
+      .user-name { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <AnimeBackdrop />
+  <div class="container">
+    <div class="user-card">
+      <div class="avatar">{user.username.charAt(0).toUpperCase()}</div>
+      <div class="user-info">
+        <h1 class="user-name">
+          {user.username}
+          {user.role === "admin" && <span class="role-badge">管理员</span>}
+        </h1>
+        <div class="user-meta">
+          <span>已发布 <strong>{user.post_count}</strong> 篇文章</span>
+          <span>加入于 {new Date(user.created_at * 1000).toLocaleDateString("zh-CN")}</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">📝 TA 的文章</h2>
+
+    {posts.length === 0 ? (
+      <div class="empty">还没有发布过文章</div>
+    ) : (
+      <div class="posts">
+        {posts.map((p) => (
+          <a class="post-card" href={`/community/${encodeURIComponent(p.slug)}/`}>
+            <div class="post-title">{p.title}</div>
+            {p.excerpt && (
+              <div class="post-excerpt">
+                {p.excerpt}{p.hasMore ? "…" : ""}
+              </div>
+            )}
+            <div class="post-meta">
+              <span>{p.dateStr}</span>
+              <span class="post-comments">💬 {p.comment_count}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+
+    <a href="/community/" class="back">← 返回社区</a>
+  </div>
+</body>
+</html>
