@@ -17,9 +17,10 @@ const len = page.data.length;
 ---
 
 <MainGridLayout>
-  <!-- 🎯 使用 full-width 插槽，让卡片脱离网格限制，完美全屏 -->
-  <div slot="full-width" class="cf-wrapper">
-    <section id="community-feed" class="cf-section" data-astro-transition-persist="community-feed">
+  <!-- 🎬 首页横幅：单独的全宽区块，静态部署（无后端）时也能正常显示 -->
+  {page.currentPage === 1 && (
+  <div slot="full-width" class="hero-wrapper">
+    <div class="hero-card">
       <div class="anime-hero">
         <div class="ah-jp">ようこそ · アニメの世界へ</div>
         <div class="ah-title">欢迎来到 <span>我的动漫小屋</span></div>
@@ -32,6 +33,13 @@ const len = page.data.length;
           <a href="/app/">📱 App</a>
         </div>
       </div>
+    </div>
+  </div>
+  )}
+
+  <!-- 🔥 社区动态：依赖后端接口，静态部署由 anime-cute.css 里的 .cf-wrapper 规则隐藏 -->
+  <div slot="full-width" class="cf-wrapper">
+    <section id="community-feed" class="cf-section" data-astro-transition-persist="community-feed">
       <div class="cf-header">
         <h2>🔥 社区最新投稿</h2>
         <a href="/community/" class="cf-more">查看全部 →</a>
@@ -68,14 +76,134 @@ const len = page.data.length;
 </MainGridLayout>
 
 <style is:global>
-  /* 🎯 全屏布局：容器实现 100vw 居中，并向上悬浮 */
-  .cf-wrapper {
-    width: 100vw;
+  /* ===== 🎬 首页横幅（静态部署也可见） ===== */
+  .hero-wrapper {
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: -15vh; /* ⭐ 悬浮高度：如果觉得太高遮住文字，改成 -10vh；觉得太低，改成 -20vh */
-    margin-bottom: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+    margin: 4px 0 20px;
+    box-sizing: border-box;
+    z-index: 40;
+  }
+
+  /* 与主内容网格 (#main-grid) 同步下移，避免横幅压在 banner 上 */
+  body.enable-banner .hero-wrapper {
+    transform: translateY(var(--banner-height-extend, 0px));
+  }
+
+  .hero-card {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    padding: 22px 24px 14px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-sizing: border-box;
+    /* 粉紫渐变玻璃卡片，透出壁纸 */
+    background: linear-gradient(135deg, rgba(255, 122, 184, 0.18), rgba(167, 139, 250, 0.16) 55%, rgba(127, 197, 255, 0.14));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px) saturate(1.15);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  /* 右上角的粉紫光晕 */
+  .hero-card::before {
+    content: "";
+    position: absolute;
+    right: -60px;
+    top: -80px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 154, 200, 0.55), rgba(255, 154, 200, 0) 68%);
+    filter: blur(6px);
+    pointer-events: none;
+  }
+
+  /* 左下角的淡蓝光晕 */
+  .hero-card::after {
+    content: "";
+    position: absolute;
+    left: -50px;
+    bottom: -90px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(127, 197, 255, 0.45), rgba(127, 197, 255, 0) 70%);
+    filter: blur(6px);
+    pointer-events: none;
+  }
+
+  .hero-card > .anime-hero {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 6px 4px 12px;
+  }
+
+  .hero-card > .anime-hero::after {
+    bottom: 0;
+    width: 64%;
+  }
+
+  /* 平板/手机非首页：主网格不位移，横幅也要跟着取消位移 */
+  @media (max-width: 1023px) {
+    body.enable-banner:not(.lg\:is-home) .hero-wrapper {
+      transform: none;
+    }
+  }
+
+  /* 桌面/平板：底部留出横幅版权小胶囊（位于主网格上方 -3.25rem）的位置，避免被横卡压住 */
+  @media (min-width: 768px) {
+    .hero-wrapper {
+      margin-bottom: 80px;
+    }
+  }
+
+  /* 主网格（含横幅版权胶囊）绘制在横卡之上，避免横卡阴影把胶囊压成一条暗影 */
+  body:has(.hero-wrapper) #main-grid {
+    position: relative;
+    z-index: 45;
+  }
+
+  /* 手机端：卡片更紧凑 */
+  @media (max-width: 640px) {
+    .hero-wrapper {
+      padding: 0 12px;
+      margin: 2px 0 16px;
+    }
+    .hero-card {
+      padding: 18px 14px 8px;
+      border-radius: 18px;
+    }
+    .ah-jp {
+      font-size: 11px;
+      letter-spacing: .22em;
+    }
+    .ah-title {
+      font-size: 21px;
+    }
+    .ah-desc {
+      font-size: 12px;
+    }
+    .ah-chips {
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .ah-chips a {
+      height: 28px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+  }
+
+  /* 🎯 社区动态容器：全宽居中 */
+  .cf-wrapper {
+    width: 100%;
+    margin: 0 0 30px;
     z-index: 50;
     display: flex;
     justify-content: center;
