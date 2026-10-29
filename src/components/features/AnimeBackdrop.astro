@@ -1,4 +1,6 @@
 ---
+import AnimeVoice from "./AnimeVoice.astro";
+import AnimeWallpaperGallery from "./AnimeWallpaperGallery.astro";
 /**
  * 二次元全屏背景层
  * - 随机动漫壁纸（可手动切换，状态记忆）
@@ -26,7 +28,9 @@ const {
 	wallpaperButton = true,
 } = Astro.props;
 
-const desktop = [1, 2, 3, 4, 5].map((i) => `/anime-wallpaper/desktop-0${i}.avif`);
+const desktop = [1, 2, 3, 4, 5].map(
+	(i) => `/anime-wallpaper/desktop-0${i}.avif`,
+);
 const mobile = [1, 2, 3, 4, 5].map((i) => `/anime-wallpaper/mobile-0${i}.avif`);
 
 const petalList = Array.from({ length: 16 }, (_, i) => ({
@@ -93,6 +97,10 @@ const petalList = Array.from({ length: 16 }, (_, i) => ({
 }
 
 {sounds && <UiSounds />}
+
+<!-- 壁纸画廊 + 看板娘甜美声音：独立页面本身已是全屏壁纸，故不显示「全屏铺满」开关 -->
+<AnimeWallpaperGallery fullwall={false} />
+<AnimeVoice />
 
 <style is:global>
 	html {
@@ -361,6 +369,18 @@ const petalList = Array.from({ length: 16 }, (_, i) => ({
 		if (isNaN(index) || index < 0) {
 			index = Math.floor(Math.random() * desktop.length);
 		}
+		// 壁纸画廊（AnimeWallpaperGallery）手动选过的图片优先，避免两套逻辑打架
+		try {
+			var pickedKey =
+				window.innerWidth < 768
+					? "anime-wallpaper-mobile"
+					: "anime-wallpaper-desktop";
+			var picked = localStorage.getItem(pickedKey);
+			if (picked !== null) {
+				var pickedIndex = parseInt(picked, 10);
+				if (!isNaN(pickedIndex) && pickedIndex >= 0) index = pickedIndex;
+			}
+		} catch (e) {}
 
 		var wasMobile = window.innerWidth < 768;
 
@@ -524,7 +544,10 @@ const petalList = Array.from({ length: 16 }, (_, i) => ({
 					}
 
 					function playVoice() {
-						if (!voices.length || !voiceEnabled()) return;
+						if (!voiceEnabled()) return;
+						// 优先用「声音」面板里选的甜美语音包
+						if (window.AnimeVoice && window.AnimeVoice.play(0.55)) return;
+						if (!voices.length) return;
 						try {
 							var audio = new Audio(voices[Math.floor(Math.random() * voices.length)]);
 							audio.volume = 0.55;

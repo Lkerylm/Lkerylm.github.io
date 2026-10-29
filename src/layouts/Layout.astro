@@ -3,6 +3,8 @@ import GoogleAnalytics from "@components/analytics/GoogleAnalytics.astro";
 import La51Analytics from "@components/analytics/La51Analytics.astro";
 import MicrosoftClarity from "@components/analytics/MicrosoftClarity.astro";
 import UmamiAnalytics from "@components/analytics/UmamiAnalytics.astro";
+import AnimeVoice from "@components/features/AnimeVoice.astro";
+import AnimeWallpaperGallery from "@components/features/AnimeWallpaperGallery.astro";
 import FancyboxManager from "@components/features/FancyboxManager.astro";
 import FontManager from "@components/features/FontManager.astro";
 import MusicManager from "@components/features/MusicManager.astro";
@@ -574,6 +576,12 @@ const websiteJsonLd = JSON.stringify({
 
     <!-- 二次元 UI 音效（点击、登录、退出等） -->
     <UiSounds />
+
+    <!-- 壁纸画廊（列出所有动漫壁纸，可选可记） -->
+    <AnimeWallpaperGallery />
+
+    <!-- 看板娘甜美声音（多语音包可选，翻页播一句） -->
+    <AnimeVoice />
 
     <!-- Fancybox Manager -->
     <FancyboxManager />

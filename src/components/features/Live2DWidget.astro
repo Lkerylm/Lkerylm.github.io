@@ -248,6 +248,25 @@ const size = config.size || { width: 600, height: 700 };
 		}
 		window.__l2dPlayVoice = playRandomVoice;
 
+		// 语音包：「声音」面板（AnimeVoice.astro）里选中的甜美语音，默认全部随机
+		function filterVoicePool(all) {
+			if (!Array.isArray(all)) return [];
+			let pack = "all";
+			try {
+				pack = localStorage.getItem("anime-voice-pack") || "all";
+			} catch (e) {}
+			if (!pack || pack === "all") return all;
+			const picked = all.filter(
+				(file) => String(file).indexOf("/tts/" + pack + "/") !== -1,
+			);
+			return picked.length ? picked : all;
+		}
+		window.__l2dFilterVoicePool = filterVoicePool;
+		window.__l2dSetVoicePack = function () {
+			window.__l2dVoicePool = filterVoicePool(window.__l2dVoicePoolAll || []);
+			return window.__l2dVoicePool.length;
+		};
+
 		function showSoundTip() {
 			if (!soundTip) return;
 			soundTip.style.display = "block";
@@ -888,8 +907,9 @@ const size = config.size || { width: 600, height: 700 };
 			try {
 				const vres = await fetch("/voices-list.json");
 				voicePool = await vres.json();
-				window.__l2dVoicePool = voicePool;
-				console.log("[live2d] voices:", voicePool.length);
+				window.__l2dVoicePoolAll = voicePool;
+				window.__l2dVoicePool = filterVoicePool(voicePool);
+				console.log("[live2d] voices:", window.__l2dVoicePool.length);
 			} catch (e) { console.warn("[live2d] voices-list 加载失败", e); }
 
 			app = (() => {

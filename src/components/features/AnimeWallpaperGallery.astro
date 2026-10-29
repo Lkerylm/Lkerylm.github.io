@@ -1,0 +1,674 @@
+---
+/**
+ * 动漫壁纸画廊（全站可用）
+ * - 一个按钮打开面板，列出 public/anime-wallpaper 下所有桌面 / 手机壁纸
+ * - 点缩略图立即切换，选择保存在 localStorage（刷新 / 换页 / APK 内都记得）
+ * - 「全屏铺满」把壁纸从横幅区扩展成整屏固定背景
+ * - 主站走 banner 图池（window.__animeWallpaperApply），独立页面直接换 #anime-backdrop-img
+ */
+interface Props {
+	/** 按钮靠哪边：left 左下（默认，位于音效开关上方）；right 右下 */
+	side?: "left" | "right";
+	/** 是否显示「全屏铺满」开关（独立二次元页面本身就是全屏，可传 false） */
+	fullwall?: boolean;
+}
+
+const { side = "left", fullwall = true } = Astro.props;
+
+const groups = [
+	{
+		kind: "desktop",
+		title: "桌面壁纸",
+		hint: "宽屏",
+		items: [1, 2, 3, 4, 5].map((i) => ({
+			index: i - 1,
+			src: `/anime-wallpaper/desktop-0${i}.avif`,
+			label: `桌面壁纸 ${i}`,
+		})),
+	},
+	{
+		kind: "mobile",
+		title: "手机壁纸",
+		hint: "竖屏",
+		items: [1, 2, 3, 4, 5].map((i) => ({
+			index: i - 1,
+			src: `/anime-wallpaper/mobile-0${i}.avif`,
+			label: `手机壁纸 ${i}`,
+		})),
+	},
+];
+---
+
+<button
+	id="anime-wallpaper-open"
+	class:list={["anime-wallpaper-open", side === "right" ? "is-right" : ""]}
+	type="button"
+	title="壁纸画廊（挑选喜欢的动漫壁纸）"
+	aria-label="壁纸画廊"
+	aria-controls="anime-wallpaper-panel"
+	aria-expanded="false"
+>
+	<span aria-hidden="true">🌸</span>
+	<span class="anime-wallpaper-open-text">壁纸</span>
+</button>
+
+<div
+	id="anime-wallpaper-panel"
+	class="anime-wallpaper-panel"
+	role="dialog"
+	aria-label="壁纸画廊"
+	aria-modal="false"
+>
+	<div class="awg-head">
+		<strong>🌸 壁纸画廊</strong>
+		<span class="awg-sub">点一下就换，自动记住</span>
+		<button id="awg-close" type="button" class="awg-close" aria-label="关闭">✕</button>
+	</div>
+
+	{
+		groups.map((group) => (
+			<div class="awg-group">
+				<div class="awg-group-title">
+					<span>{group.title}</span>
+					<em>{group.hint}</em>
+				</div>
+				<div class="awg-grid" data-awg-grid={group.kind}>
+					{group.items.map((item) => (
+						<button
+							type="button"
+							class="awg-tile"
+							data-awg-kind={group.kind}
+							data-awg-index={item.index}
+							title={item.label}
+							aria-label={item.label}
+						>
+							<img src={item.src} alt={item.label} loading="lazy" decoding="async" />
+							<span class="awg-tile-index">{item.index + 1}</span>
+						</button>
+					))}
+				</div>
+			</div>
+		))
+	}
+
+	<div class="awg-foot">
+		<button id="awg-random" type="button" class="awg-btn">🎲 随机一张</button>
+		{
+			fullwall && (
+				<button
+					id="awg-fullwall"
+					type="button"
+					class="awg-btn is-switch"
+					role="switch"
+					aria-checked="false"
+					title="让壁纸铺满整个屏幕，而不是只占顶部横幅"
+				>
+					<span class="awg-switch-dot" aria-hidden="true" />
+					<span id="awg-fullwall-text">全屏铺满</span>
+				</button>
+			)
+		}
+		<button id="awg-reset" type="button" class="awg-btn awg-btn-ghost">恢复默认</button>
+	</div>
+
+	<div class="awg-tip">共 {groups.reduce((n, g) => n + g.items.length, 0)} 张壁纸 · 全部离线可用</div>
+</div>
+
+<div id="anime-fullwall-layer" aria-hidden="true">
+	<img id="anime-fullwall-img" src="/anime-wallpaper/desktop-01.avif" alt="" />
+	<div class="anime-fullwall-veil"></div>
+</div>
+
+<style is:global>
+	/* 旧的「换壁纸」单按钮由壁纸画廊接管，避免两个按钮打架 */
+	#anime-wallpaper-next {
+		display: none !important;
+	}
+
+	.anime-wallpaper-open {
+		position: fixed;
+		left: 16px;
+		bottom: 62px;
+		z-index: 999996;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 7px 13px;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 154, 200, 0.38);
+		background: rgba(18, 16, 28, 0.55);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		color: #ffd9ea;
+		font-size: 12px;
+		line-height: 1;
+		cursor: pointer;
+		user-select: none;
+		box-shadow: 0 6px 22px rgba(255, 143, 193, 0.18);
+		transition:
+			transform 0.2s ease,
+			background 0.2s ease;
+	}
+	.anime-wallpaper-open.is-right {
+		left: auto;
+		right: 16px;
+	}
+	.anime-wallpaper-open:hover {
+		transform: translateY(-2px);
+		background: rgba(38, 28, 50, 0.75);
+	}
+	.anime-wallpaper-open:focus-visible {
+		outline: 2px solid rgba(255, 154, 200, 0.8);
+		outline-offset: 2px;
+	}
+
+	.anime-wallpaper-panel {
+		position: fixed;
+		left: 16px;
+		bottom: 104px;
+		z-index: 1000002;
+		width: 336px;
+		max-width: calc(100vw - 24px);
+		max-height: min(72vh, 560px);
+		display: none;
+		flex-direction: column;
+		gap: 10px;
+		padding: 12px;
+		overflow-y: auto;
+		border-radius: 16px;
+		border: 1px solid rgba(255, 154, 200, 0.35);
+		background: rgba(18, 16, 28, 0.94);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		color: #ffe9f3;
+		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+	}
+	.anime-wallpaper-panel.is-open {
+		display: flex;
+		animation: awg-pop 0.18s ease-out;
+	}
+	@keyframes awg-pop {
+		from {
+			opacity: 0;
+			transform: translateY(8px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	.awg-head {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
+	}
+	.awg-head strong {
+		font-weight: 600;
+	}
+	.awg-sub {
+		font-size: 10.5px;
+		color: rgba(255, 233, 243, 0.5);
+	}
+	.awg-close {
+		margin-left: auto;
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 999px;
+		background: transparent;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 11px;
+		cursor: pointer;
+	}
+	.awg-group-title {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
+		margin-bottom: 6px;
+		font-size: 11.5px;
+		color: rgba(255, 233, 243, 0.82);
+	}
+	.awg-group-title em {
+		font-style: normal;
+		font-size: 10px;
+		color: rgba(255, 233, 243, 0.42);
+	}
+
+	.awg-grid {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 6px;
+	}
+
+	.awg-tile {
+		position: relative;
+		aspect-ratio: 3 / 4;
+		padding: 0;
+		overflow: hidden;
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: rgba(255, 255, 255, 0.06);
+		cursor: pointer;
+		transition:
+			transform 0.16s ease,
+			border-color 0.16s ease,
+			box-shadow 0.16s ease;
+	}
+	.awg-tile img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.awg-tile:hover {
+		transform: translateY(-2px);
+		border-color: rgba(255, 154, 200, 0.7);
+	}
+	.awg-tile.is-active {
+		border-color: #ff9ac8;
+		box-shadow:
+			0 0 0 2px rgba(255, 154, 200, 0.55),
+			0 8px 18px rgba(255, 143, 193, 0.28);
+	}
+	.awg-tile.is-active::after {
+		content: "✓";
+		position: absolute;
+		right: 3px;
+		bottom: 2px;
+		font-size: 11px;
+		color: #fff;
+		text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+	}
+	.awg-tile-index {
+		position: absolute;
+		left: 3px;
+		top: 2px;
+		font-size: 9px;
+		line-height: 1;
+		padding: 2px 4px;
+		border-radius: 4px;
+		background: rgba(0, 0, 0, 0.45);
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.awg-foot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+	.awg-btn {
+		flex: 1 1 auto;
+		padding: 7px 10px;
+		border-radius: 9px;
+		border: 1px solid rgba(255, 154, 200, 0.42);
+		background: rgba(255, 154, 200, 0.14);
+		color: #ffd9ea;
+		font-size: 11.5px;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.awg-btn:hover {
+		background: rgba(255, 154, 200, 0.26);
+	}
+	.awg-btn-ghost {
+		border-color: rgba(255, 255, 255, 0.16);
+		background: transparent;
+		color: rgba(255, 255, 255, 0.7);
+	}
+	.awg-btn.is-switch {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		border-color: rgba(255, 255, 255, 0.16);
+		background: transparent;
+		color: rgba(255, 255, 255, 0.7);
+	}
+	.awg-switch-dot {
+		position: relative;
+		flex: 0 0 auto;
+		width: 22px;
+		height: 12px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.22);
+		transition: background 0.18s ease;
+	}
+	.awg-switch-dot::after {
+		content: "";
+		position: absolute;
+		top: 1px;
+		left: 1px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: #fff;
+		transition: transform 0.18s ease;
+	}
+	.awg-btn.is-switch[aria-checked="true"] {
+		border-color: rgba(255, 154, 200, 0.65);
+		color: #ffd9ea;
+	}
+	.awg-btn.is-switch[aria-checked="true"] .awg-switch-dot {
+		background: #ff9ac8;
+	}
+	.awg-btn.is-switch[aria-checked="true"] .awg-switch-dot::after {
+		transform: translateX(10px);
+	}
+
+	.awg-tip {
+		font-size: 10px;
+		color: rgba(255, 233, 243, 0.4);
+		text-align: center;
+	}
+
+	/* ===== 全屏铺满：壁纸铺到整个屏幕，横幅区只留标题与渐变 ===== */
+	#anime-fullwall-layer {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		display: none;
+		pointer-events: none;
+		overflow: hidden;
+		background: #08070f;
+	}
+	html[data-anime-fullwall="1"] #anime-fullwall-layer {
+		display: block;
+	}
+	#anime-fullwall-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		transform: scale(1.03);
+		filter: saturate(1.08) brightness(0.84);
+		transition: opacity 0.5s ease;
+	}
+	.anime-fullwall-veil {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(
+				180deg,
+				rgba(8, 7, 15, 0.18) 0%,
+				rgba(8, 7, 15, 0.32) 52%,
+				rgba(8, 7, 15, 0.86) 100%
+			),
+			radial-gradient(ellipse 70% 55% at 12% 0%, rgba(255, 143, 193, 0.22), transparent 62%),
+			radial-gradient(ellipse 60% 50% at 92% 12%, rgba(167, 139, 250, 0.2), transparent 66%);
+	}
+	html[data-anime-fullwall="1"] #banner-images-container {
+		opacity: 0;
+		transition: opacity 0.4s ease;
+	}
+
+	@media (max-width: 640px) {
+		.anime-wallpaper-open {
+			left: 10px;
+			bottom: 56px;
+			padding: 7px 10px;
+		}
+		.anime-wallpaper-open.is-right {
+			left: auto;
+			right: 10px;
+		}
+		.anime-wallpaper-open-text {
+			display: none;
+		}
+		.anime-wallpaper-panel {
+			left: 10px;
+			right: 10px;
+			bottom: 98px;
+			width: auto;
+			max-width: none;
+		}
+	}
+</style>
+
+<script is:inline>
+	(function () {
+		if (window.__animeWallpaperGalleryInit) return;
+		window.__animeWallpaperGalleryInit = true;
+
+		var KEY_D = "anime-wallpaper-desktop";
+		var KEY_M = "anime-wallpaper-mobile";
+		var KEY_FULL = "anime-wallpaper-fullwall";
+
+		function read(key, dflt) {
+			try {
+				var v = localStorage.getItem(key);
+				return v === null ? dflt : v;
+			} catch (e) {
+				return dflt;
+			}
+		}
+		function write(key, value) {
+			try {
+				localStorage.setItem(key, String(value));
+			} catch (e) {}
+		}
+		function toIndex(value, max) {
+			var n = parseInt(value, 10);
+			if (isNaN(n) || n < 0 || n >= max) return 0;
+			return n;
+		}
+		function isMobile() {
+			return !!(
+				window.matchMedia && window.matchMedia("(max-width: 1023px)").matches
+			);
+		}
+		function pathOf(kind, index) {
+			return "/anime-wallpaper/" + kind + "-0" + (index + 1) + ".avif";
+		}
+		function els() {
+			return {
+				panel: document.getElementById("anime-wallpaper-panel"),
+				open: document.getElementById("anime-wallpaper-open"),
+				layerImg: document.getElementById("anime-fullwall-img"),
+				full: document.getElementById("awg-fullwall"),
+			};
+		}
+		function tileCount(kind) {
+			var grid = document.querySelector('[data-awg-grid="' + kind + '"]');
+			var tiles = grid ? grid.querySelectorAll("[data-awg-kind]") : [];
+			return tiles.length || 5;
+		}
+		function currentIndex(kind) {
+			return toIndex(read(kind === "mobile" ? KEY_M : KEY_D, 0), tileCount(kind));
+		}
+		function hasPick(kind) {
+			try {
+				return localStorage.getItem(kind === "mobile" ? KEY_M : KEY_D) !== null;
+			} catch (e) {
+				return false;
+			}
+		}
+
+		// 全屏层：始终跟随「当前设备」那一套壁纸
+		function applyFullwallImage(kind, index) {
+			var e = els();
+			if (e.layerImg) e.layerImg.src = pathOf(kind, index);
+		}
+
+		// 独立二次元页面：直接换背景图（带淡入过渡）
+		function applyStandalone(src) {
+			var bg = document.getElementById("anime-backdrop-img");
+			if (!bg) return;
+			if (bg.getAttribute("src") === src) return;
+			bg.style.opacity = "0";
+			setTimeout(function () {
+				bg.src = src;
+				bg.style.opacity = "";
+			}, 160);
+		}
+
+		function syncTiles() {
+			var tiles = document.querySelectorAll("[data-awg-kind]");
+			for (var i = 0; i < tiles.length; i++) {
+				var tile = tiles[i];
+				var kind = tile.getAttribute("data-awg-kind");
+				var index = parseInt(tile.getAttribute("data-awg-index"), 10);
+				tile.classList.toggle(
+					"is-active",
+					hasPick(kind) && index === currentIndex(kind),
+				);
+			}
+		}
+
+		function syncFull() {
+			var on = read(KEY_FULL, "0") === "1";
+			document.documentElement.setAttribute("data-anime-fullwall", on ? "1" : "0");
+			var e = els();
+			if (e.full) e.full.setAttribute("aria-checked", on ? "true" : "false");
+		}
+
+		function pick(kind, index) {
+			write(kind === "mobile" ? KEY_M : KEY_D, index);
+			if (typeof window.__animeWallpaperApply === "function") {
+				try {
+					window.__animeWallpaperApply(kind, index);
+				} catch (e) {}
+			} else {
+				applyStandalone(pathOf(kind, index));
+			}
+			applyFullwallImage(kind, index);
+			syncTiles();
+			if (window.AnimeSounds) window.AnimeSounds.play("open", 0.2);
+		}
+
+		function randomPick() {
+			var kinds = ["desktop", "mobile"];
+			for (var i = 0; i < kinds.length; i++) {
+				var kind = kinds[i];
+				pick(kind, Math.floor(Math.random() * tileCount(kind)));
+			}
+		}
+
+		function resetPicks() {
+			try {
+				localStorage.removeItem(KEY_D);
+				localStorage.removeItem(KEY_M);
+				localStorage.removeItem(KEY_FULL);
+			} catch (e) {}
+			syncFull();
+			randomPick();
+		}
+
+		// 页面加载 / swup 切页后：把保存的选择重新贴回页面
+		function restore() {
+			syncFull();
+			syncTiles();
+			var kinds = ["desktop", "mobile"];
+			for (var i = 0; i < kinds.length; i++) {
+				var kind = kinds[i];
+				if (!hasPick(kind)) continue;
+				var index = currentIndex(kind);
+				if (typeof window.__animeWallpaperApply === "function") {
+					try {
+						window.__animeWallpaperApply(kind, index);
+					} catch (e) {}
+				} else if (kind === (isMobile() ? "mobile" : "desktop")) {
+					applyStandalone(pathOf(kind, index));
+				}
+				applyFullwallImage(kind, index);
+			}
+		}
+
+		function openPanel(open) {
+			var e = els();
+			if (!e.panel) return;
+			e.panel.classList.toggle("is-open", open);
+			if (e.open) e.open.setAttribute("aria-expanded", open ? "true" : "false");
+			if (open && window.AnimeSounds) window.AnimeSounds.play("open", 0.2);
+		}
+
+		document.addEventListener(
+			"click",
+			function (event) {
+				var target = event.target;
+				if (!target || !target.closest) return;
+				var e = els();
+
+				if (target.closest("#anime-wallpaper-open")) {
+					openPanel(!(e.panel && e.panel.classList.contains("is-open")));
+					return;
+				}
+				if (target.closest("#awg-close")) {
+					openPanel(false);
+					return;
+				}
+				var tile = target.closest("[data-awg-kind]");
+				if (tile) {
+					pick(
+						tile.getAttribute("data-awg-kind"),
+						parseInt(tile.getAttribute("data-awg-index"), 10) || 0,
+					);
+					return;
+				}
+				if (target.closest("#awg-random")) {
+					randomPick();
+					return;
+				}
+				if (target.closest("#awg-fullwall")) {
+					var on = read(KEY_FULL, "0") === "1";
+					write(KEY_FULL, on ? "0" : "1");
+					syncFull();
+					var kind = isMobile() ? "mobile" : "desktop";
+					applyFullwallImage(kind, currentIndex(kind));
+					if (window.AnimeSounds) window.AnimeSounds.play("click", 0.2);
+					return;
+				}
+				if (target.closest("#awg-reset")) {
+					resetPicks();
+					return;
+				}
+				if (
+					e.panel &&
+					e.panel.classList.contains("is-open") &&
+					!target.closest("#anime-wallpaper-panel")
+				) {
+					openPanel(false);
+				}
+			},
+			true,
+		);
+
+		document.addEventListener("keydown", function (event) {
+			if (event.key === "Escape") openPanel(false);
+		});
+
+		var resizeTimer = null;
+		window.addEventListener("resize", function () {
+			if (resizeTimer) clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(function () {
+				var kind = isMobile() ? "mobile" : "desktop";
+				applyFullwallImage(kind, currentIndex(kind));
+				syncTiles();
+			}, 200);
+		});
+
+		function boot() {
+			restore();
+			setTimeout(restore, 320);
+		}
+
+		window.AnimeWallpaperGallery = {
+			pick: pick,
+			restore: restore,
+			isFullwall: function () {
+				return read(KEY_FULL, "0") === "1";
+			},
+		};
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", boot);
+		} else {
+			boot();
+		}
+		document.addEventListener("swup:page:view", boot);
+	})();
+</script>

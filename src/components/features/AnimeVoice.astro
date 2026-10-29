@@ -1,0 +1,610 @@
+---
+/**
+ * 看板娘甜美声音（全站可用）
+ * - 语音包选择：public/tts 下 9 组甜美语音（晓晓 / 晓妮 / 七海 / 希儿 …），数据来自 /voice-packs.json
+ * - 每切换一个页面播一句（同一个页面只播一次），点看板娘时的声音也走这里选的包
+ * - 音量、开关、选中的语音包都存 localStorage，离线 APK 内同样生效
+ */
+---
+
+<button
+	id="anime-voice-open"
+	class="anime-voice-open"
+	type="button"
+	title="看板娘声音（选择甜美语音包）"
+	aria-label="看板娘声音"
+	aria-controls="anime-voice-panel"
+	aria-expanded="false"
+>
+	<span aria-hidden="true">💗</span>
+	<span class="anime-voice-open-text">声音</span>
+</button>
+
+<div
+	id="anime-voice-panel"
+	class="anime-voice-panel"
+	role="dialog"
+	aria-label="看板娘声音"
+	aria-modal="false"
+>
+	<div class="avp-head">
+		<strong>💗 看板娘声音</strong>
+		<span class="avp-sub">每翻一页说一句</span>
+		<button id="avp-close" type="button" class="avp-close" aria-label="关闭">✕</button>
+	</div>
+
+	<div class="avp-switches">
+		<button
+			id="avp-enabled"
+			type="button"
+			class="avp-btn is-switch"
+			role="switch"
+			aria-checked="true"
+			title="开关页面语音"
+		>
+			<span class="avp-switch-dot" aria-hidden="true"></span>
+			<span id="avp-enabled-text">页面语音</span>
+		</button>
+		<label class="avp-volume">
+			<span aria-hidden="true">🔊</span>
+			<input id="avp-volume" type="range" min="0" max="100" step="5" value="70" />
+		</label>
+	</div>
+
+	<div id="anime-voice-list" class="avp-list">
+		<div class="avp-loading">正在加载语音包…</div>
+	</div>
+
+	<div class="avp-tip">共 <span id="avp-count">0</span> 组语音 · 全部本地文件，离线可用</div>
+</div>
+
+<style is:global>
+	.anime-voice-open {
+		position: fixed;
+		left: 16px;
+		bottom: 108px;
+		z-index: 999996;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 7px 13px;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 154, 200, 0.38);
+		background: rgba(18, 16, 28, 0.55);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		color: #ffd9ea;
+		font-size: 12px;
+		line-height: 1;
+		cursor: pointer;
+		user-select: none;
+		box-shadow: 0 6px 22px rgba(255, 143, 193, 0.18);
+		transition:
+			transform 0.2s ease,
+			background 0.2s ease;
+	}
+	.anime-voice-open:hover {
+		transform: translateY(-2px);
+		background: rgba(38, 28, 50, 0.75);
+	}
+	.anime-voice-open:focus-visible {
+		outline: 2px solid rgba(255, 154, 200, 0.8);
+		outline-offset: 2px;
+	}
+
+	.anime-voice-panel {
+		position: fixed;
+		left: 16px;
+		bottom: 150px;
+		z-index: 1000002;
+		width: 320px;
+		max-width: calc(100vw - 24px);
+		max-height: min(72vh, 560px);
+		display: none;
+		flex-direction: column;
+		gap: 10px;
+		padding: 12px;
+		overflow-y: auto;
+		border-radius: 16px;
+		border: 1px solid rgba(255, 154, 200, 0.35);
+		background: rgba(18, 16, 28, 0.94);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		color: #ffe9f3;
+		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+	}
+	.anime-voice-panel.is-open {
+		display: flex;
+		animation: avp-pop 0.18s ease-out;
+	}
+	@keyframes avp-pop {
+		from {
+			opacity: 0;
+			transform: translateY(8px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	.avp-head {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
+	}
+	.avp-head strong {
+		font-weight: 600;
+	}
+	.avp-sub {
+		font-size: 10.5px;
+		color: rgba(255, 233, 243, 0.5);
+	}
+	.avp-close {
+		margin-left: auto;
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 999px;
+		background: transparent;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 11px;
+		cursor: pointer;
+	}
+	.avp-close:hover {
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	.avp-switches {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.avp-btn {
+		padding: 6px 10px;
+		border-radius: 9px;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		background: transparent;
+		color: rgba(255, 255, 255, 0.72);
+		font-size: 11.5px;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.avp-btn.is-switch {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.avp-btn.is-switch[aria-checked="true"] {
+		border-color: rgba(255, 154, 200, 0.65);
+		color: #ffd9ea;
+	}
+	.avp-switch-dot {
+		position: relative;
+		flex: 0 0 auto;
+		width: 22px;
+		height: 12px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.22);
+		transition: background 0.18s ease;
+	}
+	.avp-switch-dot::after {
+		content: "";
+		position: absolute;
+		top: 1px;
+		left: 1px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: #fff;
+		transition: transform 0.18s ease;
+	}
+	.avp-btn.is-switch[aria-checked="true"] .avp-switch-dot {
+		background: #ff9ac8;
+	}
+	.avp-btn.is-switch[aria-checked="true"] .avp-switch-dot::after {
+		transform: translateX(10px);
+	}
+	.avp-volume {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin-left: auto;
+		font-size: 12px;
+		color: rgba(255, 233, 243, 0.8);
+	}
+	.avp-volume input[type="range"] {
+		width: 84px;
+		accent-color: #ff9ac8;
+		cursor: pointer;
+	}
+
+	.avp-list {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.avp-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 7px 9px;
+		border-radius: 10px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.04);
+		cursor: pointer;
+		text-align: left;
+		color: inherit;
+		font-family: inherit;
+		transition:
+			border-color 0.16s ease,
+			background 0.16s ease;
+	}
+	.avp-item:hover {
+		border-color: rgba(255, 154, 200, 0.55);
+	}
+	.avp-item.is-active {
+		border-color: #ff9ac8;
+		background: rgba(255, 154, 200, 0.14);
+	}
+	.avp-item-emoji {
+		font-size: 15px;
+		line-height: 1;
+	}
+	.avp-item-main {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
+	.avp-item-name {
+		font-size: 12px;
+		color: #ffe9f3;
+	}
+	.avp-item-desc {
+		font-size: 10px;
+		color: rgba(255, 233, 243, 0.45);
+	}
+	.avp-item-count {
+		margin-left: auto;
+		font-size: 10px;
+		color: rgba(255, 233, 243, 0.35);
+		white-space: nowrap;
+	}
+	.avp-preview {
+		flex: 0 0 auto;
+		width: 26px;
+		height: 26px;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 154, 200, 0.45);
+		background: rgba(255, 154, 200, 0.12);
+		color: #ffd9ea;
+		font-size: 10px;
+		line-height: 1;
+		cursor: pointer;
+	}
+	.avp-preview:hover {
+		background: rgba(255, 154, 200, 0.3);
+	}
+	.avp-loading {
+		padding: 12px 0;
+		text-align: center;
+		font-size: 11.5px;
+		color: rgba(255, 233, 243, 0.5);
+	}
+	.avp-tip {
+		font-size: 10px;
+		text-align: center;
+		color: rgba(255, 233, 243, 0.4);
+	}
+
+	@media (max-width: 640px) {
+		.anime-voice-open {
+			left: 10px;
+			bottom: 100px;
+			padding: 7px 10px;
+		}
+		.anime-voice-open-text {
+			display: none;
+		}
+		.anime-voice-panel {
+			left: 10px;
+			right: 10px;
+			bottom: 142px;
+			width: auto;
+			max-width: none;
+		}
+	}
+</style>
+
+<script is:inline>
+	(function () {
+		if (window.__animeVoiceInit) return;
+		window.__animeVoiceInit = true;
+
+		var KEY_PACK = "anime-voice-pack";
+		var KEY_ON = "anime-voice-enabled";
+		var KEY_VOL = "anime-voice-volume";
+		var DEFAULT_PACK = "Xiaoxiao";
+		var FALLBACK_PACK = {
+			id: "Xiaoxiao",
+			name: "晓晓",
+			desc: "甜到冒泡的软妹音",
+			emoji: "🌸",
+			files: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (i) {
+				return "/tts/Xiaoxiao/" + i + ".mp3";
+			}),
+		};
+
+		var packs = [FALLBACK_PACK];
+		var loaded = false;
+		var unlocked = false;
+		var lastSpokenPath = "";
+		var currentAudio = null;
+
+		function read(key, dflt) {
+			try {
+				var v = localStorage.getItem(key);
+				return v === null ? dflt : v;
+			} catch (e) {
+				return dflt;
+			}
+		}
+		function write(key, value) {
+			try {
+				localStorage.setItem(key, String(value));
+			} catch (e) {}
+		}
+		function isEnabled() {
+			return read(KEY_ON, "1") !== "0";
+		}
+		function volume() {
+			var v = parseInt(read(KEY_VOL, "70"), 10);
+			if (isNaN(v)) v = 70;
+			return Math.min(1, Math.max(0, v / 100));
+		}
+		function packId() {
+			return read(KEY_PACK, DEFAULT_PACK) || DEFAULT_PACK;
+		}
+		function soundMasterOn() {
+			// 尊重左下角「音效开关」：关掉时连语音也不播
+			return !window.AnimeSounds || window.AnimeSounds.isEnabled();
+		}
+		function findPack(id) {
+			for (var i = 0; i < packs.length; i++) {
+				if (packs[i].id === id) return packs[i];
+			}
+			return null;
+		}
+		function filesOf(id) {
+			var pack = findPack(id) || findPack(DEFAULT_PACK) || packs[0];
+			return pack && pack.files ? pack.files : [];
+		}
+
+		function playFile(file, vol) {
+			if (!file) return;
+			try {
+				if (currentAudio) {
+					try {
+						currentAudio.pause();
+					} catch (e) {}
+				}
+				var audio = new Audio(file);
+				audio.volume = typeof vol === "number" ? vol : volume();
+				currentAudio = audio;
+				var p = audio.play();
+				if (p && p.catch) p.catch(function () {});
+			} catch (e) {}
+		}
+
+		function play(pack, vol) {
+			if (!isEnabled() || !soundMasterOn()) return false;
+			var files = filesOf(pack || packId());
+			if (!files.length) return false;
+			playFile(files[Math.floor(Math.random() * files.length)], vol);
+			return true;
+		}
+
+		function renderList() {
+			var list = document.getElementById("anime-voice-list");
+			var count = document.getElementById("avp-count");
+			if (!list) return;
+			var active = packId();
+			var total = 0;
+			var html = "";
+			for (var i = 0; i < packs.length; i++) {
+				var pack = packs[i];
+				total += pack.files.length;
+				html +=
+					'<div class="avp-item' +
+					(pack.id === active ? " is-active" : "") +
+					'" data-avp-pack="' +
+					pack.id +
+					'" role="button" tabindex="0">' +
+					'<span class="avp-item-emoji">' +
+					pack.emoji +
+					"</span>" +
+					'<span class="avp-item-main">' +
+					'<span class="avp-item-name">' +
+					pack.name +
+					"</span>" +
+					'<span class="avp-item-desc">' +
+					pack.desc +
+					"</span>" +
+					"</span>" +
+					'<span class="avp-item-count">' +
+					pack.files.length +
+					" 条" +
+					"</span>" +
+					'<button type="button" class="avp-preview" data-avp-preview="' +
+					pack.id +
+					'" title="试听" aria-label="试听 ' +
+					pack.name +
+					'">▶</button>' +
+					"</div>";
+			}
+			list.innerHTML = html;
+			if (count) count.textContent = String(total);
+		}
+
+		function setPack(id) {
+			if (!id) return;
+			write(KEY_PACK, id);
+			renderList();
+			if (typeof window.__l2dSetVoicePack === "function") {
+				try {
+					window.__l2dSetVoicePack(id);
+				} catch (e) {}
+			}
+			try {
+				document.dispatchEvent(
+					new CustomEvent("anime-voice-pack-change", { detail: { id: id } }),
+				);
+			} catch (e) {}
+		}
+
+		function syncSwitches() {
+			var btn = document.getElementById("avp-enabled");
+			var slider = document.getElementById("avp-volume");
+			var on = isEnabled();
+			if (btn) btn.setAttribute("aria-checked", on ? "true" : "false");
+			if (slider) slider.value = String(Math.round(volume() * 100));
+		}
+
+		function loadPacks() {
+			if (loaded) {
+				renderList();
+				return;
+			}
+			loaded = true;
+			fetch("/voice-packs.json")
+				.then(function (res) {
+					return res.json();
+				})
+				.then(function (list) {
+					if (Array.isArray(list) && list.length) {
+						var valid = list.filter(function (item) {
+							return item && item.files && item.files.length;
+						});
+						if (valid.length) packs = valid;
+					}
+					renderList();
+				})
+				.catch(function () {
+					renderList();
+				});
+		}
+
+		function openPanel(open) {
+			var panel = document.getElementById("anime-voice-panel");
+			var btn = document.getElementById("anime-voice-open");
+			if (!panel) return;
+			panel.classList.toggle("is-open", open);
+			if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
+			if (open && window.AnimeSounds) window.AnimeSounds.play("open", 0.2);
+		}
+
+		// 每翻一页说一句：同一个页面只播一次
+		function speakNav() {
+			var path = location.pathname + location.search;
+			if (path === lastSpokenPath) return;
+			lastSpokenPath = path;
+			if (!unlocked) return;
+			setTimeout(function () {
+				play();
+			}, 600);
+		}
+
+		function unlock() {
+			if (unlocked) return;
+			unlocked = true;
+			setTimeout(function () {
+				play();
+			}, 220);
+		}
+		document.addEventListener("pointerdown", unlock, { once: true, capture: true });
+		document.addEventListener("keydown", unlock, { once: true, capture: true });
+
+		document.addEventListener(
+			"click",
+			function (event) {
+				var target = event.target;
+				if (!target || !target.closest) return;
+				var panel = document.getElementById("anime-voice-panel");
+
+				if (target.closest("#anime-voice-open")) {
+					openPanel(!(panel && panel.classList.contains("is-open")));
+					return;
+				}
+				if (target.closest("#avp-close")) {
+					openPanel(false);
+					return;
+				}
+				var preview = target.closest("[data-avp-preview]");
+				if (preview) {
+					event.stopPropagation();
+					play(preview.getAttribute("data-avp-preview"), Math.max(0.5, volume()));
+					return;
+				}
+				var item = target.closest("[data-avp-pack]");
+				if (item) {
+					var id = item.getAttribute("data-avp-pack");
+					setPack(id);
+					play(id, Math.max(0.5, volume()));
+					return;
+				}
+				if (target.closest("#avp-enabled")) {
+					write(KEY_ON, isEnabled() ? "0" : "1");
+					syncSwitches();
+					if (isEnabled()) play();
+					return;
+				}
+				if (
+					panel &&
+					panel.classList.contains("is-open") &&
+					!target.closest("#anime-voice-panel")
+				) {
+					openPanel(false);
+				}
+			},
+			true,
+		);
+
+		document.addEventListener("input", function (event) {
+			var target = event.target;
+			if (!target || target.id !== "avp-volume") return;
+			write(KEY_VOL, target.value);
+			if (currentAudio) currentAudio.volume = volume();
+		});
+
+		document.addEventListener("keydown", function (event) {
+			if (event.key === "Escape") openPanel(false);
+		});
+
+		function boot() {
+			loadPacks();
+			syncSwitches();
+			speakNav();
+		}
+
+		window.AnimeVoice = {
+			play: play,
+			setPack: setPack,
+			getPack: packId,
+			packs: function () {
+				return packs;
+			},
+		};
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", boot);
+		} else {
+			boot();
+		}
+		document.addEventListener("swup:page:view", boot);
+	})();
+</script>

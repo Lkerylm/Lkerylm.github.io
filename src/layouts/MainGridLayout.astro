@@ -417,8 +417,40 @@ const mobileQuality = Math.round(configQuality * 0.9);
                 slot.appendChild(tpl.content.cloneNode(true));
             }
 
-            applyRandom('banner-image-slot-mobile', 'banner-tpl-mobile', window.__bannerRandomIndex.mobile);
-            applyRandom('banner-image-slot-desktop', 'banner-tpl-desktop', window.__bannerRandomIndex.desktop);
+            // 壁纸画廊按用户选择换图：kind = 'desktop' | 'mobile'
+            function applyIndex(kind, index) {
+                var n = parseInt(index, 10);
+                if (isNaN(n)) return false;
+                if (kind === 'mobile') {
+                    if (n < 0 || n >= mobileCount) return false;
+                    applyRandom('banner-image-slot-mobile', 'banner-tpl-mobile', n);
+                    return true;
+                }
+                if (n < 0 || n >= desktopCount) return false;
+                applyRandom('banner-image-slot-desktop', 'banner-tpl-desktop', n);
+                return true;
+            }
+
+            window.__animeWallpaperApply = applyIndex;
+            window.__animeWallpaperCounts = { mobile: mobileCount, desktop: desktopCount };
+
+            // 用户手动选过壁纸就优先用它，否则保持随机
+            function savedIndex(kind, count) {
+                try {
+                    var raw = localStorage.getItem('anime-wallpaper-' + kind);
+                    if (raw === null) return -1;
+                    var n = parseInt(raw, 10);
+                    return (isNaN(n) || n < 0 || n >= count) ? -1 : n;
+                } catch (e) {
+                    return -1;
+                }
+            }
+
+            var savedMobile = savedIndex('mobile', mobileCount);
+            var savedDesktop = savedIndex('desktop', desktopCount);
+
+            applyRandom('banner-image-slot-mobile', 'banner-tpl-mobile', savedMobile >= 0 ? savedMobile : window.__bannerRandomIndex.mobile);
+            applyRandom('banner-image-slot-desktop', 'banner-tpl-desktop', savedDesktop >= 0 ? savedDesktop : window.__bannerRandomIndex.desktop);
         })();
     </script>
     
