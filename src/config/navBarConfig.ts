@@ -63,38 +63,46 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		],
 	});
 
-	// 二次元常用站点导航，支持多级菜单
+	// 站内二次元分区（社区 / 番组 / 相册 / 留言板），不再跳转到别人的站点
 	links.push({
 		name: "二次元",
-		url: "/archive/",
+		url: "/community/",
 		icon: "mingcute:magic-1-fill",
 
 		// 子菜单
 		children: [
 			{
-				name: "哔哩哔哩",
-				url: "https://www.bilibili.com/",
-				external: true,
-				icon: "simple-icons:bilibili",
+				name: "社区投稿",
+				url: "/community/",
+				icon: "mingcute:planet-fill",
 			},
-			{
-				name: "Bangumi 番组计划",
-				url: "https://bgm.tv/",
-				external: true,
-				icon: "mingcute:play-circle-fill",
-			},
-			{
-				name: "Pixiv",
-				url: "https://www.pixiv.net/",
-				external: true,
-				icon: "simple-icons:pixiv",
-			},
-			{
-				name: "萌娘百科",
-				url: "https://zh.moegirl.org.cn/",
-				external: true,
-				icon: "mingcute:book-2-fill",
-			},
+			...(siteConfig.pages.bangumi
+				? [
+						{
+							name: "番组计划",
+							url: "/bangumi/",
+							icon: "mingcute:play-circle-fill",
+						},
+					]
+				: []),
+			...(siteConfig.pages.gallery
+				? [
+						{
+							name: "相册",
+							url: "/gallery/",
+							icon: "mingcute:pic-fill",
+						},
+					]
+				: []),
+			...(siteConfig.pages.guestbook
+				? [
+						{
+							name: "留言板",
+							url: "/guestbook/",
+							icon: "mingcute:chat-3-fill",
+						},
+					]
+				: []),
 		],
 	});
 

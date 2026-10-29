@@ -32,6 +32,19 @@
     } catch (e) {}
   }
 
+  // 支持 ?api=https://xxx / ?server=... 直接带上后端地址（APK 跳转、分享链接用）
+  try {
+    var qp = new URLSearchParams(location.search);
+    var qBase = qp.get("api") || qp.get("server");
+    if (qBase) {
+      writeLS(LS_BASE, String(qBase).trim().replace(/\/+$/, ""));
+      qp.delete("api");
+      qp.delete("server");
+      var rest = qp.toString();
+      history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
+    }
+  } catch (e) {}
+
   function getBase() {
     return readLS(LS_BASE).replace(/\/+$/, "");
   }

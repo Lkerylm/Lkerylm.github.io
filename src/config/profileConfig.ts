@@ -9,7 +9,7 @@ export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/avatar.avif",
 
 	// 名字
-	name: "Koker",
+	name: "Lkerylm",
 
 	// 个人签名
 	bio: "常驻二次元的动画宅，追番、补番，也写点小感想。",
@@ -22,17 +22,15 @@ export const profileConfig: ProfileConfig = {
 	// showName: true 时显示图标和名称，false 时只显示图标
 	links: [
 		{
-			name: "哔哩哔哩",
-			icon: "simple-icons:bilibili",
-			// 换成自己的 B 站主页地址
-			url: "https://www.bilibili.com/",
+			name: "社区",
+			icon: "mingcute:planet-fill",
+			url: "/community/",
 			showName: false,
 		},
 		{
-			name: "Pixiv",
-			icon: "simple-icons:pixiv",
-			// 换成自己的 Pixiv 主页地址
-			url: "https://www.pixiv.net/",
+			name: "相册",
+			icon: "mingcute:pic-fill",
+			url: "/gallery/",
 			showName: false,
 		},
 		{

@@ -20,33 +20,32 @@ export const friendsPageConfig: FriendsPageConfig = {
 	randomizeSort: false,
 };
 
-// 友链配置
+// 友情链接：全部指向本站自己的页面 / 自己的账号
 export const friendsConfig: FriendLink[] = [
 	{
-		title: "夏夜流萤",
-		imgurl:
-			"https://weavatar.com/avatar/d252655d40d6874417a720bad0a6c5f77f8f6a1fd2f882f8f338402dc37e4190?s=640",
-		desc: "飞萤之火自无梦的长夜亮起，绽放在终竟的明天。",
-		siteurl: "https://blog.cuteleaf.cn",
-		tags: ["Blog"],
-		weight: 10, // 权重，数字越大排序越靠前
-		enabled: true, // 是否启用
+		title: "Firefly 在线版",
+		imgurl: "/favicon/anime-192.png",
+		desc: "在手机上直接打开本站：看内容不用登录，发帖评论才需要登录",
+		siteurl: "https://lkerylm.github.io/app/",
+		tags: ["App"],
+		weight: 10,
+		enabled: true,
 	},
 	{
-		title: "Firefly Docs",
-		imgurl: "https://docs-firefly.cuteleaf.cn/logo.png",
-		desc: "Firefly主题模板文档",
-		siteurl: "https://docs-firefly.cuteleaf.cn",
-		tags: ["Docs"],
+		title: "Firefly 离线版",
+		imgurl: "/favicon/anime-180.png",
+		desc: "看板娘和模型全部打包进手机，断网、飞行模式也能看",
+		siteurl: "https://lkerylm.github.io/app/",
+		tags: ["App"],
 		weight: 9,
 		enabled: true,
 	},
 	{
-		title: "Astro",
-		imgurl: "https://avatars.githubusercontent.com/u/44914786?v=4&s=640",
-		desc: "The web framework for content-driven websites. ⭐️ Star to support our work!",
-		siteurl: "https://github.com/withastro/astro",
-		tags: ["Framework"],
+		title: "社区投稿",
+		imgurl: "/favicon/anime-128.png",
+		desc: "登录后就能发帖、评论，和大家一起聊番",
+		siteurl: "https://lkerylm.github.io/community/",
+		tags: ["Site"],
 		weight: 8,
 		enabled: true,
 	},

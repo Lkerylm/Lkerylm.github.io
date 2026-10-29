@@ -15,11 +15,11 @@ export const siteConfig: SiteConfig = {
 	// 站点 URL
 	// 部署到 Vercel / Netlify 时会自动使用平台域名（见 astro.config.mjs）
 	// 如果部署到其它平台，请改成你的真实域名，或设置环境变量 SITE_URL
-	site_url: "http://localhost:4321",
+	site_url: "https://lkerylm.github.io",
 
 	// 站点描述
 	description:
-		"我的动漫小屋是 Koker 的个人博客，记录追番日常、动画杂谈、同人创作与二次元生活碎片，收藏每一份心动与美好。",
+		"我的动漫小屋是 Lkerylm 的个人博客，记录追番日常、动画杂谈、同人创作与二次元生活碎片，收藏每一份心动与美好。",
 
 	// 站点关键词
 	keywords: [
@@ -29,7 +29,7 @@ export const siteConfig: SiteConfig = {
 		"新番",
 		"动画杂谈",
 		"ACGN",
-		"Koker",
+		"Lkerylm",
 		"个人博客",
 	],
 

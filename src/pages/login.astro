@@ -1,6 +1,7 @@
 ---
 import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
 import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+import ServerConnect from "@/components/features/ServerConnect.astro";
 export const prerender = true;
 ---
 
@@ -417,7 +418,7 @@ export const prerender = true;
           body: JSON.stringify({ username, password }),
         });
         if (res.status === 404 || res.status === 405) {
-          showMsg('后端未连接：先运行 node server/server.mjs，再点导航栏 ⚙ 填服务器地址', 'err');
+          showMsg('还没有连上你的电脑：点右下角 ⚙ 服务器，填上 http://电脑IP:8787 再登录（只浏览内容不用登录）', 'err');
           btn.disabled = false;
           btn.textContent = '登 录';
           return;
@@ -438,12 +439,13 @@ export const prerender = true;
           btn.textContent = '登 录';
         }
       } catch (err) {
-        showMsg('网络错误，请重试', 'err');
+        showMsg('网络错误：点右下角 ⚙ 服务器确认地址是否正确，或稍后重试', 'err');
         if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
         btn.disabled = false;
         btn.textContent = '登 录';
       }
     });
   </script>
+  <ServerConnect />
 </body>
 </html>

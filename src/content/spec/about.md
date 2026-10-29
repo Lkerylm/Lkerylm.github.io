@@ -1,6 +1,6 @@
 # 关于我 / About Me
 
-你好，我是 **Koker**，一个常驻二次元的动画宅。
+你好，我是 **Lkerylm**，一个常驻二次元的动画宅。
 
 喜欢在深夜补番，也喜欢在白天发呆。看番时的心动、吐槽和小小感想，都想认真记录下来，于是有了这间「动漫小屋」。
 
@@ -23,12 +23,11 @@
 
 ## 📫 找到我
 
-- 📺 **哔哩哔哩**：[https://www.bilibili.com/](https://www.bilibili.com/)
-- 🎨 **Pixiv**：[https://www.pixiv.net/](https://www.pixiv.net/)
+- 🌏 **社区投稿**：[/community/](/community/)（登录后就能发帖、评论）
+- 🖼 **相册**：[/gallery/](/gallery/)
 - 💬 **留言板**：[/guestbook/](/guestbook/)
+- 📱 **手机 App**：[/app/](/app/)（在线版 / 离线版）
 - 📡 **RSS 订阅**：[/rss/](/rss/)
-
-> 主页链接目前是占位地址，记得在 `src/config/profileConfig.ts` 里换成自己的账号。
 
 ---
 

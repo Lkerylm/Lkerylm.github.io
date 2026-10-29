@@ -1,0 +1,178 @@
+---
+/**
+ * 服务器连接面板（浮动 ⚙）
+ * 用于没有导航栏的独立页面（登录 / 注册 / 社区…）：
+ * 后端不在线时，可以直接在这里填自己电脑的地址，测通后自动保存。
+ * 依赖 /firefly-api.js
+ */
+---
+
+<button id="ffs-open" class="ffs-fab" type="button" title="连接我的电脑服务器">⚙ 服务器</button>
+
+<div id="ffs-mask" class="ffs-mask" aria-hidden="true">
+  <div class="ffs-box" role="dialog" aria-label="服务器设置">
+    <div class="ffs-title">连接我的电脑</div>
+    <div class="ffs-desc">
+      账号和投稿都存在你自己电脑上。先在电脑上启动 <b>server</b>（双击 start-server.cmd），
+      再把黑窗口里的地址填进来；手机和电脑要在同一个 Wi-Fi。
+    </div>
+    <input id="ffs-input" class="ffs-input" placeholder="http://192.168.1.10:8787" autocomplete="url" spellcheck="false">
+    <div id="ffs-msg" class="ffs-msg"></div>
+    <div class="ffs-row">
+      <button id="ffs-save" class="ffs-btn" type="button">测试并连接</button>
+      <button id="ffs-close" class="ffs-btn ffs-ghost" type="button">关闭</button>
+    </div>
+    <div class="ffs-tip">
+      只想看内容？不用连服务器，直接浏览就行；登录/发帖才会用到它。
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .ffs-fab {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 300;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 154, 200, 0.35);
+    background: rgba(20, 20, 30, 0.72);
+    color: #ffd0e6;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .ffs-fab:hover { background: rgba(255, 154, 200, 0.16); }
+  .ffs-fab[data-state="online"] { border-color: rgba(52, 211, 153, 0.5); color: #a7f3d0; }
+  .ffs-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 6, 12, 0.62);
+    backdrop-filter: blur(6px);
+    padding: 20px;
+  }
+  .ffs-mask.open { display: flex; }
+  .ffs-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 22px 22px 18px;
+    border-radius: 18px;
+    background: rgba(22, 24, 38, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-family: inherit;
+  }
+  .ffs-title { font-size: 16px; font-weight: 700; color: #ff9ac8; margin-bottom: 8px; }
+  .ffs-desc { font-size: 12.5px; line-height: 1.75; color: rgba(255, 255, 255, 0.62); margin-bottom: 12px; }
+  .ffs-desc b { color: #ffd0e6; font-weight: 600; }
+  .ffs-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .ffs-input:focus { border-color: rgba(255, 154, 200, 0.6); }
+  .ffs-msg { display: none; margin-top: 10px; font-size: 12.5px; line-height: 1.6; }
+  .ffs-msg.show { display: block; }
+  .ffs-msg.ok { color: #a7f3d0; }
+  .ffs-msg.err { color: #fecaca; }
+  .ffs-row { display: flex; gap: 10px; margin-top: 12px; }
+  .ffs-btn {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff7ab8, #c084fc);
+  }
+  .ffs-btn:active { transform: scale(0.98); }
+  .ffs-btn.ffs-ghost {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 154, 200, 0.3);
+    color: #ffd0e6;
+    font-weight: 500;
+  }
+  .ffs-tip { margin-top: 12px; font-size: 11.5px; line-height: 1.7; color: rgba(255, 255, 255, 0.42); }
+</style>
+
+<script is:inline>
+  (function () {
+    var fab = document.getElementById("ffs-open");
+    var mask = document.getElementById("ffs-mask");
+    var input = document.getElementById("ffs-input");
+    var msg = document.getElementById("ffs-msg");
+    var save = document.getElementById("ffs-save");
+    var close = document.getElementById("ffs-close");
+    if (!fab || !mask) return;
+
+    function say(text, type) {
+      msg.textContent = text;
+      msg.className = "ffs-msg show " + (type || "");
+    }
+    function norm(v) {
+      v = String(v || "").trim();
+      if (!v) return "";
+      if (!/^https?:\/\//i.test(v)) v = "http://" + v;
+      return v.replace(/\/+$/, "");
+    }
+    function openPanel() {
+      mask.classList.add("open");
+      if (window.FireflyAPI) input.value = window.FireflyAPI.base || "";
+      say("", "");
+      setTimeout(function () { input.focus(); }, 60);
+    }
+    function closePanel() { mask.classList.remove("open"); }
+
+    fab.addEventListener("click", openPanel);
+    close.addEventListener("click", closePanel);
+    mask.addEventListener("click", function (e) { if (e.target === mask) closePanel(); });
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") save.click(); });
+
+    save.addEventListener("click", function () {
+      var api = window.FireflyAPI;
+      if (!api) { say("API 脚本没加载，刷新页面重试", "err"); return; }
+      var url = norm(input.value);
+      if (!url) { say("请填写电脑上的地址，例如 http://192.168.1.10:8787", "err"); input.focus(); return; }
+      api.setBase(url);
+      save.disabled = true;
+      var old = save.textContent;
+      save.textContent = "连接中…";
+      api.check(6000).then(function (s) {
+        save.disabled = false;
+        save.textContent = old;
+        if (s && s.ok) {
+          say("连接成功！正在重新加载…", "ok");
+          setTimeout(function () { location.reload(); }, 600);
+        } else {
+          say("连不上：" + (s && s.error ? s.error : "电脑没开或地址不对") + "（可以先直接浏览内容）", "err");
+        }
+      });
+    });
+
+    document.addEventListener("firefly:backend", function (e) {
+      var ok = e && e.detail && e.detail.ok;
+      fab.dataset.state = ok ? "online" : "offline";
+      fab.textContent = ok ? "⚙ 已连接电脑" : "⚙ 服务器";
+    });
+  })();
+</script>
