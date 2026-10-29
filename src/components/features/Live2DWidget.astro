@@ -705,9 +705,13 @@ const size = config.size || { width: 600, height: 700 };
 				if (loadingEl) {
 					loadingEl.style.display = "flex";
 					loadingEl.style.opacity = "1";
+					// 弱网下模型可能几十秒都下不完，点一下就能跳过这块全屏遮罩
+					loadingEl.style.cursor = "pointer";
+					loadingEl.addEventListener("click", hideLoading, { once: true });
 				}
 				const start = Date.now();
-				while (!model && Date.now() - start < 60000) {
+				// 手机端最多等 8 秒：不能因为看板娘加载慢把整页内容挡住
+				while (!model && Date.now() - start < 8000) {
 					await new Promise((r) => setTimeout(r, 300));
 				}
 				hideLoading();

@@ -405,12 +405,26 @@ const mobileQuality = Math.round(configQuality * 0.9);
                 };
             }
 
-            // 从 template 替换默认图片（index 0 = 已渲染的默认图，>0 = template）
-            function applyRandom(slotClass, tplClass, randomIndex) {
-                if (randomIndex === 0) return;
+            // 记住首屏默认图（index 0），用户从别的壁纸切回第 1 张时用它还原
+            var slotClasses = ['banner-image-slot-mobile', 'banner-image-slot-desktop'];
+            var defaultHtml = {};
+            slotClasses.forEach(function (slotClass) {
                 var slot = container.querySelector('.' + slotClass);
+                if (slot) defaultHtml[slotClass] = slot.innerHTML;
+            });
+
+            // 从 template 替换默认图片（index 0 = 已渲染的默认图，>0 = template）
+            // force = true 时可切回 index 0（换成默认图），供壁纸画廊交互使用
+            function applyRandom(slotClass, tplClass, randomIndex, force) {
+                var slot = container.querySelector('.' + slotClass);
+                if (!slot) return;
+                if (randomIndex === 0) {
+                    if (!force) return;
+                    if (defaultHtml[slotClass]) slot.innerHTML = defaultHtml[slotClass];
+                    return;
+                }
                 var templates = container.querySelectorAll('.' + tplClass);
-                if (!slot || !templates.length) return;
+                if (!templates.length) return;
                 var tpl = templates[randomIndex - 1];
                 if (!tpl) return;
                 slot.innerHTML = '';
@@ -423,11 +437,11 @@ const mobileQuality = Math.round(configQuality * 0.9);
                 if (isNaN(n)) return false;
                 if (kind === 'mobile') {
                     if (n < 0 || n >= mobileCount) return false;
-                    applyRandom('banner-image-slot-mobile', 'banner-tpl-mobile', n);
+                    applyRandom('banner-image-slot-mobile', 'banner-tpl-mobile', n, true);
                     return true;
                 }
                 if (n < 0 || n >= desktopCount) return false;
-                applyRandom('banner-image-slot-desktop', 'banner-tpl-desktop', n);
+                applyRandom('banner-image-slot-desktop', 'banner-tpl-desktop', n, true);
                 return true;
             }
 

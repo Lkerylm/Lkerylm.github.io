@@ -1,4 +1,15 @@
 import type { BackgroundWallpaperConfig } from "@/types/config";
+import { animeWallpaperFiles } from "../utils/anime-wallpaper-utils";
+
+function wallpaperFiles(kind: "desktop" | "mobile"): string[] {
+	// 清单顺序已按文件名编号排好，保证「清单下标 === 编号 - 1」
+	const files = animeWallpaperFiles(kind);
+	if (!files.length) {
+		// 兜底：清单缺失时退回仓库自带的示例壁纸，避免横幅空白
+		return [`assets/images/AnimeWallpaper/${kind}/${kind}-01.avif`];
+	}
+	return files;
+}
 
 export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 壁纸模式："banner" 横幅壁纸，"overlay" 全屏透明，"none" 纯色背景无壁纸
@@ -35,22 +46,10 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	 * ],
 	 */
 	src: {
-		// 桌面背景图片（动漫壁纸，每次刷新随机显示一张）
-		desktop: [
-			"assets/images/AnimeWallpaper/desktop/desktop-01.avif",
-			"assets/images/AnimeWallpaper/desktop/desktop-02.avif",
-			"assets/images/AnimeWallpaper/desktop/desktop-03.avif",
-			"assets/images/AnimeWallpaper/desktop/desktop-04.avif",
-			"assets/images/AnimeWallpaper/desktop/desktop-05.avif",
-		],
-		// 移动背景图片（动漫壁纸，每次刷新随机显示一张）
-		mobile: [
-			"assets/images/AnimeWallpaper/mobile/mobile-01.avif",
-			"assets/images/AnimeWallpaper/mobile/mobile-02.avif",
-			"assets/images/AnimeWallpaper/mobile/mobile-03.avif",
-			"assets/images/AnimeWallpaper/mobile/mobile-04.avif",
-			"assets/images/AnimeWallpaper/mobile/mobile-05.avif",
-		],
+		// 桌面背景图片（动漫壁纸，22 张，每次刷新随机显示一张）
+		desktop: wallpaperFiles("desktop"),
+		// 移动背景图片（动漫壁纸，22 张，每次刷新随机显示一张）
+		mobile: wallpaperFiles("mobile"),
 	},
 	// Banner模式特有配置
 	banner: {

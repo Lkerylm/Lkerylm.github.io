@@ -1,11 +1,15 @@
 ---
 /**
  * 动漫壁纸画廊（全站可用）
- * - 一个按钮打开面板，列出 public/anime-wallpaper 下所有桌面 / 手机壁纸
+ * - 一个按钮打开面板，列出 public/anime-wallpaper/manifest.json 里所有壁纸
+ *   （横屏 22 张 / 竖屏 22 张，含「夜色」变体，共 44 张）
  * - 点缩略图立即切换，选择保存在 localStorage（刷新 / 换页 / APK 内都记得）
  * - 「全屏铺满」把壁纸从横幅区扩展成整屏固定背景
+ * - 另外维护一层「页面背景」#anime-page-bg：往下滚动时也能看到动漫壁纸
  * - 主站走 banner 图池（window.__animeWallpaperApply），独立页面直接换 #anime-backdrop-img
  */
+import manifestRaw from "../../../public/anime-wallpaper/manifest.json";
+
 interface Props {
 	/** 按钮靠哪边：left 左下（默认，位于音效开关上方）；right 右下 */
 	side?: "left" | "right";
@@ -15,28 +19,36 @@ interface Props {
 
 const { side = "left", fullwall = true } = Astro.props;
 
+type WallpaperItem = {
+	id: string;
+	kind: "desktop" | "mobile";
+	index: number;
+	tone: string;
+	label: string;
+	file: string;
+	thumb: string;
+};
+
+const allItems = ((manifestRaw as { items?: WallpaperItem[] }).items || []) as WallpaperItem[];
+
 const groups = [
 	{
-		kind: "desktop",
-		title: "桌面壁纸",
-		hint: "宽屏",
-		items: [1, 2, 3, 4, 5].map((i) => ({
-			index: i - 1,
-			src: `/anime-wallpaper/desktop-0${i}.avif`,
-			label: `桌面壁纸 ${i}`,
-		})),
+		kind: "desktop" as const,
+		title: "横屏壁纸",
+		hint: "电脑 · 平板",
+		items: allItems.filter((item) => item.kind === "desktop"),
 	},
 	{
-		kind: "mobile",
-		title: "手机壁纸",
-		hint: "竖屏",
-		items: [1, 2, 3, 4, 5].map((i) => ({
-			index: i - 1,
-			src: `/anime-wallpaper/mobile-0${i}.avif`,
-			label: `手机壁纸 ${i}`,
-		})),
+		kind: "mobile" as const,
+		title: "竖屏壁纸",
+		hint: "手机",
+		items: allItems.filter((item) => item.kind === "mobile"),
 	},
 ];
+
+const total = allItems.length;
+const nightCount = allItems.filter((item) => item.tone === "night").length;
+const firstDesktop = groups[0].items[0]?.file || "/anime-wallpaper/desktop-01.avif";
 ---
 
 <button
@@ -60,17 +72,26 @@ const groups = [
 	aria-modal="false"
 >
 	<div class="awg-head">
-		<strong>🌸 壁纸画廊</strong>
-		<span class="awg-sub">点一下就换，自动记住</span>
+		<strong>🌸 动漫壁纸画廊</strong>
+		<span class="awg-sub">点一下就换 · 自动记住</span>
 		<button id="awg-close" type="button" class="awg-close" aria-label="关闭">✕</button>
+	</div>
+
+	<div class="awg-filters" role="tablist" aria-label="壁纸筛选">
+		<button type="button" class="awg-chip is-on" data-awg-filter="all" role="tab" aria-selected="true">全部</button>
+		<button type="button" class="awg-chip" data-awg-filter="desktop" role="tab" aria-selected="false">横屏</button>
+		<button type="button" class="awg-chip" data-awg-filter="mobile" role="tab" aria-selected="false">竖屏</button>
+		<button type="button" class="awg-chip" data-awg-filter="night" role="tab" aria-selected="false">夜色</button>
 	</div>
 
 	{
 		groups.map((group) => (
-			<div class="awg-group">
+			<div class="awg-group" data-awg-group={group.kind}>
 				<div class="awg-group-title">
 					<span>{group.title}</span>
-					<em>{group.hint}</em>
+					<em>
+						{group.hint} · {group.items.length} 张
+					</em>
 				</div>
 				<div class="awg-grid" data-awg-grid={group.kind}>
 					{group.items.map((item) => (
@@ -79,10 +100,12 @@ const groups = [
 							class="awg-tile"
 							data-awg-kind={group.kind}
 							data-awg-index={item.index}
+							data-awg-tone={item.tone}
 							title={item.label}
 							aria-label={item.label}
 						>
-							<img src={item.src} alt={item.label} loading="lazy" decoding="async" />
+							<img src={item.thumb} alt={item.label} loading="lazy" decoding="async" />
+							{item.tone === "night" && <span class="awg-tile-moon">🌙</span>}
 							<span class="awg-tile-index">{item.index + 1}</span>
 						</button>
 					))}
@@ -111,13 +134,21 @@ const groups = [
 		<button id="awg-reset" type="button" class="awg-btn awg-btn-ghost">恢复默认</button>
 	</div>
 
-	<div class="awg-tip">共 {groups.reduce((n, g) => n + g.items.length, 0)} 张壁纸 · 全部离线可用</div>
+	<div class="awg-tip">共 {total} 张动漫壁纸（夜色 {nightCount} 张）· 全部离线可用</div>
+</div>
+
+<!-- 页面背景：往下滚动也能看到动漫壁纸 -->
+<div id="anime-page-bg" aria-hidden="true">
+	<img id="anime-page-bg-img" src={firstDesktop} alt="" />
+	<div class="anime-page-bg-veil"></div>
+	<div class="anime-page-bg-glow"></div>
 </div>
 
 <div id="anime-fullwall-layer" aria-hidden="true">
-	<img id="anime-fullwall-img" src="/anime-wallpaper/desktop-01.avif" alt="" />
+	<img id="anime-fullwall-img" src={firstDesktop} alt="" />
 	<div class="anime-fullwall-veil"></div>
 </div>
+
 
 <style is:global>
 	/* 旧的「换壁纸」单按钮由壁纸画廊接管，避免两个按钮打架 */
@@ -125,6 +156,7 @@ const groups = [
 		display: none !important;
 	}
 
+	/* ------------------------------ 打开按钮 ------------------------------ */
 	.anime-wallpaper-open {
 		position: fixed;
 		left: 16px;
@@ -162,19 +194,21 @@ const groups = [
 		outline-offset: 2px;
 	}
 
+	/* ------------------------------ 面板 ------------------------------ */
 	.anime-wallpaper-panel {
 		position: fixed;
 		left: 16px;
 		bottom: 104px;
 		z-index: 1000002;
-		width: 336px;
+		width: 348px;
 		max-width: calc(100vw - 24px);
-		max-height: min(72vh, 560px);
+		max-height: min(76vh, 620px);
 		display: none;
 		flex-direction: column;
 		gap: 10px;
 		padding: 12px;
 		overflow-y: auto;
+		overscroll-behavior: contain;
 		border-radius: 16px;
 		border: 1px solid rgba(255, 154, 200, 0.35);
 		background: rgba(18, 16, 28, 0.94);
@@ -225,6 +259,38 @@ const groups = [
 		font-size: 11px;
 		cursor: pointer;
 	}
+
+	/* 筛选 chips */
+	.awg-filters {
+		display: flex;
+		gap: 6px;
+		flex-wrap: wrap;
+	}
+	.awg-chip {
+		padding: 4px 10px;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		background: transparent;
+		color: rgba(255, 233, 243, 0.62);
+		font-size: 11px;
+		line-height: 1.6;
+		cursor: pointer;
+		transition:
+			background 0.16s ease,
+			color 0.16s ease,
+			border-color 0.16s ease;
+	}
+	.awg-chip:hover {
+		color: #fff;
+		border-color: rgba(255, 154, 200, 0.45);
+	}
+	.awg-chip.is-on {
+		background: rgba(255, 154, 200, 0.2);
+		border-color: rgba(255, 154, 200, 0.75);
+		color: #ffe4f0;
+		box-shadow: 0 0 0 1px rgba(255, 154, 200, 0.25);
+	}
+
 	.awg-group-title {
 		display: flex;
 		align-items: baseline;
@@ -259,6 +325,9 @@ const groups = [
 			border-color 0.16s ease,
 			box-shadow 0.16s ease;
 	}
+	.awg-tile[hidden] {
+		display: none;
+	}
 	.awg-tile img {
 		width: 100%;
 		height: 100%;
@@ -284,16 +353,24 @@ const groups = [
 		color: #fff;
 		text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
 	}
-	.awg-tile-index {
+	.awg-tile-index,
+	.awg-tile-moon {
 		position: absolute;
-		left: 3px;
-		top: 2px;
 		font-size: 9px;
 		line-height: 1;
 		padding: 2px 4px;
 		border-radius: 4px;
 		background: rgba(0, 0, 0, 0.45);
 		color: rgba(255, 255, 255, 0.85);
+	}
+	.awg-tile-index {
+		left: 3px;
+		top: 2px;
+	}
+	.awg-tile-moon {
+		right: 3px;
+		top: 2px;
+		background: rgba(38, 34, 92, 0.62);
 	}
 
 	.awg-foot {
@@ -366,15 +443,62 @@ const groups = [
 		text-align: center;
 	}
 
-	/* ===== 全屏铺满：壁纸铺到整个屏幕，横幅区只留标题与渐变 ===== */
+	/* -------------------------- 页面背景（滚动可见） -------------------------- */
+	#anime-page-bg {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		overflow: hidden;
+		pointer-events: none;
+		background: #06050c;
+		-webkit-mask-image: linear-gradient(180deg, transparent 0, #000 26vh);
+		mask-image: linear-gradient(180deg, transparent 0, #000 26vh);
+	}
+	html[data-anime-fullwall="1"] #anime-page-bg {
+		opacity: 0;
+	}
+	#anime-page-bg-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		opacity: 0.5;
+		filter: saturate(1.06) brightness(0.92);
+		transform: scale(1.04);
+		transition: opacity 0.5s ease;
+	}
+	.anime-page-bg-veil {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(180deg, rgba(8, 7, 15, 0.28) 0%, rgba(8, 7, 15, 0.72) 62%, rgba(8, 7, 15, 0.86) 100%),
+			radial-gradient(120% 80% at 50% 0%, rgba(255, 154, 200, 0.1), transparent 62%);
+	}
+	.anime-page-bg-glow {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(60% 42% at 18% 88%, rgba(122, 162, 255, 0.18), transparent 70%),
+			radial-gradient(52% 38% at 84% 14%, rgba(255, 143, 193, 0.16), transparent 72%);
+		mix-blend-mode: screen;
+	}
+	html:not(.dark) .anime-page-bg-veil {
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.86) 62%, rgba(255, 255, 255, 0.94) 100%),
+			radial-gradient(120% 80% at 50% 0%, rgba(255, 205, 228, 0.5), transparent 62%);
+	}
+	html:not(.dark) #anime-page-bg-img {
+		opacity: 0.36;
+		filter: saturate(0.98) brightness(1.06);
+	}
+
+	/* -------------------------- 全屏铺满壁纸 -------------------------- */
 	#anime-fullwall-layer {
 		position: fixed;
 		inset: 0;
 		z-index: 0;
 		display: none;
 		pointer-events: none;
-		overflow: hidden;
-		background: #08070f;
 	}
 	html[data-anime-fullwall="1"] #anime-fullwall-layer {
 		display: block;
@@ -384,50 +508,38 @@ const groups = [
 		height: 100%;
 		object-fit: cover;
 		object-position: center;
-		transform: scale(1.03);
-		filter: saturate(1.08) brightness(0.84);
-		transition: opacity 0.5s ease;
+		opacity: 0.72;
+		transition: opacity 0.4s ease;
 	}
 	.anime-fullwall-veil {
 		position: absolute;
 		inset: 0;
-		background:
-			linear-gradient(
-				180deg,
-				rgba(8, 7, 15, 0.18) 0%,
-				rgba(8, 7, 15, 0.32) 52%,
-				rgba(8, 7, 15, 0.86) 100%
-			),
-			radial-gradient(ellipse 70% 55% at 12% 0%, rgba(255, 143, 193, 0.22), transparent 62%),
-			radial-gradient(ellipse 60% 50% at 92% 12%, rgba(167, 139, 250, 0.2), transparent 66%);
-	}
-	html[data-anime-fullwall="1"] #banner-images-container {
-		opacity: 0;
-		transition: opacity 0.4s ease;
+		background: linear-gradient(180deg, rgba(8, 7, 15, 0.15) 0%, rgba(8, 7, 15, 0.7) 70%, rgba(8, 7, 15, 0.9) 100%);
 	}
 
-	@media (max-width: 640px) {
+	@media (max-width: 767px) {
 		.anime-wallpaper-open {
-			left: 10px;
-			bottom: 56px;
-			padding: 7px 10px;
-		}
-		.anime-wallpaper-open.is-right {
-			left: auto;
-			right: 10px;
-		}
-		.anime-wallpaper-open-text {
-			display: none;
+			left: 12px;
+			bottom: 58px;
+			padding: 6px 11px;
 		}
 		.anime-wallpaper-panel {
-			left: 10px;
-			right: 10px;
-			bottom: 98px;
-			width: auto;
-			max-width: none;
+			left: 8px;
+			bottom: 96px;
+			width: calc(100vw - 16px);
+			max-height: 68vh;
+		}
+		.awg-grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.anime-wallpaper-panel.is-open {
+			animation: none;
 		}
 	}
 </style>
+
 
 <script is:inline>
 	(function () {
@@ -438,12 +550,12 @@ const groups = [
 		var KEY_M = "anime-wallpaper-mobile";
 		var KEY_FULL = "anime-wallpaper-fullwall";
 
-		function read(key, dflt) {
+		function read(key, fallback) {
 			try {
 				var v = localStorage.getItem(key);
-				return v === null ? dflt : v;
+				return v === null ? fallback : v;
 			} catch (e) {
-				return dflt;
+				return fallback;
 			}
 		}
 		function write(key, value) {
@@ -451,31 +563,25 @@ const groups = [
 				localStorage.setItem(key, String(value));
 			} catch (e) {}
 		}
-		function toIndex(value, max) {
-			var n = parseInt(value, 10);
-			if (isNaN(n) || n < 0 || n >= max) return 0;
-			return n;
-		}
 		function isMobile() {
-			return !!(
-				window.matchMedia && window.matchMedia("(max-width: 1023px)").matches
-			);
+			return window.matchMedia("(max-width: 860px)").matches;
+		}
+		function pad2(n) {
+			return (n < 9 ? "0" : "") + (n + 1);
 		}
 		function pathOf(kind, index) {
-			return "/anime-wallpaper/" + kind + "-0" + (index + 1) + ".avif";
+			return "/anime-wallpaper/" + kind + "-" + pad2(index) + ".avif";
 		}
-		function els() {
-			return {
-				panel: document.getElementById("anime-wallpaper-panel"),
-				open: document.getElementById("anime-wallpaper-open"),
-				layerImg: document.getElementById("anime-fullwall-img"),
-				full: document.getElementById("awg-fullwall"),
-			};
+		function tilesOf(kind) {
+			return document.querySelectorAll('[data-awg-kind="' + kind + '"]');
 		}
 		function tileCount(kind) {
-			var grid = document.querySelector('[data-awg-grid="' + kind + '"]');
-			var tiles = grid ? grid.querySelectorAll("[data-awg-kind]") : [];
-			return tiles.length || 5;
+			return tilesOf(kind).length || 22;
+		}
+		function toIndex(value, count) {
+			var n = parseInt(value, 10);
+			if (isNaN(n) || n < 0) n = 0;
+			return n % count;
 		}
 		function currentIndex(kind) {
 			return toIndex(read(kind === "mobile" ? KEY_M : KEY_D, 0), tileCount(kind));
@@ -487,11 +593,44 @@ const groups = [
 				return false;
 			}
 		}
+		function fallbackIndex(kind) {
+			// 没选过壁纸时，本次会话随机挑一张（保持整站一致）
+			var store = window.__animePageBgRandom || (window.__animePageBgRandom = {});
+			if (store[kind] === undefined) {
+				store[kind] = Math.floor(Math.random() * tileCount(kind));
+			}
+			return store[kind];
+		}
+
+		function els() {
+			return {
+				panel: document.getElementById("anime-wallpaper-panel"),
+				open: document.getElementById("anime-wallpaper-open"),
+				full: document.getElementById("awg-fullwall"),
+				layerImg: document.getElementById("anime-fullwall-img"),
+				pageImg: document.getElementById("anime-page-bg-img"),
+			};
+		}
 
 		// 全屏层：始终跟随「当前设备」那一套壁纸
 		function applyFullwallImage(kind, index) {
 			var e = els();
-			if (e.layerImg) e.layerImg.src = pathOf(kind, index);
+			if (!e.layerImg) return;
+			var src = pathOf(kind, index);
+			if (e.layerImg.getAttribute("src") !== src) e.layerImg.src = src;
+		}
+
+		// 页面背景层：跟随当前设备 + 保存的选择
+		function applyPageBg(kind, index) {
+			var e = els();
+			if (!e.pageImg) return;
+			var src = pathOf(kind, index);
+			if (e.pageImg.getAttribute("src") === src) return;
+			e.pageImg.style.opacity = "0";
+			setTimeout(function () {
+				e.pageImg.src = src;
+				e.pageImg.style.opacity = "";
+			}, 140);
 		}
 
 		// 独立二次元页面：直接换背景图（带淡入过渡）
@@ -512,10 +651,32 @@ const groups = [
 				var tile = tiles[i];
 				var kind = tile.getAttribute("data-awg-kind");
 				var index = parseInt(tile.getAttribute("data-awg-index"), 10);
-				tile.classList.toggle(
-					"is-active",
-					hasPick(kind) && index === currentIndex(kind),
-				);
+				tile.classList.toggle("is-active", hasPick(kind) && index === currentIndex(kind));
+			}
+		}
+
+		function syncFilters() {
+			var chips = document.querySelectorAll("[data-awg-filter]");
+			var mode = window.__animeWallpaperFilter || "all";
+			for (var i = 0; i < chips.length; i++) {
+				var on = chips[i].getAttribute("data-awg-filter") === mode;
+				chips[i].classList.toggle("is-on", on);
+				chips[i].setAttribute("aria-selected", on ? "true" : "false");
+			}
+			var tiles = document.querySelectorAll("[data-awg-kind]");
+			for (var j = 0; j < tiles.length; j++) {
+				var tile = tiles[j];
+				var kind = tile.getAttribute("data-awg-kind");
+				var tone = tile.getAttribute("data-awg-tone");
+				var show = mode === "all" || mode === kind || (mode === "night" && tone === "night");
+				if (show) tile.removeAttribute("hidden");
+				else tile.setAttribute("hidden", "");
+			}
+			var groups = document.querySelectorAll("[data-awg-group]");
+			for (var k = 0; k < groups.length; k++) {
+				var g = groups[k];
+				var visible = g.querySelector("[data-awg-kind]:not([hidden])");
+				g.style.display = visible ? "" : "none";
 			}
 		}
 
@@ -526,16 +687,25 @@ const groups = [
 			if (e.full) e.full.setAttribute("aria-checked", on ? "true" : "false");
 		}
 
+		function deviceKind() {
+			return isMobile() ? "mobile" : "desktop";
+		}
+
 		function pick(kind, index) {
 			write(kind === "mobile" ? KEY_M : KEY_D, index);
+			// 全屏层 / 页面背景只跟「当前设备」这一套走，
+			// 否则在电脑上点竖屏壁纸会让整页背景变成竖图（随机一张时尤其明显）
+			var device = deviceKind();
+			var deviceIndex = kind === device ? index : currentIndex(device);
 			if (typeof window.__animeWallpaperApply === "function") {
 				try {
 					window.__animeWallpaperApply(kind, index);
 				} catch (e) {}
-			} else {
-				applyStandalone(pathOf(kind, index));
+			} else if (kind === device) {
+				applyStandalone(pathOf(device, deviceIndex));
 			}
-			applyFullwallImage(kind, index);
+			applyFullwallImage(device, deviceIndex);
+			applyPageBg(device, deviceIndex);
 			syncTiles();
 			if (window.AnimeSounds) window.AnimeSounds.play("open", 0.2);
 		}
@@ -546,6 +716,7 @@ const groups = [
 				var kind = kinds[i];
 				pick(kind, Math.floor(Math.random() * tileCount(kind)));
 			}
+			if (window.AnimeCursor) window.AnimeCursor.say("🎲 换了一组新壁纸～");
 		}
 
 		function resetPicks() {
@@ -554,6 +725,7 @@ const groups = [
 				localStorage.removeItem(KEY_M);
 				localStorage.removeItem(KEY_FULL);
 			} catch (e) {}
+			window.__animePageBgRandom = {};
 			syncFull();
 			randomPick();
 		}
@@ -561,20 +733,24 @@ const groups = [
 		// 页面加载 / swup 切页后：把保存的选择重新贴回页面
 		function restore() {
 			syncFull();
+			syncFilters();
 			syncTiles();
+			var deviceKind = isMobile() ? "mobile" : "desktop";
 			var kinds = ["desktop", "mobile"];
 			for (var i = 0; i < kinds.length; i++) {
 				var kind = kinds[i];
-				if (!hasPick(kind)) continue;
-				var index = currentIndex(kind);
-				if (typeof window.__animeWallpaperApply === "function") {
-					try {
-						window.__animeWallpaperApply(kind, index);
-					} catch (e) {}
-				} else if (kind === (isMobile() ? "mobile" : "desktop")) {
-					applyStandalone(pathOf(kind, index));
+				var index = hasPick(kind) ? currentIndex(kind) : fallbackIndex(kind);
+				if (hasPick(kind)) {
+					if (typeof window.__animeWallpaperApply === "function") {
+						try {
+							window.__animeWallpaperApply(kind, index);
+						} catch (e) {}
+					} else if (kind === deviceKind) {
+						applyStandalone(pathOf(kind, index));
+					}
 				}
 				applyFullwallImage(kind, index);
+				if (kind === deviceKind) applyPageBg(kind, index);
 			}
 		}
 
@@ -599,6 +775,13 @@ const groups = [
 				}
 				if (target.closest("#awg-close")) {
 					openPanel(false);
+					return;
+				}
+				var chip = target.closest("[data-awg-filter]");
+				if (chip) {
+					window.__animeWallpaperFilter = chip.getAttribute("data-awg-filter");
+					syncFilters();
+					if (window.AnimeSounds) window.AnimeSounds.play("click", 0.16);
 					return;
 				}
 				var tile = target.closest("[data-awg-kind]");
@@ -647,6 +830,7 @@ const groups = [
 			resizeTimer = setTimeout(function () {
 				var kind = isMobile() ? "mobile" : "desktop";
 				applyFullwallImage(kind, currentIndex(kind));
+				applyPageBg(kind, currentIndex(kind));
 				syncTiles();
 			}, 200);
 		});
