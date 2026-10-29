@@ -1,0 +1,406 @@
+{
+  "version": 2,
+  "generatedAt": "2026-10-29T14:53:53.195Z",
+  "counts": {
+    "desktop": 22,
+    "mobile": 22
+  },
+  "items": [
+    {
+      "id": "desktop-01",
+      "kind": "desktop",
+      "index": 0,
+      "tone": "light",
+      "label": "火锅小聚",
+      "file": "/anime-wallpaper/desktop-01.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-01.avif"
+    },
+    {
+      "id": "desktop-12",
+      "kind": "desktop",
+      "index": 11,
+      "tone": "night",
+      "label": "火锅小聚 · 夜",
+      "file": "/anime-wallpaper/desktop-12.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-12.avif"
+    },
+    {
+      "id": "desktop-02",
+      "kind": "desktop",
+      "index": 1,
+      "tone": "light",
+      "label": "樱花电车窗",
+      "file": "/anime-wallpaper/desktop-02.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-02.avif"
+    },
+    {
+      "id": "desktop-13",
+      "kind": "desktop",
+      "index": 12,
+      "tone": "night",
+      "label": "樱花电车窗 · 夜",
+      "file": "/anime-wallpaper/desktop-13.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-13.avif"
+    },
+    {
+      "id": "desktop-03",
+      "kind": "desktop",
+      "index": 2,
+      "tone": "light",
+      "label": "星夜长发",
+      "file": "/anime-wallpaper/desktop-03.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-03.avif"
+    },
+    {
+      "id": "desktop-14",
+      "kind": "desktop",
+      "index": 13,
+      "tone": "night",
+      "label": "星夜长发 · 夜",
+      "file": "/anime-wallpaper/desktop-14.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-14.avif"
+    },
+    {
+      "id": "desktop-04",
+      "kind": "desktop",
+      "index": 3,
+      "tone": "light",
+      "label": "黄昏电车",
+      "file": "/anime-wallpaper/desktop-04.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-04.avif"
+    },
+    {
+      "id": "desktop-15",
+      "kind": "desktop",
+      "index": 14,
+      "tone": "night",
+      "label": "黄昏电车 · 夜",
+      "file": "/anime-wallpaper/desktop-15.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-15.avif"
+    },
+    {
+      "id": "desktop-05",
+      "kind": "desktop",
+      "index": 4,
+      "tone": "light",
+      "label": "雨中伞下",
+      "file": "/anime-wallpaper/desktop-05.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-05.avif"
+    },
+    {
+      "id": "desktop-16",
+      "kind": "desktop",
+      "index": 15,
+      "tone": "night",
+      "label": "雨中伞下 · 夜",
+      "file": "/anime-wallpaper/desktop-16.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-16.avif"
+    },
+    {
+      "id": "desktop-06",
+      "kind": "desktop",
+      "index": 5,
+      "tone": "light",
+      "label": "月下少女",
+      "file": "/anime-wallpaper/desktop-06.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-06.avif"
+    },
+    {
+      "id": "desktop-17",
+      "kind": "desktop",
+      "index": 16,
+      "tone": "night",
+      "label": "月下少女 · 夜",
+      "file": "/anime-wallpaper/desktop-17.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-17.avif"
+    },
+    {
+      "id": "desktop-07",
+      "kind": "desktop",
+      "index": 6,
+      "tone": "light",
+      "label": "粉发午后",
+      "file": "/anime-wallpaper/desktop-07.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-07.avif"
+    },
+    {
+      "id": "desktop-18",
+      "kind": "desktop",
+      "index": 17,
+      "tone": "night",
+      "label": "粉发午后 · 夜",
+      "file": "/anime-wallpaper/desktop-18.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-18.avif"
+    },
+    {
+      "id": "desktop-08",
+      "kind": "desktop",
+      "index": 7,
+      "tone": "light",
+      "label": "夏日海边",
+      "file": "/anime-wallpaper/desktop-08.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-08.avif"
+    },
+    {
+      "id": "desktop-19",
+      "kind": "desktop",
+      "index": 18,
+      "tone": "night",
+      "label": "夏日海边 · 夜",
+      "file": "/anime-wallpaper/desktop-19.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-19.avif"
+    },
+    {
+      "id": "desktop-09",
+      "kind": "desktop",
+      "index": 8,
+      "tone": "light",
+      "label": "神社黄昏",
+      "file": "/anime-wallpaper/desktop-09.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-09.avif"
+    },
+    {
+      "id": "desktop-20",
+      "kind": "desktop",
+      "index": 19,
+      "tone": "night",
+      "label": "神社黄昏 · 夜",
+      "file": "/anime-wallpaper/desktop-20.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-20.avif"
+    },
+    {
+      "id": "desktop-10",
+      "kind": "desktop",
+      "index": 9,
+      "tone": "light",
+      "label": "猫咪与风铃",
+      "file": "/anime-wallpaper/desktop-10.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-10.avif"
+    },
+    {
+      "id": "desktop-21",
+      "kind": "desktop",
+      "index": 20,
+      "tone": "night",
+      "label": "猫咪与风铃 · 夜",
+      "file": "/anime-wallpaper/desktop-21.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-21.avif"
+    },
+    {
+      "id": "desktop-11",
+      "kind": "desktop",
+      "index": 10,
+      "tone": "light",
+      "label": "天台微风",
+      "file": "/anime-wallpaper/desktop-11.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-11.avif"
+    },
+    {
+      "id": "desktop-22",
+      "kind": "desktop",
+      "index": 21,
+      "tone": "night",
+      "label": "天台微风 · 夜",
+      "file": "/anime-wallpaper/desktop-22.avif",
+      "thumb": "/anime-wallpaper/thumbs/desktop-22.avif"
+    },
+    {
+      "id": "mobile-01",
+      "kind": "mobile",
+      "index": 0,
+      "tone": "light",
+      "label": "樱落少女",
+      "file": "/anime-wallpaper/mobile-01.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-01.avif"
+    },
+    {
+      "id": "mobile-12",
+      "kind": "mobile",
+      "index": 11,
+      "tone": "night",
+      "label": "樱落少女 · 夜",
+      "file": "/anime-wallpaper/mobile-12.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-12.avif"
+    },
+    {
+      "id": "mobile-02",
+      "kind": "mobile",
+      "index": 1,
+      "tone": "light",
+      "label": "星空少女",
+      "file": "/anime-wallpaper/mobile-02.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-02.avif"
+    },
+    {
+      "id": "mobile-13",
+      "kind": "mobile",
+      "index": 12,
+      "tone": "night",
+      "label": "星空少女 · 夜",
+      "file": "/anime-wallpaper/mobile-13.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-13.avif"
+    },
+    {
+      "id": "mobile-03",
+      "kind": "mobile",
+      "index": 2,
+      "tone": "light",
+      "label": "雪夜灯火",
+      "file": "/anime-wallpaper/mobile-03.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-03.avif"
+    },
+    {
+      "id": "mobile-14",
+      "kind": "mobile",
+      "index": 13,
+      "tone": "night",
+      "label": "雪夜灯火 · 夜",
+      "file": "/anime-wallpaper/mobile-14.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-14.avif"
+    },
+    {
+      "id": "mobile-04",
+      "kind": "mobile",
+      "index": 3,
+      "tone": "light",
+      "label": "雨伞小径",
+      "file": "/anime-wallpaper/mobile-04.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-04.avif"
+    },
+    {
+      "id": "mobile-15",
+      "kind": "mobile",
+      "index": 14,
+      "tone": "night",
+      "label": "雨伞小径 · 夜",
+      "file": "/anime-wallpaper/mobile-15.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-15.avif"
+    },
+    {
+      "id": "mobile-05",
+      "kind": "mobile",
+      "index": 4,
+      "tone": "light",
+      "label": "午后猫尾",
+      "file": "/anime-wallpaper/mobile-05.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-05.avif"
+    },
+    {
+      "id": "mobile-16",
+      "kind": "mobile",
+      "index": 15,
+      "tone": "night",
+      "label": "午后猫尾 · 夜",
+      "file": "/anime-wallpaper/mobile-16.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-16.avif"
+    },
+    {
+      "id": "mobile-06",
+      "kind": "mobile",
+      "index": 5,
+      "tone": "light",
+      "label": "月见长发",
+      "file": "/anime-wallpaper/mobile-06.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-06.avif"
+    },
+    {
+      "id": "mobile-17",
+      "kind": "mobile",
+      "index": 16,
+      "tone": "night",
+      "label": "月见长发 · 夜",
+      "file": "/anime-wallpaper/mobile-17.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-17.avif"
+    },
+    {
+      "id": "mobile-07",
+      "kind": "mobile",
+      "index": 6,
+      "tone": "light",
+      "label": "粉樱插画",
+      "file": "/anime-wallpaper/mobile-07.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-07.avif"
+    },
+    {
+      "id": "mobile-18",
+      "kind": "mobile",
+      "index": 17,
+      "tone": "night",
+      "label": "粉樱插画 · 夜",
+      "file": "/anime-wallpaper/mobile-18.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-18.avif"
+    },
+    {
+      "id": "mobile-08",
+      "kind": "mobile",
+      "index": 7,
+      "tone": "light",
+      "label": "夏日泳装",
+      "file": "/anime-wallpaper/mobile-08.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-08.avif"
+    },
+    {
+      "id": "mobile-19",
+      "kind": "mobile",
+      "index": 18,
+      "tone": "night",
+      "label": "夏日泳装 · 夜",
+      "file": "/anime-wallpaper/mobile-19.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-19.avif"
+    },
+    {
+      "id": "mobile-09",
+      "kind": "mobile",
+      "index": 8,
+      "tone": "light",
+      "label": "黄昏屋顶",
+      "file": "/anime-wallpaper/mobile-09.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-09.avif"
+    },
+    {
+      "id": "mobile-20",
+      "kind": "mobile",
+      "index": 19,
+      "tone": "night",
+      "label": "黄昏屋顶 · 夜",
+      "file": "/anime-wallpaper/mobile-20.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-20.avif"
+    },
+    {
+      "id": "mobile-10",
+      "kind": "mobile",
+      "index": 9,
+      "tone": "light",
+      "label": "花火夜",
+      "file": "/anime-wallpaper/mobile-10.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-10.avif"
+    },
+    {
+      "id": "mobile-21",
+      "kind": "mobile",
+      "index": 20,
+      "tone": "night",
+      "label": "花火夜 · 夜",
+      "file": "/anime-wallpaper/mobile-21.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-21.avif"
+    },
+    {
+      "id": "mobile-11",
+      "kind": "mobile",
+      "index": 10,
+      "tone": "light",
+      "label": "海风轻语",
+      "file": "/anime-wallpaper/mobile-11.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-11.avif"
+    },
+    {
+      "id": "mobile-22",
+      "kind": "mobile",
+      "index": 21,
+      "tone": "night",
+      "label": "海风轻语 · 夜",
+      "file": "/anime-wallpaper/mobile-22.avif",
+      "thumb": "/anime-wallpaper/thumbs/mobile-22.avif"
+    }
+  ]
+}
