@@ -610,9 +610,18 @@
 			}, 600);
 		}
 
-		function unlock() {
+		function unlock(event) {
 			if (unlocked) return;
 			unlocked = true;
+			var target = event && event.target;
+			// 第一次交互就是点「静音 / 关语音 / 拖音量」时，只解锁不发声
+			if (
+				target &&
+				target.closest &&
+				target.closest("#anime-sound-toggle, #avp-enabled, #avp-volume")
+			) {
+				return;
+			}
 			setTimeout(function () {
 				play();
 			}, 220);
