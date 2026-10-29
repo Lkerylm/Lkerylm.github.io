@@ -1,0 +1,312 @@
+---
+/**
+ * 导航栏账号区：登录 / 注册 ↔ 头像菜单（用户中心 · 写文章 · 管理后台 · 通知 · 服务器设置 · 退出）
+ * 依赖 /firefly-api.js（已在 Layout / 独立页面的 <head> 中引入）
+ */
+---
+
+<div id="firefly-auth" class="ff-auth" data-state="loading">
+  <span id="ff-api-dot" class="ff-dot" title="正在检测后端…"></span>
+  <a class="ff-btn" href="/login/">登录</a>
+  <a class="ff-btn ff-btn-primary" href="/register/">注册</a>
+</div>
+
+<style is:global>
+  #firefly-auth {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    font-size: 13px;
+    line-height: 1;
+  }
+  #firefly-auth .ff-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 10px;
+    color: var(--primary, #ff9ac8);
+    border: 1px solid rgba(255, 154, 200, 0.35);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  #firefly-auth .ff-btn:hover {
+    background: rgba(255, 154, 200, 0.12);
+    transform: translateY(-1px);
+  }
+  #firefly-auth .ff-btn-primary {
+    background: linear-gradient(135deg, #ff9ac8, #c084fc);
+    color: #fff;
+    border-color: transparent;
+    font-weight: 600;
+  }
+  #firefly-auth .ff-btn-primary:hover {
+    filter: brightness(1.08);
+    background: linear-gradient(135deg, #ff9ac8, #c084fc);
+  }
+  #firefly-auth .ff-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #9ca3af;
+    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.15);
+    flex: none;
+    transition: all 0.2s;
+  }
+  #firefly-auth .ff-dot[data-ok="true"] {
+    background: #34d399;
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.18);
+  }
+  #firefly-auth .ff-dot[data-ok="false"] {
+    background: #f87171;
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18);
+  }
+  #firefly-auth .ff-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 154, 200, 0.35);
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  #firefly-auth .ff-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff9ac8, #7dd3fc);
+    color: #1b1e33;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    overflow: hidden;
+    flex: none;
+  }
+  #firefly-auth .ff-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  #firefly-auth .ff-badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #f43f5e;
+    color: #fff;
+    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #firefly-auth .ff-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 190px;
+    padding: 6px;
+    border-radius: 12px;
+    background: rgba(24, 26, 42, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
+    z-index: 90;
+    display: none;
+  }
+  #firefly-auth .ff-menu.open {
+    display: block;
+  }
+  #firefly-auth .ff-menu a,
+  #firefly-auth .ff-menu button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    color: #e8e9f3;
+    text-decoration: none;
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+  }
+  #firefly-auth .ff-menu a:hover,
+  #firefly-auth .ff-menu button:hover {
+    background: rgba(255, 154, 200, 0.14);
+  }
+  #firefly-auth .ff-sep {
+    height: 1px;
+    margin: 4px 6px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  #firefly-auth .ff-gear {
+    width: 30px;
+    height: 34px;
+    border: none;
+    background: none;
+    color: inherit;
+    opacity: 0.55;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0;
+    line-height: 1;
+  }
+  #firefly-auth .ff-gear:hover {
+    opacity: 1;
+  }
+  @media (max-width: 1023px) {
+    #firefly-auth .ff-btn:not(.ff-btn-primary),
+    #firefly-auth .ff-gear {
+      display: none;
+    }
+    #firefly-auth .ff-btn {
+      height: 30px;
+      padding: 0 9px;
+      font-size: 12px;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function openServerDialog() {
+      var api = window.FireflyAPI;
+      if (!api) return;
+      var v = window.prompt(
+        "后端服务器地址（留空 = 与当前网页同源）\n例如：http://192.168.1.10:8787",
+        api.base
+      );
+      if (v === null) return;
+      api.setBase(v.trim());
+      api.check().then(function (s) {
+        if (s.ok) {
+          alert("已连接后端：" + (api.base || location.origin));
+          location.reload();
+        } else {
+          alert("连接失败：" + (s.error || "请确认电脑上的 node server/server.mjs 正在运行，且地址可访问"));
+        }
+      });
+    }
+
+    function render(user, unread) {
+      var el = document.getElementById("firefly-auth");
+      if (!el) return;
+      var api = window.FireflyAPI || {};
+      var st = api.status || { ok: null, error: "" };
+
+      var dot =
+        '<span id="ff-api-dot" class="ff-dot" data-ok="' + (st.ok === null ? "" : st.ok) + '" title="' +
+        (st.ok ? "后端在线" : st.ok === false ? "后端未连接（点 ⚙ 设置地址）" : "正在检测后端…") +
+        '"></span>';
+
+      if (!user) {
+        el.dataset.state = "guest";
+        el.innerHTML =
+          dot +
+          '<a class="ff-btn" href="/login/">登录</a>' +
+          '<a class="ff-btn ff-btn-primary" href="/register/">注册</a>' +
+          '<button class="ff-gear" type="button" title="后端服务器设置">⚙</button>';
+        el.querySelector(".ff-gear").addEventListener("click", openServerDialog);
+        return;
+      }
+
+      el.dataset.state = "user";
+      var initial = (user.username || "?").slice(0, 1).toUpperCase();
+      var avatar = user.avatar
+        ? '<span class="ff-avatar"><img src="' + esc(user.avatar) + '" alt=""></span>'
+        : '<span class="ff-avatar">' + esc(initial) + "</span>";
+
+      el.innerHTML =
+        dot +
+        '<button class="ff-user" type="button" id="ff-user-btn">' +
+        avatar +
+        "<span>" + esc(user.username) + "</span>" +
+        (unread > 0 ? '<span class="ff-badge">' + (unread > 99 ? "99+" : unread) + "</span>" : "") +
+        '<span style="opacity:.6">▾</span>' +
+        "</button>" +
+        '<div class="ff-menu" id="ff-user-menu">' +
+        '<a href="/dashboard/">📚 用户中心</a>' +
+        '<a href="/dashboard/new/">✍️ 写文章</a>' +
+        '<a href="/community/">🌏 社区</a>' +
+        '<a href="/dashboard/#notifications">🔔 通知' + (unread > 0 ? "（" + unread + "）" : "") + "</a>" +
+        (user.role === "admin"
+          ? '<div class="ff-sep"></div><a href="/admin/">🛠 管理后台</a><a href="/admin/review/">✅ 审核文章</a>'
+          : "") +
+        '<div class="ff-sep"></div>' +
+        '<button type="button" id="ff-server-btn">⚙ 服务器设置</button>' +
+        '<button type="button" id="ff-logout-btn" style="color:#ffb0b0">🚪 退出登录</button>' +
+        "</div>";
+
+      var menu = document.getElementById("ff-user-menu");
+      document.getElementById("ff-user-btn").addEventListener("click", function (e) {
+        e.stopPropagation();
+        menu.classList.toggle("open");
+      });
+      document.addEventListener("click", function closeMenu() {
+        menu.classList.remove("open");
+        document.removeEventListener("click", closeMenu);
+      });
+      document.getElementById("ff-server-btn").addEventListener("click", openServerDialog);
+      document.getElementById("ff-logout-btn").addEventListener("click", function () {
+        fetch("/api/auth/logout/", { method: "POST" }).finally(function () {
+          if (window.FireflyAPI) window.FireflyAPI.clearToken();
+          location.href = "/";
+        });
+      });
+    }
+
+    var last = { user: null, unread: 0 };
+    function refresh() {
+      var api = window.FireflyAPI;
+      var el = document.getElementById("firefly-auth");
+      if (!api || !el) return;
+      api
+        .me()
+        .then(function (d) {
+          last.user = d && d.ok ? d.user : null;
+          last.unread = (d && d.unread) || 0;
+          render(last.user, last.unread);
+        })
+        .catch(function () {
+          render(null, 0);
+        });
+    }
+
+    window.__fireflyAuthRefresh = refresh;
+
+    document.addEventListener("firefly:auth", refresh);
+    document.addEventListener("firefly:backend", function () {
+      render(last.user, last.unread);
+    });
+
+    ["DOMContentLoaded", "astro:page-load", "swup:page:view", "swup:content:replace"].forEach(function (ev) {
+      document.addEventListener(ev, refresh);
+    });
+
+    refresh();
+  })();
+</script>
+

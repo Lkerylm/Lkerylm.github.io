@@ -11,7 +11,8 @@ export const prerender = true;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>登录 - 我的动漫小屋</title>
   <AnimeHeadMeta />
-  <style>
+  <script is:inline src="/firefly-api.js"></script>
+  <style is:global>
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -415,13 +416,21 @@ export const prerender = true;
           credentials: 'include',
           body: JSON.stringify({ username, password }),
         });
+        if (res.status === 404 || res.status === 405) {
+          showMsg('后端未连接：先运行 node server/server.mjs，再点导航栏 ⚙ 填服务器地址', 'err');
+          btn.disabled = false;
+          btn.textContent = '登 录';
+          return;
+        }
         const data = await res.json();
 
         if (data.ok) {
           showMsg('欢迎回来，' + (data.user?.username || '') + '！', 'ok');
           if (window.AnimeSounds) window.AnimeSounds.play('login', 0.45);
           playWelcomeVoice();
-          setTimeout(() => { location.href = '/'; }, 1500);
+          setTimeout(() => {
+            location.href = data.user && data.user.role === 'admin' ? '/admin/' : '/dashboard/';
+          }, 1200);
         } else {
           showMsg(data.error || '登录失败', 'err');
           if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);

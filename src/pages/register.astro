@@ -11,7 +11,8 @@ export const prerender = true;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>注册 - 我的动漫小屋</title>
   <AnimeHeadMeta />
-  <style>
+  <script is:inline src="/firefly-api.js"></script>
+  <style is:global>
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -303,12 +304,25 @@ export const prerender = true;
           credentials: 'include',
           body: JSON.stringify({ username, email, password }),
         });
+        if (res.status === 404 || res.status === 405) {
+          showMsg('后端未连接：先运行 node server/server.mjs，再点导航栏 ⚙ 填服务器地址', 'err');
+          btn.disabled = false;
+          btn.textContent = '注 册';
+          return;
+        }
         const data = await res.json();
         if (data.ok) {
-          showMsg('注册成功！正在跳转…', 'ok');
+          showMsg(
+            data.user && data.user.role === 'admin'
+              ? '注册成功！你是第一位用户，已自动成为管理员 🎉'
+              : '注册成功！正在跳转…',
+            'ok'
+          );
           if (window.AnimeSounds) window.AnimeSounds.play('login', 0.45);
           playWelcomeVoice();
-          setTimeout(() => { location.href = '/'; }, 1500);
+          setTimeout(() => {
+            location.href = data.user && data.user.role === 'admin' ? '/admin/' : '/dashboard/';
+          }, 1500);
         } else {
           showMsg(data.error || '注册失败', 'err');
           if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);

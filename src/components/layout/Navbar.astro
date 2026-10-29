@@ -7,6 +7,7 @@ import DisplaySettings from "@/components/controls/DisplaySettingsIntegrated.sve
 import LightDarkSwitch from "@/components/controls/LightDarkSwitch.svelte";
 import Search from "@/components/controls/Search.svelte";
 import MusicPlayer from "@/components/features/MusicPlayer.astro";
+import AuthNav from "@/components/features/AuthNav.astro";
 import { backgroundWallpaper, navBarConfig, siteConfig } from "@/config";
 import { musicPlayerConfig } from "@/config/musicConfig";
 import { LinkPresets } from "@/constants/link-presets";
@@ -134,6 +135,7 @@ if (isLocalSrcLogo) {
                 })}
             </div>
             <div class="flex col-start-3 justify-self-end">
+                <AuthNav />
                 <!--<SearchPanel client:load>-->
                 <Search
                     client:load

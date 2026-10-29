@@ -142,3 +142,32 @@ src/_server/dashboard-posts/     后台文章编辑页
 3. 把 `src/_server/*` 的内容移回 `src/pages/` 对应位置；
 4. 注意 Vercel/Netlify 的文件系统是临时的，SQLite 数据不会持久化，
    正式使用建议换成云数据库（Turso / Supabase / Neon 等）。
+
+## 八、2.0.0 起：账号 / 后台 / 实时数据已经可用
+
+新增了**独立后端** `server/`（Node + `node:sqlite`，零依赖），不需要 Astro 适配器、不影响静态部署：
+
+```powershell
+# 在项目根目录双击，或：
+node server\server.mjs        # http://localhost:8787  +  http://192.168.x.x:8787
+```
+
+同一个端口同时提供 **打包好的网站（dist/）** 和 **全部接口（/api/*）**：
+
+- 注册 / 登录 / 退出 / 当前用户
+- 投稿 / 改稿 / 删除 / 审核（管理员）
+- 评论 / 通知
+- 后台：统计、用户管理（升降级、删除、重置密码）、评论管理、**活动流水**
+- 上传图片（`public/uploads/`）
+
+前端通过 `public/firefly-api.js` 统一接入：它给所有 `fetch('/api/...')` 自动拼后端地址、带上
+`Authorization: Bearer <token>`，登录/注册成功后自动保存 token。所以：
+
+- 在 `http://localhost:8787/` 打开网站 → 同源，直接可用；
+- 在 GitHub Pages 上打开 → 点导航栏的 **⚙**，填 `http://192.168.x.x:8787` 即可跨域连上（后端已开 CORS）。
+
+第一个注册的账号自动成为管理员；老库（`data/blog.db`）里的用户和文章继续有效，
+bcrypt 老密码会在下次登录时自动升级为 scrypt。
+
+详见 `server/README.md`。两个 APK 的构建见 `FireflyAPK/APK-README.md`（`node build-two-apks.mjs both`）。
+

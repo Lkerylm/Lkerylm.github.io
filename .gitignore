@@ -47,3 +47,6 @@ Firefly-docs/
 cache/
 package/
 .obsidian/
+# 服务运行痕迹
+server.pid
+server-*.log

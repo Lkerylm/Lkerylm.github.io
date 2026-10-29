@@ -11,7 +11,8 @@ export const prerender = true;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台 - 我的动漫小屋</title>
   <AnimeHeadMeta />
-  <style>
+  <script is:inline src="/firefly-api.js"></script>
+  <style is:global>
     * { box-sizing: border-box; }
     body {
       margin: 0; min-height: 100vh;
@@ -38,7 +39,14 @@ export const prerender = true;
     .tab.active { color: #ff9ac8; border-bottom-color: #ff9ac8; }
 
     .panel { display: none; }
-    .panel.active { display: block; }
+    .panel.active {
+      display: block;
+      background: rgba(10, 12, 22, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 18px 20px;
+      backdrop-filter: blur(10px);
+    }
 
     /* 统计卡片 */
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
@@ -60,13 +68,13 @@ export const prerender = true;
       display: flex; justify-content: space-between;
       align-items: center; gap: 16px;
       padding: 14px 18px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.09);
       border-radius: 12px;
       transition: all 0.2s;
       flex-wrap: wrap;
     }
-    .item:hover { background: rgba(255,255,255,0.07); }
+    .item:hover { background: rgba(255,255,255,0.1); }
     .item-info { flex: 1; min-width: 200px; }
     .item-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
     .item-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
@@ -101,6 +109,41 @@ export const prerender = true;
     .empty { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); font-size: 14px; }
     .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
 
+    .pulse {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: rgba(255,255,255,0.55);
+      margin-bottom: 14px;
+    }
+    .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #34d399; flex: none;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
+      100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+    }
+    .item.new { animation: flash 1.6s ease; }
+    @keyframes flash {
+      from { background: rgba(255,154,200,0.18); border-color: rgba(255,154,200,0.5); }
+      to { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); }
+    }
+    .act-chip {
+      display: inline-block; font-size: 11px; padding: 3px 8px;
+      border-radius: 6px; margin-right: 8px;
+      background: rgba(255,154,200,0.15); color: #ff9ac8;
+      vertical-align: middle;
+    }
+    .act-login { background: rgba(125,211,252,0.15); color: #7dd3fc; }
+    .act-logout { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+    .act-post_create, .act-post_approve, .act-register { background: rgba(100,255,150,0.16); color: #a8ffc4; }
+    .act-post_reject, .act-post_delete, .act-comment_delete, .act-login_failed, .act-admin_delete {
+      background: rgba(255,80,80,0.15); color: #ffb0b0;
+    }
+    .act-admin_promote, .act-admin_demote, .act-admin_reset { background: rgba(167,139,250,0.2); color: #c4b5fd; }
+
+
     @media (max-width: 640px) {
       .item { flex-direction: column; align-items: flex-start; }
       .item-actions { width: 100%; }
@@ -125,6 +168,7 @@ export const prerender = true;
       <button class="tab" data-tab="users">👥 用户管理</button>
       <button class="tab" data-tab="posts">📝 文章管理</button>
       <button class="tab" data-tab="comments">💬 评论管理</button>
+      <button class="tab" data-tab="activity">📡 实时活动</button>
     </div>
 
     <div class="panel active" id="panel-dashboard">
@@ -143,6 +187,14 @@ export const prerender = true;
 
     <div class="panel" id="panel-comments">
       <div class="list" id="commentList"><div class="loading">加载中…</div></div>
+    </div>
+
+    <div class="panel" id="panel-activity">
+      <div class="pulse" id="pulseBar">
+        <span class="pulse-dot"></span>
+        <span id="pulseText">实时监听中…</span>
+      </div>
+      <div class="list" id="activityList"><div class="loading">加载中…</div></div>
     </div>
   </div>
 
@@ -184,18 +236,30 @@ export const prerender = true;
           <div class="stat-card">
             <div class="label">用户总数</div>
             <div class="value">${s.userCount}<span class="unit">人</span></div>
+            <div class="item-meta" style="margin-top:6px;">今日 +${s.todayUsers ?? 0}</div>
           </div>
           <div class="stat-card">
             <div class="label">文章总数</div>
             <div class="value">${s.postCount}<span class="unit">篇</span></div>
+            <div class="item-meta" style="margin-top:6px;">今日 +${s.todayPosts ?? 0}</div>
           </div>
           <div class="stat-card">
             <div class="label">待审核文章</div>
             <div class="value" style="color:#ffd060;">${s.pendingCount}<span class="unit">篇</span></div>
+            <div class="item-meta" style="margin-top:6px;"><a href="/admin/review/" style="color:#ffd060;">去审核 →</a></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">已通过</div>
+            <div class="value" style="color:#a8ffc4;">${s.approvedCount ?? 0}<span class="unit">篇</span></div>
           </div>
           <div class="stat-card">
             <div class="label">评论总数</div>
             <div class="value">${s.commentCount}<span class="unit">条</span></div>
+            <div class="item-meta" style="margin-top:6px;">今日 +${s.todayComments ?? 0}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">当前在线</div>
+            <div class="value" style="color:#7dd3fc;">${s.onlineCount ?? 0}<span class="unit">人</span></div>
           </div>
         `;
       } catch (err) {
@@ -340,7 +404,7 @@ export const prerender = true;
               <div class="item-meta">作者 ${escapeHtml(c.author)} · 于《${escapeHtml(c.post_title)}》 · ${fmtDate(c.created_at)}</div>
             </div>
             <div class="item-actions">
-              <a class="act act-reject" style="text-decoration:none;display:inline-block;" href="/community/${encodeURIComponent(c.post_slug)}/" target="_blank">查看</a>
+              <a class="act act-reject" style="text-decoration:none;display:inline-block;" href="/community/view/?slug=${encodeURIComponent(c.post_slug)}" target="_blank">查看</a>
               <button class="act act-delete" data-id="${c.id}">删除</button>
             </div>
           </div>`;
@@ -372,6 +436,70 @@ export const prerender = true;
       }
     }
 
+    // ===== 实时活动（2 秒增量拉取） =====
+    const ACTION_LABEL = {
+      register: '注册', login: '登录', login_failed: '登录失败', logout: '退出',
+      post_create: '投稿', post_update: '改稿', post_delete: '删文',
+      post_approve: '通过审核', post_reject: '拒绝文章',
+      comment_create: '评论', comment_delete: '删评论', upload: '上传',
+      profile_update: '改资料', password_change: '改密码',
+      admin_promote: '升管理员', admin_demote: '降级', admin_delete: '删用户', admin_reset: '重置密码'
+    };
+    let lastActivityId = 0;
+    let realtimeTimer = null;
+
+    function fmtDateTime(ts) {
+      if (!ts) return '';
+      return new Date(ts * 1000).toLocaleString('zh-CN', { hour12: false });
+    }
+
+    function activityItem(a, isNew) {
+      const label = ACTION_LABEL[a.action] || a.action;
+      return '<div class="item' + (isNew ? ' new' : '') + '">' +
+        '<div class="item-info">' +
+        '<div class="item-title"><span class="act-chip act-' + escapeHtml(a.action) + '">' + escapeHtml(label) + '</span>' + escapeHtml(a.detail || '') + '</div>' +
+        '<div class="item-meta">' + escapeHtml(a.username || '游客') + ' · ' + fmtDateTime(a.created_at) + (a.ip ? ' · ' + escapeHtml(a.ip) : '') + '</div>' +
+        '</div></div>';
+    }
+
+    async function pollActivity() {
+      const list = document.getElementById('activityList');
+      if (!list) return;
+      try {
+        const res = await fetch('/api/admin/activity/?afterId=' + lastActivityId);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || '加载失败');
+
+        const rows = data.activity || [];
+
+        if (lastActivityId === 0) {
+          list.innerHTML = rows.length
+            ? rows.map(a => activityItem(a, false)).join('')
+            : '<div class="empty">还没有活动记录，去投稿/审核试试～</div>';
+        } else if (rows.length) {
+          list.insertAdjacentHTML('afterbegin', rows.map(a => activityItem(a, true)).join(''));
+          while (list.children.length > 100) list.removeChild(list.lastElementChild);
+        }
+
+        lastActivityId = Math.max(lastActivityId, data.maxId || 0);
+        document.getElementById('pulseText').textContent =
+          '实时监听中 · 最后更新 ' + new Date().toLocaleTimeString('zh-CN');
+      } catch (err) {
+        document.getElementById('pulseText').textContent = '连接中断，重试中…' + (err && err.message ? '（' + err.message + '）' : '');
+      }
+    }
+
+    function startRealtime() {
+      if (realtimeTimer) return;
+      pollActivity();
+      realtimeTimer = setInterval(function () {
+        if (!document.hidden) pollActivity();
+      }, 2000);
+      setInterval(function () {
+        if (!document.hidden) loadStats();
+      }, 5000);
+    }
+
     // ===== Tab 切换 =====
     function initTabs() {
       document.querySelectorAll('.tab').forEach(tab => {
@@ -386,6 +514,7 @@ export const prerender = true;
           if (name === 'users') loadUsers();
           if (name === 'posts') loadPosts();
           if (name === 'comments') loadComments();
+          if (name === 'activity') pollActivity();
         });
       });
     }
@@ -396,6 +525,7 @@ export const prerender = true;
       if (!user) return;
       initTabs();
       loadStats();
+      startRealtime();
     })();
   </script>
 </body>
