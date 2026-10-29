@@ -1,0 +1,638 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>文章 - 我的动漫小屋</title><link rel="icon" type="image/svg+xml" href="/favicon/anime.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon/anime-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon/anime-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/favicon/anime-180.png"><link rel="shortcut icon" href="/favicon/anime.ico"><meta name="theme-color" content="#ff9ac8"><meta name="apple-mobile-web-app-title" content="我的动漫小屋"><meta name="application-name" content="我的动漫小屋"><script src="/firefly-api.js"></script><style>#anime-sound-toggle{position:fixed;left:16px;bottom:16px;z-index:999995;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid rgba(255,154,200,.38);background:#12101c8c;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#ffd9ea;font-size:12px;line-height:1;cursor:pointer;user-select:none;box-shadow:0 6px 22px #ff8fc12e;transition:transform .2s ease,background .2s ease,opacity .2s ease}#anime-sound-toggle:hover{transform:translateY(-2px);background:#261c32bf}#anime-sound-toggle:focus-visible{outline:2px solid rgba(255,154,200,.8);outline-offset:2px}#anime-sound-toggle.is-off{opacity:.55;border-color:#ffffff2e;color:#ffffffa6}#anime-sound-icon{font-size:14px}@media(max-width:640px){#anime-sound-toggle{left:10px;bottom:10px;padding:7px 10px}#anime-sound-text{display:none}}
+</style>
+<link rel="stylesheet" href="/_astro/AnimeBackdrop.apcTOslU.css">
+<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#1b1e33,#0a0b12);font-family:system-ui,-apple-system,Noto Sans SC,sans-serif;color:#fff;padding:40px 20px}.container{max-width:820px;margin:0 auto}.back{color:#ff9ac8;text-decoration:none;font-size:13px}h1{font-size:28px;margin:14px 0 8px;line-height:1.4;word-break:break-word}.meta{color:#ffffff80;font-size:13px;margin-bottom:22px}.cover{width:100%;border-radius:14px;margin-bottom:20px;display:none}.content{white-space:pre-wrap;word-break:break-word;font-size:15px;line-height:1.9;background:#ffffff0a;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px}h2{font-size:18px;margin:36px 0 14px}.comment{display:flex;gap:12px;padding:14px 16px;margin-bottom:10px;background:#ffffff0a;border:1px solid rgba(255,255,255,.07);border-radius:12px}.avatar{width:34px;height:34px;border-radius:50%;flex:none;background:linear-gradient(135deg,#ff9ac8,#7dd3fc);color:#1b1e33;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.cname{font-size:13px;color:#ff9ac8;margin-bottom:4px}.ctext{font-size:14px;line-height:1.7;white-space:pre-wrap;word-break:break-word}.ctime{font-size:11px;color:#ffffff59;margin-top:6px}textarea{width:100%;min-height:90px;resize:vertical;background:#ffffff0f;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px;color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px}button{padding:10px 22px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#ff9ac8,#c084fc);color:#fff;font-size:14px;font-family:inherit}button:disabled{opacity:.5;cursor:not-allowed}.hint{color:#ffffff80;font-size:13px}.hint a{color:#ff9ac8}.empty{color:#fff6;font-size:14px;padding:16px 0}.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%) translateY(20px);background:#141624f5;border:1px solid rgba(255,255,255,.12);padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;transition:all .25s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%) translateY(0)}
+</style><script type="module" src="/_astro/page.CiPokonQ.js"></script></head> <body> <div id="anime-backdrop" aria-hidden="true"> <div class="anime-backdrop-media"> <img id="anime-backdrop-img" src="/anime-wallpaper/desktop-01.avif" alt="" loading="eager"> </div> <div class="anime-backdrop-glow"></div> <div class="anime-backdrop-veil"></div> <div class="anime-petals"> <span style="left:2%; width:7px; height:7px; opacity:0.25; --petal-delay:0s; --petal-duration:15s; --petal-drift:40px;"></span><span style="left:15.3%; width:11px; height:11px; opacity:0.35; --petal-delay:-1.9s; --petal-duration:18.5s; --petal-drift:-70px;"></span><span style="left:28.6%; width:15px; height:15px; opacity:0.45; --petal-delay:-3.8s; --petal-duration:22s; --petal-drift:100px;"></span><span style="left:20.9%; width:19px; height:19px; opacity:0.55; --petal-delay:-5.699999999999999s; --petal-duration:25.5s; --petal-drift:-130px;"></span><span style="left:34.2%; width:7px; height:7px; opacity:0.65; --petal-delay:-7.6s; --petal-duration:29s; --petal-drift:160px;"></span><span style="left:47.5%; width:11px; height:11px; opacity:0.25; --petal-delay:-9.5s; --petal-duration:15s; --petal-drift:-40px;"></span><span style="left:39.8%; width:15px; height:15px; opacity:0.35; --petal-delay:-11.399999999999999s; --petal-duration:18.5s; --petal-drift:70px;"></span><span style="left:53.1%; width:19px; height:19px; opacity:0.45; --petal-delay:-13.299999999999999s; --petal-duration:22s; --petal-drift:-100px;"></span><span style="left:66.4%; width:7px; height:7px; opacity:0.55; --petal-delay:-15.2s; --petal-duration:25.5s; --petal-drift:130px;"></span><span style="left:58.699999999999996%; width:11px; height:11px; opacity:0.65; --petal-delay:-17.099999999999998s; --petal-duration:29s; --petal-drift:-160px;"></span><span style="left:72%; width:15px; height:15px; opacity:0.25; --petal-delay:-19s; --petal-duration:15s; --petal-drift:40px;"></span><span style="left:85.3%; width:19px; height:19px; opacity:0.35; --petal-delay:-20.9s; --petal-duration:18.5s; --petal-drift:-70px;"></span><span style="left:77.6%; width:7px; height:7px; opacity:0.45; --petal-delay:-0.7999999999999972s; --petal-duration:22s; --petal-drift:100px;"></span><span style="left:90.89999999999999%; width:11px; height:11px; opacity:0.55; --petal-delay:-2.6999999999999993s; --petal-duration:25.5s; --petal-drift:-130px;"></span><span style="left:4.200000000000003%; width:15px; height:15px; opacity:0.65; --petal-delay:-4.599999999999998s; --petal-duration:29s; --petal-drift:160px;"></span><span style="left:96.5%; width:19px; height:19px; opacity:0.25; --petal-delay:-6.5s; --petal-duration:15s; --petal-drift:-40px;"></span> </div> </div> <button id="anime-wallpaper-next" type="button" title="换一张动漫壁纸" aria-label="换一张动漫壁纸"> <span class="anime-wallpaper-icon">🌸</span> <span class="anime-wallpaper-text">换壁纸</span> </button> <div id="anime-corner-l2d" data-anime-l2d> <div id="anime-corner-bubble" class="anime-corner-bubble">
+一起看番吗？
+</div> <canvas id="anime-corner-canvas"></canvas> <button id="anime-corner-next" type="button" title="换一个看板娘" aria-label="换一个看板娘">
+🔄
+</button> </div> <div id="anime-sound-toggle" role="button" tabindex="0" aria-label="音效开关" title="音效开关（点击切换）"> <span id="anime-sound-icon" aria-hidden="true">🎵</span> <span id="anime-sound-text">音效开</span> </div>  <script>
+	(function () {
+		if (window.__animeSoundsInit) return;
+		window.__animeSoundsInit = true;
+
+		var STORAGE_KEY = "anime-sound-enabled";
+		var FILES = {
+			click: "/sounds/ui/click.wav",
+			tap: "/sounds/ui/tap.wav",
+			login: "/sounds/ui/login.wav",
+			logout: "/sounds/ui/logout.wav",
+			success: "/sounds/ui/success.wav",
+			error: "/sounds/ui/error.wav",
+			notification: "/sounds/ui/notification.wav",
+			open: "/sounds/ui/open.wav",
+			close: "/sounds/ui/close.wav",
+		};
+
+		var enabled = true;
+		try {
+			enabled = localStorage.getItem(STORAGE_KEY) !== "false";
+		} catch (e) {}
+
+		var cache = {};
+
+		function getAudio(name) {
+			if (cache[name]) return cache[name];
+			var audio = new Audio(FILES[name] || FILES.click);
+			audio.preload = "auto";
+			cache[name] = audio;
+			return audio;
+		}
+
+		function play(name, volume) {
+			if (!enabled) return null;
+			try {
+				var src = getAudio(name);
+				var audio = src.cloneNode(true);
+				audio.volume = typeof volume === "number" ? volume : 0.3;
+				var p = audio.play();
+				if (p && p.catch) p.catch(function () {});
+				return audio;
+			} catch (e) {
+				return null;
+			}
+		}
+
+		function syncUi() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			var icon = document.getElementById("anime-sound-icon");
+			var text = document.getElementById("anime-sound-text");
+			if (!toggle) return;
+			toggle.classList.toggle("is-off", !enabled);
+			toggle.setAttribute("aria-pressed", String(enabled));
+			if (icon) icon.textContent = enabled ? "🎵" : "🔇";
+			if (text) text.textContent = enabled ? "音效开" : "音效关";
+		}
+
+		function setEnabled(value) {
+			enabled = Boolean(value);
+			try {
+				localStorage.setItem(STORAGE_KEY, String(enabled));
+			} catch (e) {}
+			syncUi();
+			if (enabled) play("open", 0.25);
+		}
+
+		window.AnimeSounds = {
+			play: play,
+			setEnabled: setEnabled,
+			isEnabled: function () {
+				return enabled;
+			},
+			toggle: function () {
+				setEnabled(!enabled);
+				return enabled;
+			},
+		};
+
+		// 全局点击音效（捕获阶段，保证动态元素也能生效）
+		// 覆盖：导航、按钮、链接、标签、分类、分页、目录、卡片等所有可点击元素
+		var nearMotion =
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		var SPARKS = ["✨", "💖", "🌸", "⭐", "🎀", "💫"];
+		var lastSpark = 0;
+
+		function sparkle(x, y) {
+			if (nearMotion) return;
+			var now = Date.now();
+			if (now - lastSpark < 70) return;
+			lastSpark = now;
+			var el = document.createElement("span");
+			el.className = "anime-click-spark";
+			el.textContent = SPARKS[Math.floor(Math.random() * SPARKS.length)];
+			el.style.left = x + "px";
+			el.style.top = y + "px";
+			el.style.setProperty(
+				"--spark-x",
+				Math.round(Math.random() * 52 - 26) + "px",
+			);
+			document.body.appendChild(el);
+			setTimeout(function () {
+				el.remove();
+			}, 720);
+		}
+
+		document.addEventListener(
+			"click",
+			function (event) {
+				var target = event.target;
+				if (!target || !target.closest) return;
+				if (
+					target.closest(
+						"#anime-sound-toggle, [data-no-sound], input, textarea, select, option",
+					)
+				) {
+					return;
+				}
+				var el = target.closest(
+					'[data-sound], a, button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn, summary, label[for], .tab, .nav-item, .post-card-wrapper',
+				);
+				if (!el) return;
+
+				var custom = el.getAttribute && el.getAttribute("data-sound");
+				var isButton = el.matches(
+					'button, [role="button"], [role="tab"], .btn, .btn-regular, .btn-plain, .btn-ghost, .btn-primary, .floating-btn',
+				);
+				play(custom || (isButton ? "click" : "tap"), isButton ? 0.22 : 0.18);
+
+				var rect =
+					target.getBoundingClientRect && target.getBoundingClientRect();
+				sparkle(
+					event.clientX ||
+						(rect ? rect.left + rect.width / 2 : window.innerWidth / 2),
+					event.clientY ||
+						(rect ? rect.top + rect.height / 2 : window.innerHeight / 2),
+				);
+			},
+			true,
+		);
+
+		function bindToggle() {
+			var toggle = document.getElementById("anime-sound-toggle");
+			if (!toggle || toggle.dataset.bound === "1") return;
+			toggle.dataset.bound = "1";
+			syncUi();
+			toggle.addEventListener("click", function (event) {
+				event.stopPropagation();
+				if (window.AnimeSounds) window.AnimeSounds.toggle();
+			});
+			toggle.addEventListener("keydown", function (event) {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					if (window.AnimeSounds) window.AnimeSounds.toggle();
+				}
+			});
+		}
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", bindToggle);
+		} else {
+			bindToggle();
+		}
+		document.addEventListener("swup:page:view", bindToggle);
+	})();
+</script>  <script>(function(){const desktop = ["/anime-wallpaper/desktop-01.avif","/anime-wallpaper/desktop-02.avif","/anime-wallpaper/desktop-03.avif","/anime-wallpaper/desktop-04.avif","/anime-wallpaper/desktop-05.avif"];
+const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.avif","/anime-wallpaper/mobile-03.avif","/anime-wallpaper/mobile-04.avif","/anime-wallpaper/mobile-05.avif"];
+
+	(function () {
+		if (window.__animeBackdropReady) return;
+		window.__animeBackdropReady = true;
+
+		var img = document.getElementById("anime-backdrop-img");
+		if (!img || !Array.isArray(desktop) || !desktop.length) return;
+
+		var STORAGE_KEY = "anime-wallpaper-index";
+		var reduceMotion =
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+		var index = -1;
+		try {
+			index = parseInt(localStorage.getItem(STORAGE_KEY) || "-1", 10);
+		} catch (e) {}
+		if (isNaN(index) || index < 0) {
+			index = Math.floor(Math.random() * desktop.length);
+		}
+
+		var wasMobile = window.innerWidth < 768;
+
+		function currentList() {
+			return window.innerWidth < 768 ? mobile : desktop;
+		}
+
+		function apply(fade) {
+			var list = currentList();
+			if (!list || !list.length) return;
+			var src = list[index % list.length];
+
+			if (!fade) {
+				img.src = src;
+				return;
+			}
+
+			img.style.opacity = "0";
+			var done = function () {
+				img.style.opacity = "1";
+				img.onload = null;
+			};
+			img.onload = done;
+			img.src = src;
+			// 兜底：图片已缓存时 onload 可能不触发
+			setTimeout(done, 900);
+		}
+
+		apply(false);
+
+		// 预加载其余壁纸，切换更顺滑
+		desktop.concat(mobile).forEach(function (src) {
+			var preload = new Image();
+			preload.src = src;
+		});
+
+		var btn = document.getElementById("anime-wallpaper-next");
+		if (btn) {
+			btn.addEventListener("click", function () {
+				index = (index + 1) % desktop.length;
+				try {
+					localStorage.setItem(STORAGE_KEY, String(index));
+				} catch (e) {}
+				apply(true);
+				btn.classList.add("is-switching");
+				setTimeout(function () {
+					btn.classList.remove("is-switching");
+				}, 520);
+				if (window.AnimeSounds) window.AnimeSounds.play("open", 0.22);
+			});
+		}
+
+		// 滚动视差：壁纸随页面缓慢移动，而不是一整块死图
+		if (!reduceMotion) {
+			var ticking = false;
+			var update = function () {
+				ticking = false;
+				var y = window.scrollY || document.documentElement.scrollTop || 0;
+				var shift = Math.min(y * 0.08, 72);
+				img.style.transform =
+					"translate3d(0," + shift.toFixed(1) + "px,0) scale(1.03)";
+			};
+			window.addEventListener(
+				"scroll",
+				function () {
+					if (!ticking) {
+						ticking = true;
+						requestAnimationFrame(update);
+					}
+				},
+				{ passive: true },
+			);
+			update();
+		}
+
+		var resizeTimer = null;
+		window.addEventListener("resize", function () {
+			if (resizeTimer) clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(function () {
+				var isMobile = window.innerWidth < 768;
+				if (isMobile !== wasMobile) {
+					wasMobile = isMobile;
+					apply(false);
+				}
+			}, 200);
+		});
+	})();
+})();</script>  <script src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script> <script src="/Firefly-live2d-main/load/pixi.min.js"></script> <script src="/Firefly-live2d-main/load/cubism4.min.js"></script> <script>
+				(function () {
+					if (window.__animeCornerL2DInit) return;
+					window.__animeCornerL2DInit = true;
+
+					var wrap = document.getElementById("anime-corner-l2d");
+					var canvas = document.getElementById("anime-corner-canvas");
+					if (!wrap || !canvas) return;
+					if (window.innerWidth < 900) return;
+
+					var bubble = document.getElementById("anime-corner-bubble");
+					var nextBtn = document.getElementById("anime-corner-next");
+
+					var LINES = [
+						"今天也要元气满满哦～",
+						"要不要一起看番？",
+						"嘿嘿，被你发现了～",
+						"这个壁纸好看吗？",
+						"记得多喝水呀！",
+						"再摸我就要害羞了…",
+						"新的一天，新的番剧！",
+					];
+
+					var bubbleTimer = null;
+					function say(text) {
+						if (!bubble) return;
+						bubble.textContent = text || LINES[Math.floor(Math.random() * LINES.length)];
+						bubble.classList.add("is-show");
+						if (bubbleTimer) clearTimeout(bubbleTimer);
+						bubbleTimer = setTimeout(function () {
+							bubble.classList.remove("is-show");
+						}, 3600);
+					}
+
+					var app = null;
+					var model = null;
+					var pool = [];
+					var voices = [];
+					var idx = -1;
+					var loading = false;
+					var baseX = 0;
+					var baseY = 0;
+					var curX = 0;
+					var curY = 0;
+					var targetX = 0;
+					var targetY = 0;
+
+					function layout() {
+						if (!app || !model) return;
+						var w = wrap.clientWidth || 260;
+						var h = wrap.clientHeight || 340;
+						app.renderer.resize(w, h);
+						var bounds = model.getLocalBounds();
+						var scale = (h * 0.98) / (bounds.height || 1);
+						model.anchor.set(0.5, 1);
+						model.scale.set(scale);
+						baseX = w / 2;
+						baseY = h + 6;
+						model.x = baseX + curX;
+						model.y = baseY + curY;
+					}
+
+					function voiceEnabled() {
+						if (window.AnimeSounds && !window.AnimeSounds.isEnabled()) return false;
+						return true;
+					}
+
+					function playVoice() {
+						if (!voices.length || !voiceEnabled()) return;
+						try {
+							var audio = new Audio(voices[Math.floor(Math.random() * voices.length)]);
+							audio.volume = 0.55;
+							var p = audio.play();
+							if (p && p.catch) p.catch(function () {});
+						} catch (e) {}
+					}
+
+					function playMotion() {
+						if (!model) return;
+						try {
+							var defs = model.internalModel?.motionManager?.definitions || {};
+							var groups = Object.keys(defs).filter(function (group) {
+								return group !== "idle" && Array.isArray(defs[group]) && defs[group].length;
+							});
+							if (groups.length) {
+								model.motion(groups[Math.floor(Math.random() * groups.length)]);
+							}
+						} catch (e) {}
+					}
+
+					async function show(startIndex) {
+						if (loading || !app || !pool.length) return false;
+						loading = true;
+
+						if (model) {
+							try {
+								app.stage.removeChild(model);
+							} catch (e) {}
+							try {
+								model.destroy();
+							} catch (e) {}
+							model = null;
+						}
+
+						var tries = Math.min(pool.length, 14);
+						for (var n = 0; n < tries; n++) {
+							var target = (startIndex + n) % pool.length;
+							try {
+								var loaded = await PIXI.live2d.Live2DModel.from(pool[target]);
+								model = loaded;
+								idx = target;
+								app.stage.addChild(loaded);
+								layout();
+								try {
+									loaded.motion("idle");
+								} catch (e) {}
+								wrap.classList.add("is-ready");
+								loading = false;
+								return true;
+							} catch (err) {
+								console.warn("[anime-l2d] 模型加载失败:", pool[target], err);
+							}
+						}
+						loading = false;
+						return false;
+					}
+
+					async function boot() {
+						try {
+							var res = await fetch("/models-list.json");
+							pool = await res.json();
+						} catch (e) {
+							console.warn("[anime-l2d] models-list.json 加载失败", e);
+							return;
+						}
+						if (!Array.isArray(pool) || !pool.length) return;
+
+						try {
+							var vres = await fetch("/voices-list.json");
+							voices = await vres.json();
+						} catch (e) {}
+
+						if (window.PIXI?.live2d?.config) {
+							PIXI.live2d.config.sound = false;
+							PIXI.live2d.config.motionSync = true;
+						}
+
+						app = new PIXI.Application({
+							view: canvas,
+							width: wrap.clientWidth || 260,
+							height: wrap.clientHeight || 340,
+							transparent: true,
+							backgroundAlpha: 0,
+							antialias: true,
+							autoDensity: true,
+							resolution: Math.min(window.devicePixelRatio || 1, 2),
+						});
+
+						await show(Math.floor(Math.random() * pool.length));
+
+						document.addEventListener("mousemove", function (event) {
+							targetX = (event.clientX / window.innerWidth) * 2 - 1;
+							targetY = (event.clientY / window.innerHeight) * 2 - 1;
+						});
+
+						(function tick() {
+							requestAnimationFrame(tick);
+							if (!model) return;
+							try {
+								model.focus(targetX * 1.4, -targetY * 1.4);
+							} catch (e) {}
+							curX += (targetX * 10 - curX) * 0.06;
+							curY += (targetY * 6 - curY) * 0.06;
+							model.x = baseX + curX;
+							model.y = baseY + curY;
+						})();
+
+						canvas.addEventListener("click", function () {
+							playMotion();
+							playVoice();
+							say();
+						});
+
+						if (nextBtn) {
+							nextBtn.addEventListener("click", async function (event) {
+								event.stopPropagation();
+								say("换一个新朋友～");
+								await show((idx + 1) % pool.length);
+							});
+						}
+
+						window.addEventListener("resize", layout);
+					}
+
+					var wait = setInterval(function () {
+						if (window.PIXI && PIXI.live2d) {
+							clearInterval(wait);
+							boot();
+						}
+					}, 200);
+					setTimeout(function () {
+						clearInterval(wait);
+					}, 15000);
+				})();
+			</script>  <div class="container"> <a class="back" href="/community/">← 返回社区</a> <h1 id="title">加载中…</h1> <div class="meta" id="meta"></div> <img class="cover" id="cover" alt="封面"> <div class="content" id="content">正在加载文章…</div> <h2>💬 评论 <span id="cCount" style="font-size:13px;color:rgba(255,255,255,.45)"></span></h2> <div id="comments"><div class="empty">加载中…</div></div> <div id="commentForm" style="display:none;margin-top:16px;"> <textarea id="cInput" placeholder="友善发言～（Ctrl+Enter 发送）"></textarea> <button id="cSend">发表评论</button> </div> <div class="hint" id="loginHint" style="margin-top:14px;display:none;"> <a href="/login/">登录</a> 后即可评论 · 没有账号？<a href="/register/">立即注册</a> </div> </div> <div class="toast" id="toast"></div> <script>
+    (function () {
+      var esc = function (s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      };
+      var fmt = function (ts) {
+        if (!ts) return "";
+        return new Date(ts * 1000).toLocaleString("zh-CN", { hour12: false });
+      };
+      var toastTimer;
+      function toast(msg, isErr) {
+        var el = document.getElementById("toast");
+        el.textContent = msg;
+        el.style.borderColor = isErr ? "rgba(255,80,80,.5)" : "rgba(255,154,200,.5)";
+        el.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2200);
+      }
+
+      var slug = new URLSearchParams(location.search).get("slug");
+      var post = null;
+      var me = null;
+
+      function renderPost() {
+        document.title = post.title + " - 我的动漫小屋";
+        document.getElementById("title").textContent = post.title;
+        document.getElementById("meta").textContent = "作者 " + post.author + " · " + fmt(post.created_at);
+        document.getElementById("content").textContent = post.content || "";
+        if (post.cover) {
+          var img = document.getElementById("cover");
+          img.src = post.cover;
+          img.style.display = "block";
+        }
+      }
+
+      function renderComments(list) {
+        var box = document.getElementById("comments");
+        if (!list || list.length === 0) {
+          box.innerHTML = '<div class="empty">还没有评论，来抢沙发～</div>';
+          return;
+        }
+        box.innerHTML = list
+          .map(function (c) {
+            var av = c.avatar
+              ? '<div class="avatar"><img src="' + esc(c.avatar) + '" alt=""></div>'
+              : '<div class="avatar">' + esc((c.author || "?").slice(0, 1).toUpperCase()) + "</div>";
+            return (
+              '<div class="comment">' + av +
+              '<div style="flex:1;min-width:0">' +
+              '<div class="cname">' + esc(c.author) + "</div>" +
+              '<div class="ctext">' + esc(c.content) + "</div>" +
+              '<div class="ctime">' + fmt(c.created_at) + "</div>" +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      async function loadComments() {
+        if (!post) return;
+        var r = await fetch("/api/comments/list/?postId=" + post.id);
+        var d = await r.json();
+        if (d && d.ok) {
+          renderComments(d.comments);
+          document.getElementById("cCount").textContent = d.comments.length ? "(" + d.comments.length + ")" : "";
+        }
+      }
+
+      async function loadPost() {
+        var r = await fetch("/api/posts/public/");
+        var d = await r.json();
+        if (!d || !d.ok) throw new Error("加载失败");
+        post = (d.posts || []).find(function (p) { return p.slug === slug; });
+        if (!post) {
+          document.getElementById("title").textContent = "文章不存在或未通过审核";
+          document.getElementById("content").textContent = "这篇文章可能还在审核中，或者已经被删除。";
+          document.getElementById("comments").style.display = "none";
+          return false;
+        }
+        renderPost();
+        await loadComments();
+        return true;
+      }
+
+      async function loadMe() {
+        try {
+          var r = await fetch("/api/auth/me/");
+          var d = await r.json();
+          me = d && d.ok ? d.user : null;
+        } catch (e) {
+          me = null;
+        }
+        if (!post) return;
+        document.getElementById("commentForm").style.display = me ? "block" : "none";
+        document.getElementById("loginHint").style.display = me ? "none" : "block";
+      }
+
+      document.getElementById("cSend").addEventListener("click", async function () {
+        var btn = this;
+        var input = document.getElementById("cInput");
+        var content = input.value.trim();
+        if (!content) return toast("评论不能为空", true);
+        btn.disabled = true;
+        try {
+          var r = await fetch("/api/comments/create/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ postId: post.id, content: content }),
+          });
+          var d = await r.json();
+          if (d.ok) {
+            input.value = "";
+            toast("评论成功");
+            await loadComments();
+          } else {
+            toast(d.error || "发送失败", true);
+          }
+        } catch (e) {
+          toast("网络错误", true);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById("cInput").addEventListener("keydown", function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") document.getElementById("cSend").click();
+      });
+
+      (async function () {
+        if (!slug) {
+          document.getElementById("title").textContent = "缺少文章参数";
+          document.getElementById("content").textContent = "请从社区列表进入。";
+          return;
+        }
+        try {
+          var ok = await loadPost();
+          if (!ok) return;
+          await loadMe();
+          setInterval(function () {
+            if (!document.hidden) loadComments();
+          }, 5000);
+        } catch (e) {
+          document.getElementById("title").textContent = "加载失败";
+          document.getElementById("content").textContent =
+            "无法连接后端（" + (e && e.message ? e.message : "网络错误") + "）。请确认电脑上的后端已启动。";
+        }
+      })();
+    })();
+  </script> </body> </html>

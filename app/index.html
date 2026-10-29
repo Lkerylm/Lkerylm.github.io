@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>下载 Firefly App</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;padding:40px 18px;color:#fff;
+    font-family:system-ui,-apple-system,"Noto Sans SC",sans-serif;
+    background:radial-gradient(1000px 500px at 15% -10%,#452a58 0%,transparent 60%),
+               radial-gradient(800px 420px at 100% 5%,#1e3a5f 0%,transparent 55%),#0a0b12;
+  }
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:26px;margin:0 0 8px}
+  .sub{color:rgba(255,255,255,.55);font-size:13.5px;margin-bottom:26px;line-height:1.7}
+  .card{
+    background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);
+    border-radius:16px;padding:20px 22px;margin-bottom:16px;
+  }
+  .card h2{margin:0 0 6px;font-size:17px}
+  .tag{
+    display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;
+    background:rgba(255,154,200,.18);color:#ff9ac8;margin-left:8px;vertical-align:middle;
+  }
+  .tag.green{background:rgba(100,255,150,.16);color:#a8ffc4}
+  .desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.8;margin:8px 0 14px}
+  ul{margin:8px 0 14px;padding-left:20px;font-size:13px;color:rgba(255,255,255,.6);line-height:1.9}
+  a.dl{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:11px 20px;border-radius:11px;text-decoration:none;color:#fff;font-weight:600;font-size:14px;
+    background:linear-gradient(135deg,#ff7ab8,#c084fc);
+  }
+  a.dl.ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,154,200,.35);color:#ffd0e6;font-weight:500}
+  .meta{font-size:11.5px;color:rgba(255,255,255,.35);margin-top:10px}
+  .foot{text-align:center;font-size:12px;color:rgba(255,255,255,.35);margin-top:26px}
+  .foot a{color:#ff9ac8;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🦋 下载 Firefly App</h1>
+  <div class="sub">两个版本界面完全一样，区别只在于数据存在哪里：<br>
+    在线版和电脑上的网站共用一个数据库；离线版所有内容只存在手机里。</div>
+
+  <div class="card">
+    <h2>在线版<span class="tag">推荐 · 2.85 MB</span></h2>
+    <div class="desc">和电脑端完全一致：注册 / 登录 / 写文章 / 审核 / 管理后台 / 实时看到别人的操作。
+      数据保存在你自己的电脑上（后端服务），手机与电脑连同一个 Wi-Fi 即可。</div>
+    <ul>
+      <li>手机上注册的账号 = 电脑网页上的账号</li>
+      <li>后台「📡 实时活动」2 秒刷新，谁投稿、谁审核一目了然</li>
+      <li>第一次打开要填电脑地址，例如 <code>http://192.168.1.10:8787</code></li>
+    </ul>
+    <a class="dl" href="/app/Firefly-2.0.0-online.apk" download>⬇️ 下载在线版 APK</a>
+    <div class="meta">包名 com.lkerylm.firefly.online · 可与离线版同时安装 · 已签名</div>
+  </div>
+
+  <div class="card">
+    <h2>离线版<span class="tag green">26.57 MB</span></h2>
+    <div class="desc">功能一样全：本地注册 / 登录（密码哈希）、本地后台、投稿审核、活动记录、Live2D 看板娘。
+      <b>完全断网也能用</b>，数据存在手机本地。</div>
+    <ul>
+      <li>第一个注册的账号自动成为管理员</li>
+      <li>后台可管理用户、审核文章、查看活动、导出 JSON 备份</li>
+      <li>不联网、不传数据，换手机需要重新注册</li>
+    </ul>
+    <a class="dl ghost" href="/app/Firefly-2.0.0-offline.apk" download>⬇️ 下载离线版 APK</a>
+    <div class="meta">包名 com.lkerylm.firefly · versionCode 3 · 可覆盖升级 1.0.0 / 1.1.0</div>
+  </div>
+
+  <div class="card">
+    <h2>电脑端（网页）</h2>
+    <div class="desc">网页版的注册、登录、投稿、后台需要本机的后端服务在运行：</div>
+    <ul>
+      <li>在电脑项目目录双击 <code>start-server.cmd</code></li>
+      <li>浏览器打开 <code>http://localhost:8787/</code></li>
+      <li>第一个注册的账号自动成为管理员</li>
+    </ul>
+    <a class="dl ghost" href="/">← 返回网站首页</a>
+  </div>
+
+  <div class="foot">Firefly 2.0.0 · <a href="/">lkerylm.github.io</a></div>
+</div>
+</body>
+</html>
