@@ -601,7 +601,8 @@ const size = config.size || { width: 600, height: 700 };
 			loading = true;
 			const remote = isRemoteUrl(src);
 			// patience：用户手动选择时给的耐心更足（模型平均 16MB，弱网首屏确实要几十秒）
-			const timeoutMs = remote ? (patience ? 60000 : 25000) : 25000;
+			// 内置模型在同源，但贴图约 1.7MB，国内直连 GitHub Pages 常常 20~60 秒，给足 60 秒。
+			const timeoutMs = patience ? 75000 : (remote ? 40000 : 60000);
 			// 主线路（GitHub Pages）慢或被拦截时，同一份文件再从镜像线路取一次
 			const mirror = mirrorOfModel(src);
 			const sources = mirror ? [src, mirror] : [src];
@@ -652,7 +653,7 @@ const size = config.size || { width: 600, height: 700 };
 		async function loadFrom(startIdx, patience) {
 			const total = isMobile ? Math.min(pool.length, 5) : Math.min(pool.length, 20);
 			// 总时限：极端慢网下逐个尝试会拖到几分钟，这里兜底，超时就放弃（旧模型仍在）
-			const deadline = Date.now() + (patience ? 75000 : 50000);
+			const deadline = Date.now() + (patience ? 150000 : 120000);
 			let i = startIdx;
 			for (let n = 0; n < total; n++) {
 				// 只有用户选中的那个模型享受耐心值，后续回落的模型用默认超时
@@ -891,14 +892,29 @@ const size = config.size || { width: 600, height: 700 };
 				console.log("[live2d] voices:", voicePool.length);
 			} catch (e) { console.warn("[live2d] voices-list 加载失败", e); }
 
-			app = new PIXI.Application({
-				view: canvas,
-				width: baseW,
-				height: baseH,
-				transparent: true, backgroundAlpha: 0,
-				antialias: true, autoDensity: true,
-				resolution: Math.min(window.devicePixelRatio || 1, 2),
-			});
+			app = (() => {
+				try {
+					return new PIXI.Application({
+						view: canvas,
+						width: baseW,
+						height: baseH,
+						transparent: true, backgroundAlpha: 0,
+						antialias: true, autoDensity: true,
+						resolution: Math.min(window.devicePixelRatio || 1, 2),
+					});
+				} catch (e) {
+					return null;
+				}
+			})();
+			// WebGL 不可用（远程桌面 / 虚拟机 / 显卡驱动异常 / 浏览器关了硬件加速）时，
+			// PIXI 会直接抛错，这里必须自己兜住，否则看板娘永远停在"加载中"。
+			if (!app) {
+				console.warn("[live2d] WebGL 不可用，跳过看板娘");
+				widget.style.display = "none";
+				showBootTip("当前浏览器/设备不支持 WebGL，看板娘无法显示（可在浏览器设置里开启「硬件加速」后刷新）");
+				setTimeout(hideBootTip, 12000);
+				return;
+			}
 
 			// 先显示容器，模型（贴图 5MB）加载期间也能看到位置，避免"什么都没有"
 			widget.style.display = "block";
@@ -915,6 +931,23 @@ const size = config.size || { width: 600, height: 700 };
 			if (savedModel && (!okInit || currentIdx !== pool.indexOf(savedModel))) {
 				try { localStorage.removeItem(MODEL_KEY); } catch (e) {}
 				pinnedModel = false;
+			}
+
+			// 首屏没加载出来：给明确提示 + 自动重试一次（弱网下第一次经常刚好卡在超时边缘）
+			if (!okInit) {
+				showBootTip("看板娘正在重试加载…（GitHub Pages 国内较慢，可点右下角 🔄 手动重试）");
+				setTimeout(async () => {
+					if (model || loading) return;
+					failedUrls.clear();
+					const okRetry = await loadFrom(initialIdx);
+					if (okRetry) hideBootTip();
+					else {
+						showBootTip("看板娘加载失败：网络较慢或被拦截，点右下角 🔄 可重试");
+						setTimeout(hideBootTip, 10000);
+					}
+				}, 3000);
+			} else {
+				hideBootTip();
 			}
 
 			widget.style.display = "block";
@@ -959,7 +992,13 @@ const size = config.size || { width: 600, height: 700 };
 				e.stopPropagation();
 				nextBtn.style.transform = "rotate(360deg)";
 				setTimeout(() => { nextBtn.style.transform = "rotate(0deg)"; }, 400);
-				await loadFrom(pickNext());
+				// 手动点"换一个"等于用户主动重试：把之前超时失败的记录清掉
+				failedUrls.clear();
+				const ok = await loadFrom(pickNext());
+				if (!ok) {
+					showBootTip("看板娘加载失败：网络较慢或被拦截，稍后再试");
+					setTimeout(hideBootTip, 8000);
+				}
 			});
 
 			window.addEventListener("resize", () => {
