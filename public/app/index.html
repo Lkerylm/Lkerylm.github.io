@@ -7,35 +7,100 @@
 <style>
   *{box-sizing:border-box}
   body{
-    margin:0;min-height:100vh;padding:40px 18px;color:#fff;
+    margin:0;min-height:100vh;padding:44px 18px 60px;color:#fff;position:relative;overflow-x:hidden;
     font-family:system-ui,-apple-system,"Noto Sans SC",sans-serif;
-    background:radial-gradient(1000px 500px at 15% -10%,#452a58 0%,transparent 60%),
-               radial-gradient(800px 420px at 100% 5%,#1e3a5f 0%,transparent 55%),#0a0b12;
+    background:
+      radial-gradient(900px 520px at 12% -12%,rgba(255,122,184,.30) 0%,transparent 62%),
+      radial-gradient(760px 460px at 102% 4%,rgba(124,92,255,.30) 0%,transparent 58%),
+      radial-gradient(700px 500px at 50% 110%,rgba(34,211,238,.16) 0%,transparent 60%),
+      #0a0712;
   }
-  .wrap{max-width:720px;margin:0 auto}
-  h1{font-size:26px;margin:0 0 8px}
-  .sub{color:rgba(255,255,255,.55);font-size:13.5px;margin-bottom:26px;line-height:1.7}
+  /* 顶部光带 */
+  body::before{
+    content:"";position:fixed;left:0;right:0;top:0;height:2px;z-index:3;
+    background:linear-gradient(90deg,transparent,#ff8ec0,#ffd166,#a78bfa,#22d3ee,transparent);
+    opacity:.85;
+  }
+  /* 星点 */
+  body::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;
+    background-image:
+      radial-gradient(1.6px 1.6px at 18% 22%,#fff 50%,transparent 51%),
+      radial-gradient(1.4px 1.4px at 72% 12%,#fff 50%,transparent 51%),
+      radial-gradient(1.2px 1.2px at 45% 62%,#fff 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 88% 72%,#fff 50%,transparent 51%),
+      radial-gradient(1.2px 1.2px at 8% 82%,#fff 50%,transparent 51%);
+    background-size:420px 420px,380px 380px,460px 460px,520px 520px,340px 340px;
+    animation:drift 46s linear infinite;
+  }
+  @keyframes drift{from{background-position:0 0,0 0,0 0,0 0,0 0}to{background-position:420px 320px,-380px 260px,460px 380px,-520px 300px,340px 240px}}
+
+  .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto}
+  h1{
+    font-size:28px;margin:0 0 10px;letter-spacing:.01em;font-weight:800;
+    background:linear-gradient(120deg,#fff 10%,#ffd1e6 42%,#ffb3d9 58%,#c4b5fd 92%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 3px 14px rgba(255,122,184,.35));
+  }
+  .sub{color:rgba(255,255,255,.6);font-size:13.5px;margin-bottom:26px;line-height:1.8}
+  .sub b{color:#ffc9e3;font-weight:600}
+
   .card{
-    background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);
-    border-radius:16px;padding:20px 22px;margin-bottom:16px;
+    position:relative;overflow:hidden;
+    background:linear-gradient(165deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+    border:1px solid rgba(255,255,255,.13);border-radius:20px;padding:22px 22px 20px;margin-bottom:16px;
+    box-shadow:0 16px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
   }
-  .card h2{margin:0 0 6px;font-size:17px}
+  .card::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:linear-gradient(180deg,#ff8ec0,#a78bfa,#22d3ee);opacity:.85;
+  }
+  .card:hover{transform:translateY(-3px);border-color:rgba(255,154,200,.4);
+    box-shadow:0 20px 48px rgba(255,111,174,.18),inset 0 1px 0 rgba(255,255,255,.2)}
+  .card h2{margin:0 0 6px;font-size:17px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .tag{
-    display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;
-    background:rgba(255,154,200,.18);color:#ff9ac8;margin-left:8px;vertical-align:middle;
+    display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;
+    background:linear-gradient(135deg,rgba(255,122,184,.28),rgba(167,139,250,.28));
+    border:1px solid rgba(255,154,200,.4);color:#ffd6ea;
   }
-  .tag.green{background:rgba(100,255,150,.16);color:#a8ffc4}
-  .desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.8;margin:8px 0 14px}
-  ul{margin:8px 0 14px;padding-left:20px;font-size:13px;color:rgba(255,255,255,.6);line-height:1.9}
+  .tag.green{
+    background:linear-gradient(135deg,rgba(52,211,153,.24),rgba(34,211,238,.2));
+    border-color:rgba(110,231,183,.4);color:#b6f7dd;
+  }
+  .desc{font-size:13px;color:rgba(255,255,255,.62);line-height:1.85;margin:10px 0 12px}
+  .desc b{color:#ffd6ea}
+  ul{margin:8px 0 16px;padding-left:20px;font-size:13px;color:rgba(255,255,255,.62);line-height:1.95}
+  ul li::marker{color:#ff9ac8}
+  code{
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);
+    padding:1px 6px;border-radius:6px;font-size:12px;color:#ffd6ea;
+  }
+
   a.dl{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:11px 20px;border-radius:11px;text-decoration:none;color:#fff;font-weight:600;font-size:14px;
-    background:linear-gradient(135deg,#ff7ab8,#c084fc);
+    position:relative;display:inline-flex;align-items:center;gap:8px;overflow:hidden;
+    padding:12px 22px;border-radius:13px;text-decoration:none;color:#fff;font-weight:700;font-size:14px;
+    background:linear-gradient(135deg,#ff6fae,#ff8ec0 40%,#a78bfa);
+    box-shadow:0 10px 24px rgba(255,90,160,.35),inset 0 1px 0 rgba(255,255,255,.4);
+    transition:transform .16s ease,box-shadow .16s ease;
   }
-  a.dl.ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,154,200,.35);color:#ffd0e6;font-weight:500}
-  .meta{font-size:11.5px;color:rgba(255,255,255,.35);margin-top:10px}
-  .foot{text-align:center;font-size:12px;color:rgba(255,255,255,.35);margin-top:26px}
-  .foot a{color:#ff9ac8;text-decoration:none}
+  a.dl::after{
+    content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);
+    transform:skewX(-18deg);animation:shine 3.6s ease-in-out infinite;
+  }
+  @keyframes shine{0%{left:-60%}55%,100%{left:130%}}
+  a.dl:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(255,90,160,.45),inset 0 1px 0 rgba(255,255,255,.45)}
+  a.dl.ghost{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,154,200,.35);
+    color:#ffd0e6;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  a.dl.ghost::after{display:none}
+  .meta{font-size:11.5px;color:rgba(255,255,255,.38);margin-top:12px;letter-spacing:.02em}
+  .foot{text-align:center;font-size:12px;color:rgba(255,255,255,.38);margin-top:28px}
+  .foot a{color:#ff9ac8;text-decoration:none;border-bottom:1px dashed rgba(255,154,200,.4)}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -53,7 +118,7 @@
       <li>后台「📡 实时活动」2 秒刷新，谁投稿、谁审核一目了然</li>
       <li>第一次打开要填电脑地址，例如 <code>http://192.168.1.10:8787</code></li>
     </ul>
-    <a class="dl" href="/app/Firefly-2.0.0-online.apk" download>⬇️ 下载在线版 APK</a>
+    <a class="dl" href="/app/Firefly-2.0.1-online.apk" download>⬇️ 下载在线版 APK</a>
     <div class="meta">包名 com.lkerylm.firefly.online · 可与离线版同时安装 · 已签名</div>
   </div>
 
@@ -66,8 +131,8 @@
       <li>后台可管理用户、审核文章、查看活动、导出 JSON 备份</li>
       <li>不联网、不传数据，换手机需要重新注册</li>
     </ul>
-    <a class="dl ghost" href="/app/Firefly-2.0.0-offline.apk" download>⬇️ 下载离线版 APK</a>
-    <div class="meta">包名 com.lkerylm.firefly · versionCode 3 · 可覆盖升级 1.0.0 / 1.1.0</div>
+    <a class="dl ghost" href="/app/Firefly-2.0.1-offline.apk" download>⬇️ 下载离线版 APK</a>
+    <div class="meta">包名 com.lkerylm.firefly · versionCode 4 · 可覆盖升级 1.0.0 / 1.1.0</div>
   </div>
 
   <div class="card">
@@ -81,7 +146,7 @@
     <a class="dl ghost" href="/">← 返回网站首页</a>
   </div>
 
-  <div class="foot">Firefly 2.0.0 · <a href="/">lkerylm.github.io</a></div>
+  <div class="foot">Firefly 2.0.1 · <a href="/">lkerylm.github.io</a></div>
 </div>
 </body>
 </html>

@@ -18,58 +18,11 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		LinkPreset.Archive,
 	];
 
-	// 根据配置决定是否添加友链，在siteConfig关闭pages.friends时导航栏不显示友链
-	if (siteConfig.pages.friends) {
-		links.push(LinkPreset.Friends);
-	}
-
-	// 根据配置决定是否添加留言板，在siteConfig关闭pages.guestbook时导航栏不显示留言板
-	if (siteConfig.pages.guestbook) {
-		links.push(LinkPreset.Guestbook);
-	}
-
-	// 下载 App（在线版 / 离线版）
+	// 站内二次元分区（社区 / 番组 / 相册 / 留言板 / 友链），全部指向自己的站点
 	links.push({
-		name: "App",
-		url: "/app/",
-		icon: "mingcute:cellphone-fill",
-	});
-
-	// 我的及其子菜单
-	links.push({
-		name: "我的",
-		url: "/my/",
-		icon: "mingcute:cat-fill",
-		children: [
-			// 根据配置决定是否添加相册，在siteConfig关闭pages.gallery时导航栏不显示相册
-			...(siteConfig.pages.gallery ? [LinkPreset.Gallery] : []),
-
-			// 根据配置决定是否添加番组计划，在siteConfig关闭pages.bangumi时导航栏不显示番组计划
-			...(siteConfig.pages.bangumi ? [LinkPreset.Bangumi] : []),
-		],
-	});
-
-	// 关于及其子菜单
-	links.push({
-		name: "关于",
-		url: "/content/",
-		icon: "mingcute:flower-2-fill",
-		children: [
-			// 根据配置决定是否添加赞助，在siteConfig关闭pages.sponsor时导航栏不显示赞助
-			...(siteConfig.pages.sponsor ? [LinkPreset.Sponsor] : []),
-
-			// 关于页面
-			LinkPreset.About,
-		],
-	});
-
-	// 站内二次元分区（社区 / 番组 / 相册 / 留言板），不再跳转到别人的站点
-	links.push({
-		name: "二次元",
+		name: "社区",
 		url: "/community/",
 		icon: "mingcute:magic-1-fill",
-
-		// 子菜单
 		children: [
 			{
 				name: "社区投稿",
@@ -103,7 +56,51 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 						},
 					]
 				: []),
+			...(siteConfig.pages.friends
+				? [
+						{
+							name: "友链",
+							url: "/friends/",
+							icon: "mingcute:link-2-fill",
+						},
+					]
+				: []),
 		],
+	});
+
+	// 我的及其子菜单
+	links.push({
+		name: "我的",
+		url: "/my/",
+		icon: "mingcute:cat-fill",
+		children: [
+			// 根据配置决定是否添加相册，在siteConfig关闭pages.gallery时导航栏不显示相册
+			...(siteConfig.pages.gallery ? [LinkPreset.Gallery] : []),
+
+			// 根据配置决定是否添加番组计划，在siteConfig关闭pages.bangumi时导航栏不显示番组计划
+			...(siteConfig.pages.bangumi ? [LinkPreset.Bangumi] : []),
+		],
+	});
+
+	// 关于及其子菜单
+	links.push({
+		name: "关于",
+		url: "/content/",
+		icon: "mingcute:flower-2-fill",
+		children: [
+			// 根据配置决定是否添加赞助，在siteConfig关闭pages.sponsor时导航栏不显示赞助
+			...(siteConfig.pages.sponsor ? [LinkPreset.Sponsor] : []),
+
+			// 关于页面
+			LinkPreset.About,
+		],
+	});
+
+	// 下载 App（在线版 / 离线版）
+	links.push({
+		name: "App",
+		url: "/app/",
+		icon: "mingcute:cellphone-fill",
 	});
 
 	// 仅返回链接，其它导航搜索相关配置在模块顶层常量中独立导出
