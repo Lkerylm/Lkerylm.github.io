@@ -1,7 +1,8 @@
 <!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>注册 - 我的动漫小屋</title><link rel="icon" type="image/svg+xml" href="/favicon/anime.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon/anime-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon/anime-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/favicon/anime-180.png"><link rel="shortcut icon" href="/favicon/anime.ico"><meta name="theme-color" content="#ff9ac8"><meta name="apple-mobile-web-app-title" content="我的动漫小屋"><meta name="application-name" content="我的动漫小屋"><script src="/firefly-api.js"></script><style>#anime-sound-toggle{position:fixed;left:16px;bottom:16px;z-index:999995;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid rgba(255,154,200,.38);background:#12101c8c;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#ffd9ea;font-size:12px;line-height:1;cursor:pointer;user-select:none;box-shadow:0 6px 22px #ff8fc12e;transition:transform .2s ease,background .2s ease,opacity .2s ease}#anime-sound-toggle:hover{transform:translateY(-2px);background:#261c32bf}#anime-sound-toggle:focus-visible{outline:2px solid rgba(255,154,200,.8);outline-offset:2px}#anime-sound-toggle.is-off{opacity:.55;border-color:#ffffff2e;color:#ffffffa6}#anime-sound-icon{font-size:14px}@media(max-width:640px){#anime-sound-toggle{left:10px;bottom:10px;padding:7px 10px}#anime-sound-text{display:none}}
 </style>
 <link rel="stylesheet" href="/_astro/AnimeBackdrop.apcTOslU.css">
-<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#22254a,#0a0b12 70%,#050609);font-family:Noto Sans SC,system-ui,-apple-system,sans-serif;color:#fff;padding:20px;overflow:hidden;position:relative}body:before{content:"";position:fixed;top:40%;left:50%;width:80vmin;height:80vmin;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(167,139,250,.25) 0%,rgba(255,154,200,.12) 40%,transparent 70%);border-radius:50%;filter:blur(40px);pointer-events:none;z-index:0}#reg-l2d{position:fixed;inset:0;width:100vw;height:100vh;z-index:1;pointer-events:none;overflow:hidden}#reg-l2d canvas{background:transparent!important;display:block!important;position:absolute!important;top:0!important;left:0!important}.petals{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}.petal{position:absolute;top:-5%;width:10px;height:10px;background:radial-gradient(circle,#ffc0d9 0%,#ff7ab8 60%,transparent 70%);border-radius:50% 0 50% 50%;opacity:.85;filter:blur(.3px);animation:fall linear infinite}@keyframes fall{0%{transform:translate3d(0,-5vh,0) rotate(0);opacity:0}10%{opacity:.9}to{transform:translate3d(30px,110vh,0) rotate(360deg);opacity:0}}.card{position:relative;z-index:10;width:100%;max-width:420px;margin-left:auto;margin-right:8vw;background:#14141e99;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:40px 34px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 20px 60px #0009,0 0 60px #a78bfa1a;animation:cardIn .7s cubic-bezier(.22,1,.36,1)}@keyframes cardIn{0%{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}.logo{text-align:center;margin-bottom:6px}.logo-icon{display:inline-block;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ff9ac8);box-shadow:0 10px 30px #a78bfa66;font-size:26px;line-height:52px;text-align:center;margin-bottom:12px}h1{margin:0 0 6px;font-size:24px;text-align:center;font-weight:700;letter-spacing:.05em}.sub{text-align:center;color:#ffffff80;font-size:12px;margin-bottom:26px;letter-spacing:.1em}label{display:block;font-size:13px;margin-bottom:8px;color:#ffffffbf;font-weight:500}input{width:100%;padding:12px 15px;background:#0006;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#fff;font-size:14px;margin-bottom:18px;outline:none;transition:all .2s;font-family:inherit}input:focus{border-color:#a78bfa;background:#00000080;box-shadow:0 0 0 4px #a78bfa1f}input::placeholder{color:#ffffff4d}button{width:100%;padding:13px;background:linear-gradient(135deg,#a78bfa,#ff9ac8);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;letter-spacing:.1em;transition:all .25s;font-family:inherit;box-shadow:0 10px 24px #a78bfa40}button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 32px #a78bfa66}button:disabled{opacity:.6;cursor:not-allowed}.msg{margin-top:16px;padding:11px 15px;border-radius:10px;font-size:13px;display:none}.msg.err{display:block;background:#ff505026;color:#ffb0b0;border:1px solid rgba(255,80,80,.3)}.msg.ok{display:block;background:#64ff9626;color:#a8ffc4;border:1px solid rgba(100,255,150,.3)}.links{margin-top:20px;text-align:center;font-size:13px;color:#ffffff80}.links a{color:#a78bfa;text-decoration:none;margin:0 6px;transition:all .2s}.links a:hover{color:#fff}.divider{color:#fff3;margin:0 4px}@media(max-width:900px){.card{margin-left:auto;margin-right:auto}#reg-l2d{opacity:.35}}
+<style>.ffs-fab{position:fixed;right:16px;bottom:16px;z-index:300;height:38px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,154,200,.35);background:#14141eb8;color:#ffd0e6;font-family:inherit;font-size:12.5px;cursor:pointer;backdrop-filter:blur(10px);box-shadow:0 8px 24px #00000059}.ffs-fab:hover{background:#ff9ac829}.ffs-fab[data-state=online]{border-color:#34d39980;color:#a7f3d0}.ffs-mask{position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;background:#04060c9e;backdrop-filter:blur(6px);padding:20px}.ffs-mask.open{display:flex}.ffs-box{width:100%;max-width:420px;padding:22px 22px 18px;border-radius:18px;background:#161826f7;border:1px solid rgba(255,255,255,.12);box-shadow:0 24px 70px #0000008c;color:#fff;font-family:inherit}.ffs-title{font-size:16px;font-weight:700;color:#ff9ac8;margin-bottom:8px}.ffs-desc{font-size:12.5px;line-height:1.75;color:#ffffff9e;margin-bottom:12px}.ffs-desc b{color:#ffd0e6;font-weight:600}.ffs-input{width:100%;height:46px;padding:0 14px;border-radius:12px;background:#0000004d;border:1px solid rgba(255,255,255,.14);color:#fff;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box}.ffs-input:focus{border-color:#ff9ac899}.ffs-msg{display:none;margin-top:10px;font-size:12.5px;line-height:1.6}.ffs-msg.show{display:block}.ffs-msg.ok{color:#a7f3d0}.ffs-msg.err{color:#fecaca}.ffs-row{display:flex;gap:10px;margin-top:12px}.ffs-btn{flex:1;height:44px;border:none;border-radius:12px;font-family:inherit;font-size:14px;font-weight:600;color:#fff;cursor:pointer;background:linear-gradient(135deg,#ff7ab8,#c084fc)}.ffs-btn:active{transform:scale(.98)}.ffs-btn.ffs-ghost{background:#ffffff12;border:1px solid rgba(255,154,200,.3);color:#ffd0e6;font-weight:500}.ffs-tip{margin-top:12px;font-size:11.5px;line-height:1.7;color:#ffffff6b}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#22254a,#0a0b12 70%,#050609);font-family:Noto Sans SC,system-ui,-apple-system,sans-serif;color:#fff;padding:20px;overflow:hidden;position:relative}body:before{content:"";position:fixed;top:40%;left:50%;width:80vmin;height:80vmin;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(167,139,250,.25) 0%,rgba(255,154,200,.12) 40%,transparent 70%);border-radius:50%;filter:blur(40px);pointer-events:none;z-index:0}#reg-l2d{position:fixed;inset:0;width:100vw;height:100vh;z-index:1;pointer-events:none;overflow:hidden}#reg-l2d canvas{background:transparent!important;display:block!important;position:absolute!important;top:0!important;left:0!important}.petals{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}.petal{position:absolute;top:-5%;width:10px;height:10px;background:radial-gradient(circle,#ffc0d9 0%,#ff7ab8 60%,transparent 70%);border-radius:50% 0 50% 50%;opacity:.85;filter:blur(.3px);animation:fall linear infinite}@keyframes fall{0%{transform:translate3d(0,-5vh,0) rotate(0);opacity:0}10%{opacity:.9}to{transform:translate3d(30px,110vh,0) rotate(360deg);opacity:0}}.card{position:relative;z-index:10;width:100%;max-width:420px;margin-left:auto;margin-right:8vw;background:#14141e99;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:40px 34px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 20px 60px #0009,0 0 60px #a78bfa1a;animation:cardIn .7s cubic-bezier(.22,1,.36,1)}@keyframes cardIn{0%{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}.logo{text-align:center;margin-bottom:6px}.logo-icon{display:inline-block;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ff9ac8);box-shadow:0 10px 30px #a78bfa66;font-size:26px;line-height:52px;text-align:center;margin-bottom:12px}h1{margin:0 0 6px;font-size:24px;text-align:center;font-weight:700;letter-spacing:.05em}.sub{text-align:center;color:#ffffff80;font-size:12px;margin-bottom:26px;letter-spacing:.1em}label{display:block;font-size:13px;margin-bottom:8px;color:#ffffffbf;font-weight:500}input{width:100%;padding:12px 15px;background:#0006;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#fff;font-size:14px;margin-bottom:18px;outline:none;transition:all .2s;font-family:inherit}input:focus{border-color:#a78bfa;background:#00000080;box-shadow:0 0 0 4px #a78bfa1f}input::placeholder{color:#ffffff4d}button{width:100%;padding:13px;background:linear-gradient(135deg,#a78bfa,#ff9ac8);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;letter-spacing:.1em;transition:all .25s;font-family:inherit;box-shadow:0 10px 24px #a78bfa40}button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 32px #a78bfa66}button:disabled{opacity:.6;cursor:not-allowed}.msg{margin-top:16px;padding:11px 15px;border-radius:10px;font-size:13px;display:none}.msg.err{display:block;background:#ff505026;color:#ffb0b0;border:1px solid rgba(255,80,80,.3)}.msg.ok{display:block;background:#64ff9626;color:#a8ffc4;border:1px solid rgba(100,255,150,.3)}.links{margin-top:20px;text-align:center;font-size:13px;color:#ffffff80}.links a{color:#a78bfa;text-decoration:none;margin:0 6px;transition:all .2s}.links a:hover{color:#fff}.divider{color:#fff3;margin:0 4px}@media(max-width:900px){.card{margin-left:auto;margin-right:auto}#reg-l2d{opacity:.35}}
 </style><script type="module" src="/_astro/page.CiPokonQ.js"></script></head> <body> <div id="anime-backdrop" aria-hidden="true"> <div class="anime-backdrop-media"> <img id="anime-backdrop-img" src="/anime-wallpaper/desktop-01.avif" alt="" loading="eager"> </div> <div class="anime-backdrop-glow"></div> <div class="anime-backdrop-veil"></div>  </div> <button id="anime-wallpaper-next" type="button" title="换一张动漫壁纸" aria-label="换一张动漫壁纸"> <span class="anime-wallpaper-icon">🌸</span> <span class="anime-wallpaper-text">换壁纸</span> </button>  <div id="anime-sound-toggle" role="button" tabindex="0" aria-label="音效开关" title="音效开关（点击切换）"> <span id="anime-sound-icon" aria-hidden="true">🎵</span> <span id="anime-sound-text">音效开</span> </div>  <script>
 	(function () {
 		if (window.__animeSoundsInit) return;
@@ -405,7 +406,7 @@ const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.av
           body: JSON.stringify({ username, email, password }),
         });
         if (res.status === 404 || res.status === 405) {
-          showMsg('后端未连接：先运行 node server/server.mjs，再点导航栏 ⚙ 填服务器地址', 'err');
+          showMsg('还没有连上你的电脑：点右下角 ⚙ 服务器，填上 http://电脑IP:8787 再注册（只浏览内容不用注册）', 'err');
           btn.disabled = false;
           btn.textContent = '注 册';
           return;
@@ -430,10 +431,75 @@ const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.av
           btn.textContent = '注 册';
         }
       } catch (err) {
-        showMsg('网络错误，请重试', 'err');
+        showMsg('网络错误：点右下角 ⚙ 服务器确认地址是否正确，或稍后重试', 'err');
         if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
         btn.disabled = false;
         btn.textContent = '注 册';
       }
     });
-  </script> </body> </html>
+  </script> <button id="ffs-open" class="ffs-fab" type="button" title="连接我的电脑服务器">⚙ 服务器</button> <div id="ffs-mask" class="ffs-mask" aria-hidden="true"> <div class="ffs-box" role="dialog" aria-label="服务器设置"> <div class="ffs-title">连接我的电脑</div> <div class="ffs-desc">
+账号和投稿都存在你自己电脑上。先在电脑上启动 <b>server</b>（双击 start-server.cmd），
+      再把黑窗口里的地址填进来；手机和电脑要在同一个 Wi-Fi。
+</div> <input id="ffs-input" class="ffs-input" placeholder="http://192.168.1.10:8787" autocomplete="url" spellcheck="false"> <div id="ffs-msg" class="ffs-msg"></div> <div class="ffs-row"> <button id="ffs-save" class="ffs-btn" type="button">测试并连接</button> <button id="ffs-close" class="ffs-btn ffs-ghost" type="button">关闭</button> </div> <div class="ffs-tip">
+只想看内容？不用连服务器，直接浏览就行；登录/发帖才会用到它。
+</div> </div> </div>  <script>
+  (function () {
+    var fab = document.getElementById("ffs-open");
+    var mask = document.getElementById("ffs-mask");
+    var input = document.getElementById("ffs-input");
+    var msg = document.getElementById("ffs-msg");
+    var save = document.getElementById("ffs-save");
+    var close = document.getElementById("ffs-close");
+    if (!fab || !mask) return;
+
+    function say(text, type) {
+      msg.textContent = text;
+      msg.className = "ffs-msg show " + (type || "");
+    }
+    function norm(v) {
+      v = String(v || "").trim();
+      if (!v) return "";
+      if (!/^https?:\/\//i.test(v)) v = "http://" + v;
+      return v.replace(/\/+$/, "");
+    }
+    function openPanel() {
+      mask.classList.add("open");
+      if (window.FireflyAPI) input.value = window.FireflyAPI.base || "";
+      say("", "");
+      setTimeout(function () { input.focus(); }, 60);
+    }
+    function closePanel() { mask.classList.remove("open"); }
+
+    fab.addEventListener("click", openPanel);
+    close.addEventListener("click", closePanel);
+    mask.addEventListener("click", function (e) { if (e.target === mask) closePanel(); });
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") save.click(); });
+
+    save.addEventListener("click", function () {
+      var api = window.FireflyAPI;
+      if (!api) { say("API 脚本没加载，刷新页面重试", "err"); return; }
+      var url = norm(input.value);
+      if (!url) { say("请填写电脑上的地址，例如 http://192.168.1.10:8787", "err"); input.focus(); return; }
+      api.setBase(url);
+      save.disabled = true;
+      var old = save.textContent;
+      save.textContent = "连接中…";
+      api.check(6000).then(function (s) {
+        save.disabled = false;
+        save.textContent = old;
+        if (s && s.ok) {
+          say("连接成功！正在重新加载…", "ok");
+          setTimeout(function () { location.reload(); }, 600);
+        } else {
+          say("连不上：" + (s && s.error ? s.error : "电脑没开或地址不对") + "（可以先直接浏览内容）", "err");
+        }
+      });
+    });
+
+    document.addEventListener("firefly:backend", function (e) {
+      var ok = e && e.detail && e.detail.ok;
+      fab.dataset.state = ok ? "online" : "offline";
+      fab.textContent = ok ? "⚙ 已连接电脑" : "⚙ 服务器";
+    });
+  })();
+</script> </body></html>
