@@ -29,9 +29,10 @@ node server\server.mjs
 - 登录返回一个 30 天有效的 token，前端存在 `localStorage.firefly_token`，请求时放 `Authorization: Bearer <token>`；
 - 管理员可在 `/admin/` 里改角色、删用户、重置密码。
 
-> 忘记管理员密码？停掉服务后执行：
+> 忘记管理员密码？停掉服务后执行（会重置密码并设为管理员，旧登录全部失效）：
 > ```powershell
-> node -e "const{DatabaseSync}=require('node:sqlite');const db=new DatabaseSync('data/blog.db');db.prepare(\"UPDATE users SET role='admin' WHERE id=(SELECT MIN(id) FROM users)\").run();console.log('done')"
+> node server/reset-admin.mjs 你的用户名 新密码     # 账号不存在则直接创建
+> node server/reset-admin.mjs                      # 不带参数 = 把最早注册的用户提升为管理员
 > ```
 
 ## 三、接口一览

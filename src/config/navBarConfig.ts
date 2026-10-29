@@ -28,6 +28,13 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		links.push(LinkPreset.Guestbook);
 	}
 
+	// 下载 App（在线版 / 离线版）
+	links.push({
+		name: "App",
+		url: "/app/",
+		icon: "mingcute:cellphone-fill",
+	});
+
 	// 我的及其子菜单
 	links.push({
 		name: "我的",
