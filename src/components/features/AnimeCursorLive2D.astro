@@ -1,0 +1,1254 @@
+---
+/**
+ * 动漫少女「Live2D 鼠标陪伴角色」（全站可用）
+ * ------------------------------------------------------------------
+ * 和右下角看板娘（Live2DWidget.astro）共用同一套运行库 / 同一批模型，
+ * 区别是这只小可爱会**跟着鼠标跑**：
+ *
+ *   · 位置   跟随光标（右下 18px 起，贴边自动翻到另一侧，缓动 + 轻微呼吸）
+ *   · 模型   随机轮换（默认 2 分钟，且只在你不动鼠标时才换）
+ *   · 换装   「⚙ 模型库」可搜索 200+ 个在线模型，点一下即换；
+ *            也能粘贴自己的 .model3.json 地址加入，选中结果存 localStorage
+ *   · 降级   WebGL / 运行库不可用时回落到 AnimeCursor.astro 的手绘 Q 版
+ *   · 触屏   默认关闭（省流量），可点左下「🎭 看板娘」手动打开
+ *
+ * 渲染为什么放在 iframe：Cubism 4 的 CubismShader_WebGL 是模块级单例，着色器绑在
+ * 第一个 WebGL 上下文上；同页第二个 PIXI 渲染器会画不出东西（控制台刷
+ * "no valid shader program"）。放进 /acx/cursor-frame.html 后拥有独立 JS 作用域，
+ * 和右下角看板娘互不干扰。
+ *
+ * 自己想改的常见位置（都在下面 <script> 里，改完 pnpm build 即可）：
+ *   1) SIZES        角色三档大小（宽 / 高，CSS 像素）
+ *   2) DEFAULT_ROTATE / ROTATE_MAX_MB / IDLE_MS  轮换节奏与轻量模型上限
+ *   3) 默认模型池   搜 `buildRotationPool`，想固定用某几个模型就写死在数组里
+ *   4) localStorage 键名：acx_on / acx_src / acx_rotate / acx_size / acx_idle / acx_custom
+ *
+ * 也可以在浏览器控制台里直接调：
+ *   AnimeCursorLive2D.on() / .off() / .toggle() / .next()
+ *   AnimeCursorLive2D.setModel("https://…/xxx.model3.json")
+ *   AnimeCursorLive2D.setSize("s" | "m" | "l") / .setRotate(0|60|120|300)
+ */
+---
+
+<div id="acx-dock" class="acx-dock">
+	<button
+		id="acx-toggle"
+		class="acx-btn acx-btn--main"
+		type="button"
+		aria-pressed="false"
+		title="Live2D 鼠标看板娘（跟随光标 · 随机换装）"
+	>
+		<span class="acx-ico" aria-hidden="true">🎭</span>
+		<span class="acx-txt">看板娘</span>
+	</button>
+	<button id="acx-next" class="acx-btn" type="button" title="换一个模型" aria-label="换一个模型" hidden
+		>🔄</button
+	>
+	<button id="acx-open" class="acx-btn" type="button" title="模型库 / 设置" aria-label="模型库 / 设置" hidden
+		>⚙</button
+	>
+</div>
+
+<div id="acx-stage" class="acx-stage" aria-hidden="true">
+	<iframe
+		id="acx-frame"
+		class="acx-frame"
+		src="/acx/cursor-frame.html"
+		title="Live2D 鼠标角色"
+		scrolling="no"
+		tabindex="-1"
+		aria-hidden="true"></iframe>
+	<span id="acx-hint" class="acx-hint"></span>
+</div>
+
+<div id="acx-panel" class="acx-panel" role="dialog" aria-label="鼠标看板娘设置" hidden>
+	<div class="acx-head">
+		<strong>🎭 鼠标看板娘</strong>
+		<button id="acx-close" class="acx-x" type="button" aria-label="关闭">✕</button>
+	</div>
+
+	<div class="acx-row">
+		<label for="acx-rotate">自动轮换</label>
+		<select id="acx-rotate">
+			<option value="0">不换（只用当前）</option>
+			<option value="60">每 1 分钟</option>
+			<option value="120">每 2 分钟</option>
+			<option value="300">每 5 分钟</option>
+			<option value="600">每 10 分钟</option>
+		</select>
+	</div>
+
+	<div class="acx-row">
+		<label for="acx-size">角色大小</label>
+		<select id="acx-size">
+			<option value="s">小</option>
+			<option value="m">中</option>
+			<option value="l">大</option>
+		</select>
+	</div>
+
+	<label class="acx-check"
+		><input id="acx-idle" type="checkbox" checked /> 只在我停下鼠标时才换（推荐）</label
+	>
+
+	<input id="acx-search" class="acx-input" type="text" placeholder="搜索模型：名字 / 体积…" />
+
+	<div id="acx-list" class="acx-list"></div>
+
+	<div class="acx-add">
+		<input id="acx-custom" class="acx-input" type="text" placeholder="粘贴 .model3.json 地址，添加自己的模型" />
+		<button id="acx-addbtn" class="acx-btn acx-btn--mini" type="button">添加</button>
+	</div>
+
+	<p class="acx-note">
+		标注「官方」的模型是 <b>Live2D Inc.</b> 公开示例素材，依
+		<a
+			href="https://www.live2d.com/eula/live2d-free-material-license-agreement_cn.html"
+			target="_blank"
+			rel="noopener noreferrer">Free Material License</a
+		>
+		仅通过浏览器加载展示；「本站」模型放在仓库
+		<code>public/Firefly-live2d-main/model/</code> 下。选中的模型与设置都保存在浏览器 localStorage。
+	</p>
+</div>
+
+<style is:global>
+	/* 开启 Live2D 看板娘时：藏掉手绘 Q 版小人，其余（樱花拖尾 / 台词气泡 / 点击星光）照旧 */
+	html.acx-on #anime-cursor .anime-cursor-svg {
+		display: none !important;
+	}
+	html.acx-on .anime-cursor {
+		filter: none !important;
+	}
+
+	/* ---------- 左下角按钮组 ---------- */
+	.acx-dock {
+		position: fixed;
+		left: 16px;
+		bottom: 192px;
+		z-index: 999996;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.acx-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		min-width: 34px;
+		height: 28px;
+		padding: 0 10px;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 154, 200, 0.38);
+		background: rgba(18, 16, 28, 0.55);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		color: #ffd9ea;
+		font-size: 12px;
+		line-height: 1;
+		font-family: inherit;
+		cursor: pointer;
+		user-select: none;
+		box-shadow: 0 6px 22px rgba(255, 143, 193, 0.18);
+		transition:
+			transform 0.2s ease,
+			background 0.2s ease,
+			opacity 0.2s ease,
+			color 0.2s ease;
+	}
+	.acx-btn:hover {
+		transform: translateY(-2px);
+		background: rgba(38, 28, 50, 0.75);
+	}
+	.acx-btn:focus-visible {
+		outline: 2px solid rgba(255, 154, 200, 0.8);
+		outline-offset: 2px;
+	}
+	.acx-btn[hidden] {
+		display: none !important;
+	}
+	.acx-btn--main.is-off {
+		opacity: 0.55;
+		border-color: rgba(255, 255, 255, 0.18);
+		color: rgba(255, 255, 255, 0.65);
+	}
+	.acx-btn--main.is-on {
+		border-color: rgba(255, 154, 200, 0.75);
+		background: rgba(255, 154, 200, 0.16);
+		color: #ffe6f2;
+	}
+	.acx-btn--mini {
+		height: 26px;
+		padding: 0 12px;
+		font-size: 12px;
+		flex: 0 0 auto;
+	}
+	.acx-ico {
+		font-size: 13px;
+	}
+
+	/* ---------- 跟随鼠标的角色 ---------- */
+	.acx-stage {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: var(--acx-w, 150px);
+		height: var(--acx-h, 196px);
+		z-index: 999999;
+		pointer-events: none;
+		opacity: 0;
+		transform: translate3d(-300px, -300px, 0);
+		transition: opacity 0.22s ease;
+		will-change: transform;
+	}
+	.acx-stage.is-visible {
+		opacity: 1;
+	}
+	.acx-stage.is-hidden,
+	.acx-stage.is-typing {
+		opacity: 0;
+	}
+	.acx-frame {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		background: transparent;
+		pointer-events: none;
+		color-scheme: light;
+	}
+	.acx-hint {
+		position: absolute;
+		left: 50%;
+		bottom: 46%;
+		transform: translateX(-50%);
+		max-width: 190px;
+		padding: 3px 8px;
+		border-radius: 10px;
+		background: rgba(28, 20, 40, 0.86);
+		border: 1px solid rgba(255, 154, 200, 0.45);
+		color: #ffe6f2;
+		font-size: 11px;
+		line-height: 1.45;
+		white-space: nowrap;
+		opacity: 0;
+		transition: opacity 0.18s ease;
+	}
+	.acx-hint.is-show {
+		opacity: 1;
+	}
+</style>
+
+<style is:global>
+	/* ---------- 模型库面板 ---------- */
+	.acx-panel {
+		position: fixed;
+		left: 16px;
+		bottom: 232px;
+		width: 322px;
+		max-width: calc(100vw - 32px);
+		max-height: min(66vh, 560px);
+		/* 面板本身不滚，内容超了裁掉，列表自己滚（短屏时见下面的 media 查询） */
+		overflow: hidden;
+		z-index: 1000002;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 12px 12px 10px;
+		border-radius: 16px;
+		border: 1px solid rgba(255, 154, 200, 0.4);
+		background: rgba(20, 16, 30, 0.94);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		color: #ffe6f2;
+		font-size: 12px;
+		line-height: 1.5;
+		font-family: inherit;
+		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+	}
+	.acx-panel[hidden] {
+		display: none !important;
+	}
+	.acx-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		font-size: 13px;
+	}
+	.acx-head strong {
+		font-weight: 600;
+		letter-spacing: 0.02em;
+	}
+	.acx-x {
+		width: 22px;
+		height: 22px;
+		border: none;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffd9ea;
+		font-size: 12px;
+		font-family: inherit;
+		cursor: pointer;
+	}
+	.acx-x:hover {
+		background: rgba(255, 154, 200, 0.28);
+	}
+	.acx-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
+	.acx-row label {
+		color: rgba(255, 255, 255, 0.72);
+	}
+	.acx-row select,
+	.acx-input {
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 8px;
+		color: #ffeaf4;
+		font-size: 12px;
+		font-family: inherit;
+		padding: 5px 8px;
+		outline: none;
+	}
+	.acx-input {
+		width: 100%;
+	}
+	.acx-input::placeholder {
+		color: rgba(255, 255, 255, 0.34);
+	}
+	.acx-input:focus,
+	.acx-row select:focus {
+		border-color: rgba(255, 154, 200, 0.75);
+	}
+	.acx-check {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		color: rgba(255, 255, 255, 0.72);
+		cursor: pointer;
+	}
+	.acx-list {
+		flex: 1 1 auto;
+		min-height: 96px;
+		max-height: 300px;
+		overflow-y: auto;
+		padding: 2px;
+		border-radius: 10px;
+		background: rgba(0, 0, 0, 0.18);
+	}
+	.acx-list::-webkit-scrollbar {
+		width: 6px;
+	}
+	.acx-list::-webkit-scrollbar-thumb {
+		background: rgba(255, 154, 200, 0.4);
+		border-radius: 3px;
+	}
+	.acx-item {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		width: 100%;
+		padding: 6px 8px;
+		border: none;
+		border-radius: 8px;
+		background: transparent;
+		color: rgba(255, 255, 255, 0.82);
+		font-size: 12px;
+		font-family: inherit;
+		text-align: left;
+		cursor: pointer;
+	}
+	.acx-item:hover {
+		background: rgba(255, 154, 200, 0.16);
+	}
+	.acx-item.is-active {
+		background: rgba(255, 154, 200, 0.26);
+		color: #fff;
+	}
+	.acx-item-name {
+		flex: 1 1 auto;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.acx-item-meta {
+		flex: 0 0 auto;
+		font-size: 10.5px;
+		color: rgba(255, 255, 255, 0.42);
+	}
+	.acx-del {
+		flex: 0 0 auto;
+		width: 18px;
+		height: 18px;
+		border: none;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.08);
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 10px;
+		line-height: 1;
+		cursor: pointer;
+	}
+	.acx-del:hover {
+		background: rgba(255, 100, 140, 0.4);
+		color: #fff;
+	}
+	.acx-sect {
+		padding: 8px 8px 4px;
+		font-size: 10.5px;
+		letter-spacing: 0.06em;
+		color: rgba(255, 255, 255, 0.36);
+	}
+	.acx-add {
+		display: flex;
+		gap: 6px;
+	}
+	.acx-note {
+		margin: 0;
+		font-size: 10.5px;
+		line-height: 1.55;
+		color: rgba(255, 255, 255, 0.4);
+	}
+	.acx-note a {
+		color: #ffb3d9;
+		text-decoration: none;
+	}
+	.acx-note code {
+		padding: 0 3px;
+		border-radius: 4px;
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	@media (max-width: 640px) {
+		.acx-dock {
+			left: 10px;
+			bottom: 184px;
+		}
+		.acx-txt {
+			display: none;
+		}
+		.acx-panel {
+			left: 10px;
+			right: 10px;
+			width: auto;
+			bottom: 220px;
+			max-height: 64vh;
+		}
+	}
+	/* 矮屏（比如横屏手机 / 小窗）：面板改成从顶部挂下来，否则会被顶出视口 */
+	@media (max-height: 620px) {
+		.acx-panel {
+			top: 12px;
+			bottom: auto;
+			max-height: calc(100vh - 24px);
+		}
+		.acx-list {
+			min-height: 64px;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.acx-stage {
+			transition: none;
+		}
+	}
+</style>
+
+<script is:inline>
+	(function () {
+		if (window.__acxL2DInit) return;
+		window.__acxL2DInit = true;
+
+		/* ============ 想让角色「自己改」就看这几行 ============ */
+		// 三档角色尺寸（CSS 像素），想更大/更小直接改数字
+		var SIZES = {
+			s: { w: 112, h: 146 },
+			m: { w: 150, h: 196 },
+			l: { w: 196, h: 252 },
+		};
+		// 自动轮换默认间隔（秒），0 = 不自动换
+		var DEFAULT_ROTATE = 120;
+		// 轮换只挑「轻量模型」，别每两分钟拉一个 15MB 的
+		var ROTATE_MAX_MB = 6;
+		// 鼠标停多久算「空闲」，空闲时才换，免得你正看着它突然变脸
+		var IDLE_MS = 6000;
+		// 等渲染 iframe 就绪的上限（毫秒）
+		var FRAME_READY_TIMEOUT = 20000;
+		/* ==================================================== */
+
+		var KEY_ON = "acx_on";
+		var KEY_SRC = "acx_src";
+		var KEY_ROT = "acx_rotate";
+		var KEY_SIZE = "acx_size";
+		var KEY_IDLE = "acx_idle";
+		var KEY_CUSTOM = "acx_custom";
+
+		var reduceMotion = !!(
+			window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+		);
+		var coarse =
+			(window.matchMedia && window.matchMedia("(pointer: coarse)").matches) ||
+			(window.matchMedia && !window.matchMedia("(hover: hover)").matches);
+
+		function lsGet(k, def) {
+			try {
+				var v = localStorage.getItem(k);
+				return v === null ? def : v;
+			} catch (e) {
+				return def;
+			}
+		}
+		function lsSet(k, v) {
+			try {
+				localStorage.setItem(k, String(v));
+			} catch (e) {}
+		}
+		function lsDel(k) {
+			try {
+				localStorage.removeItem(k);
+			} catch (e) {}
+		}
+
+		var state = {
+			booted: false,
+			enabled: false,
+			inited: false,
+			model: false,
+			loading: false,
+			src: "",
+			rotate: DEFAULT_ROTATE,
+			size: "m",
+			idleOnly: true,
+			lastMove: 0,
+			lastRotate: 0,
+			lastMotion: 0,
+			pointerX: Math.round(window.innerWidth * 0.66),
+			pointerY: Math.round(window.innerHeight * 0.45),
+			drawX: -320,
+			drawY: -320,
+			failed: {},
+		};
+
+		var catalog = { local: [], official: [], big: [], custom: [] };
+		var rotateTimer = null;
+		var hintTimer = null;
+
+		function els() {
+			return {
+				toggle: document.getElementById("acx-toggle"),
+				next: document.getElementById("acx-next"),
+				open: document.getElementById("acx-open"),
+				stage: document.getElementById("acx-stage"),
+				frame: document.getElementById("acx-frame"),
+				hint: document.getElementById("acx-hint"),
+				panel: document.getElementById("acx-panel"),
+				list: document.getElementById("acx-list"),
+				search: document.getElementById("acx-search"),
+				rotate: document.getElementById("acx-rotate"),
+				size: document.getElementById("acx-size"),
+				idle: document.getElementById("acx-idle"),
+				customInput: document.getElementById("acx-custom"),
+				closeBtn: document.getElementById("acx-close"),
+			};
+		}
+
+		function hint(text, ms) {
+			var h = els().hint;
+			if (!h) return;
+			if (hintTimer) {
+				clearTimeout(hintTimer);
+				hintTimer = null;
+			}
+			if (!text) {
+				h.classList.remove("is-show");
+				return;
+			}
+			h.textContent = text;
+			h.classList.add("is-show");
+			if (ms) {
+				hintTimer = setTimeout(function () {
+					h.classList.remove("is-show");
+				}, ms);
+			}
+		}
+
+		// ------------------------------ 和渲染 iframe 通信 ------------------------------
+		var frameReady = false;
+		var frameReadyResolvers = [];
+		var frameWaiters = {};
+		var reqSeq = 0;
+
+		function postToFrame(msg) {
+			var frame = els().frame;
+			if (!frame || !frame.contentWindow) return false;
+			try {
+				frame.contentWindow.postMessage(msg, "*");
+				return true;
+			} catch (e) {
+				return false;
+			}
+		}
+
+		function onFrameMessage(e) {
+			var frame = els().frame;
+			if (!frame || e.source !== frame.contentWindow) return;
+			var d = e.data || {};
+			if (d.type === "ready") {
+				frameReady = true;
+				frameReadyResolvers.splice(0).forEach(function (fn) {
+					fn(true);
+				});
+			} else if (d.type === "fatal") {
+				frameReadyResolvers.splice(0).forEach(function (fn) {
+					fn(false);
+				});
+			} else if ((d.type === "loaded" || d.type === "error") && d.id && frameWaiters[d.id]) {
+				var fn = frameWaiters[d.id];
+				delete frameWaiters[d.id];
+				fn(d.type === "loaded");
+			}
+		}
+
+		function waitFrameReady() {
+			if (frameReady) return Promise.resolve(true);
+			return new Promise(function (resolve) {
+				frameReadyResolvers.push(resolve);
+				setTimeout(function () {
+					var i = frameReadyResolvers.indexOf(resolve);
+					if (i >= 0) {
+						frameReadyResolvers.splice(i, 1);
+						resolve(frameReady);
+					}
+				}, FRAME_READY_TIMEOUT);
+			});
+		}
+
+		/** GitHub Pages 模型 → jsDelivr 镜像（safe 仓库太大，镜像不了） */
+		function candidatesOf(url) {
+			var list = [url];
+			var m = /^https?:\/\/lkerylm\.github\.io\/([^\/?#]+)\/(.+)$/i.exec(url || "");
+			if (m && m[1] !== "firefly-live2d-safe") {
+				list.push("https://fastly.jsdelivr.net/gh/Lkerylm/" + m[1] + "@main/" + m[2]);
+			}
+			return list;
+		}
+
+		function requestLoad(url, timeoutMs) {
+			var frame = els().frame;
+			if (!frame || !frame.contentWindow) return Promise.resolve(false);
+			var id = "r" + ++reqSeq;
+			return new Promise(function (resolve) {
+				var done = false;
+				var timer = setTimeout(function () {
+					if (done) return;
+					done = true;
+					delete frameWaiters[id];
+					resolve(false);
+				}, timeoutMs || 50000);
+				frameWaiters[id] = function (ok) {
+					if (done) return;
+					done = true;
+					clearTimeout(timer);
+					resolve(ok);
+				};
+				try {
+					frame.contentWindow.postMessage(
+						{ type: "load", id: id, url: url, urls: candidatesOf(url) },
+						"*",
+					);
+				} catch (e) {
+					clearTimeout(timer);
+					delete frameWaiters[id];
+					resolve(false);
+				}
+			});
+		}
+
+		// ------------------------------ 模型目录 / 轮换池 ------------------------------
+		function fetchJson(url) {
+			return fetch(url, { credentials: "same-origin" })
+				.then(function (r) {
+					return r.ok ? r.json() : null;
+				})
+				.catch(function () {
+					return null;
+				});
+		}
+
+		function customModels() {
+			try {
+				var a = JSON.parse(lsGet(KEY_CUSTOM, "[]"));
+				return Array.isArray(a)
+					? a.filter(function (u) {
+							return typeof u === "string" && u;
+						})
+					: [];
+			} catch (e) {
+				return [];
+			}
+		}
+
+		function nameOfUrl(u) {
+			var m = /([^\/]+)\.model3?\.json$/i.exec(u || "");
+			return m ? m[1] : u;
+		}
+
+		async function loadCatalogs() {
+			if (catalog.official.length || catalog.local.length) return;
+			var res = await Promise.all([
+				fetchJson("/models-list.json"),
+				fetchJson("/models-safe-catalog.json"),
+				fetchJson("/models-catalog.json"),
+			]);
+			var local = Array.isArray(res[0]) ? res[0] : [];
+			var safe = Array.isArray(res[1]) ? res[1] : (res[1] && res[1].models) || [];
+			var all = Array.isArray(res[2]) ? res[2] : (res[2] && res[2].models) || [];
+			catalog.local = local.map(function (u, i) {
+				return {
+					name: i === 0 ? "Firefly 流萤（本站内置）" : "本站模型 " + (i + 1),
+					url: u,
+					mb: null,
+					tag: "本站",
+				};
+			});
+			catalog.official = safe.map(function (m) {
+				return { name: m.name || "官方示例", url: m.url, mb: m.mb || null, tag: "官方" };
+			});
+			catalog.big = all.map(function (m) {
+				return { name: m.name || "模型", url: m.url, mb: m.mb || null, tag: "更多" };
+			});
+			syncCustom();
+			renderList();
+		}
+
+		function syncCustom() {
+			catalog.custom = customModels().map(function (u) {
+				return { name: nameOfUrl(u), url: u, mb: null, tag: "我的", removable: true };
+			});
+		}
+
+		/** 轮换池 = 本站内置 + 官方轻量模型 + 自己加的模型 */
+		function buildRotationPool() {
+			var pool = [];
+			function push(m) {
+				if (!m || !m.url) return;
+				for (var i = 0; i < pool.length; i++) if (pool[i].url === m.url) return;
+				pool.push(m);
+			}
+			catalog.local.forEach(push);
+			catalog.official.forEach(function (m) {
+				if (!m.mb || m.mb <= ROTATE_MAX_MB) push(m);
+			});
+			catalog.custom.forEach(push);
+			// 离线时（APK 断网）只留本站内置模型，别去拉 CDN 白等几十秒
+			if (navigator.onLine === false) {
+				pool = pool.filter(function (m) {
+					return !/^https?:/i.test(m.url);
+				});
+			}
+			return pool;
+		}
+
+		// ------------------------------ 尺寸 / 换装 ------------------------------
+		function stageSize() {
+			return SIZES[state.size] || SIZES.m;
+		}
+
+		function applySize() {
+			var s = stageSize();
+			var stage = els().stage;
+			if (stage) {
+				stage.style.width = s.w + "px";
+				stage.style.height = s.h + "px";
+			}
+			postToFrame({ type: "size", w: s.w, h: s.h });
+		}
+
+		function playMotion() {
+			postToFrame({ type: "motion" });
+		}
+
+		async function applyModel(url, quiet) {
+			if (!url || state.loading) return false;
+			if (!frameReady) {
+				var okFrame = await waitFrameReady();
+				if (!okFrame) {
+					failSoft("Live2D 运行库加载失败");
+					return false;
+				}
+			}
+			state.loading = true;
+			hint(quiet ? "" : "换装中…");
+			var ok = await requestLoad(url, quiet ? 45000 : 60000);
+			state.loading = false;
+			if (!ok) {
+				state.failed[url] = true;
+				hint("这个模型下不来…换一个试试", 3200);
+				return false;
+			}
+			state.model = true;
+			state.src = url;
+			delete state.failed[url];
+			hint("");
+			// 模型真的出来了才藏掉手绘 Q 版小人，避免中间空窗
+			document.documentElement.classList.add("acx-on");
+			playMotion();
+			lsSet(KEY_SRC, url);
+			state.lastRotate = Date.now();
+			renderList();
+			return true;
+		}
+
+		function pickFromPool(pool, current) {
+			var usable = pool.filter(function (m) {
+				return !state.failed[m.url] && m.url !== current;
+			});
+			if (!usable.length) {
+				usable = pool.filter(function (m) {
+					return !state.failed[m.url];
+				});
+			}
+			if (!usable.length) return "";
+			return usable[Math.floor(Math.random() * usable.length)].url;
+		}
+
+		function next() {
+			var pool = buildRotationPool();
+			if (!pool.length) return;
+			applyModel(pickFromPool(pool, state.src));
+		}
+
+		function rotateTick() {
+			if (!state.enabled || !state.rotate || state.loading) return;
+			if (document.hidden) return;
+			// 只有鼠标停下来（空闲）时才换，免得你正看着它突然变脸
+			if (state.idleOnly && Date.now() - state.lastMove < IDLE_MS) return;
+			if (Date.now() - state.lastRotate < state.rotate * 1000) return;
+			var pool = buildRotationPool();
+			if (pool.length < 2) return;
+			var url = pickFromPool(pool, state.src);
+			if (url) applyModel(url, true);
+		}
+
+		function startRotate() {
+			if (rotateTimer) clearInterval(rotateTimer);
+			rotateTimer = setInterval(rotateTick, 5000);
+		}
+
+		// ------------------------------ 模型库面板 ------------------------------
+		function escapeHtml(s) {
+			return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+				return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+			});
+		}
+
+		function renderList(filter) {
+			var list = els().list;
+			if (!list) return;
+			var q = (filter || "").trim().toLowerCase();
+			var groups = [
+				{ title: "我的模型", items: catalog.custom },
+				{ title: "本站 / 官方示例", items: catalog.official.concat(catalog.local) },
+				{ title: "更多模型（体积较大）", items: catalog.big },
+			];
+			var html = "";
+			groups.forEach(function (g) {
+				var items = g.items.filter(function (m) {
+					if (!q) return true;
+					return (m.name || "").toLowerCase().indexOf(q) >= 0 || String(m.mb || "").indexOf(q) >= 0;
+				});
+				if (!items.length) return;
+				html += '<div class="acx-sect">' + g.title + " · " + items.length + "</div>";
+				items.slice(0, q ? 80 : 400).forEach(function (m) {
+					var active = m.url === state.src ? " is-active" : "";
+					var meta = (m.tag || "") + (m.mb ? " · " + m.mb + "MB" : "");
+					html +=
+						'<button type="button" class="acx-item' +
+						active +
+						'" data-url="' +
+						escapeHtml(m.url) +
+						'">' +
+						'<span class="acx-item-name">' +
+						escapeHtml(m.name || m.url) +
+						"</span>" +
+						'<span class="acx-item-meta">' +
+						escapeHtml(meta) +
+						"</span>" +
+						(m.removable
+							? '<span class="acx-del" data-url="' + escapeHtml(m.url) + '" title="移除">✕</span>'
+							: "") +
+						"</button>";
+				});
+			});
+			if (!html) html = '<div class="acx-sect">没有匹配的模型</div>';
+			list.innerHTML = html;
+		}
+
+		function openPanel() {
+			var p = els().panel;
+			if (!p) return;
+			p.hidden = false;
+			if (!catalog.official.length) loadCatalogs();
+			renderList(els().search ? els().search.value : "");
+			if (els().search) {
+				try {
+					els().search.focus({ preventScroll: true });
+				} catch (e) {}
+			}
+		}
+
+		function closePanel() {
+			var p = els().panel;
+			if (p) p.hidden = true;
+		}
+
+		function pick(url) {
+			if (!url) return;
+			applyModel(url);
+		}
+
+		function addCustom() {
+			var input = els().customInput;
+			if (!input) return;
+			var url = (input.value || "").trim();
+			if (!/^https?:\/\/.+/i.test(url) && !/^\/.+\.json$/i.test(url)) {
+				hint("要填 http(s) 开头的 .model3.json 地址哦", 3000);
+				return;
+			}
+			var list = customModels();
+			if (list.indexOf(url) === -1) list.push(url);
+			lsSet(KEY_CUSTOM, JSON.stringify(list.slice(-30)));
+			input.value = "";
+			syncCustom();
+			renderList(els().search ? els().search.value : "");
+			applyModel(url);
+		}
+
+		function removeCustom(url) {
+			var list = customModels().filter(function (u) {
+				return u !== url;
+			});
+			lsSet(KEY_CUSTOM, JSON.stringify(list));
+			syncCustom();
+			renderList(els().search ? els().search.value : "");
+			hint("已从「我的模型」里移除", 1800);
+		}
+
+		// ------------------------------ 开关 / 跟随 / 启动 ------------------------------
+		function setOn(v, silent) {
+			state.enabled = !!v;
+			lsSet(KEY_ON, state.enabled ? "1" : "0");
+			var e = els();
+			if (e.toggle) {
+				e.toggle.classList.toggle("is-on", state.enabled);
+				e.toggle.classList.toggle("is-off", !state.enabled);
+				e.toggle.setAttribute("aria-pressed", state.enabled ? "true" : "false");
+			}
+			if (e.next) e.next.hidden = !state.enabled;
+			if (e.open) e.open.hidden = !state.enabled;
+			if (!state.enabled) {
+				closePanel();
+				document.documentElement.classList.remove("acx-on");
+				if (e.stage) e.stage.classList.remove("is-visible");
+				postToFrame({ type: "pause" });
+			} else {
+				if (e.stage) e.stage.classList.add("is-visible");
+				init();
+				postToFrame({ type: "resume" });
+			}
+			if (!silent && window.AnimeCursor && window.AnimeCursor.say) {
+				window.AnimeCursor.say(state.enabled ? "换我上场陪你啦～" : "那我先歇一会儿～");
+			}
+		}
+
+		function failSoft(msg) {
+			console.warn("[acx]", msg);
+			state.enabled = false;
+			lsSet(KEY_ON, "0");
+			document.documentElement.classList.remove("acx-on");
+			var e = els();
+			if (e.toggle) {
+				e.toggle.classList.remove("is-on");
+				e.toggle.classList.add("is-off");
+				e.toggle.setAttribute("aria-pressed", "false");
+			}
+			if (e.next) e.next.hidden = true;
+			if (e.open) e.open.hidden = true;
+			if (e.stage) e.stage.classList.remove("is-visible");
+			postToFrame({ type: "pause" });
+			if (window.AnimeCursor && window.AnimeCursor.say) {
+				window.AnimeCursor.say("Live2D 起不来，先用小手绘陪你啦～");
+			}
+		}
+
+		var rafId = 0;
+		function startFollow() {
+			if (rafId) return;
+			function loop() {
+				rafId = requestAnimationFrame(loop);
+				var st = els().stage;
+				if (!st || !state.enabled) return;
+				var w = st.offsetWidth || stageSize().w;
+				var h = st.offsetHeight || stageSize().h;
+				// 默认站在光标右下；贴到视口边缘就翻到另一侧，别被裁掉
+				var bx = state.pointerX + 18;
+				if (bx + w > window.innerWidth - 6) bx = state.pointerX - w - 18;
+				var by = state.pointerY + 12;
+				if (by + h > window.innerHeight - 6) by = window.innerHeight - h - 6;
+				if (by < 6) by = 6;
+				if (bx < 6) bx = 6;
+				var k = reduceMotion ? 1 : 0.22;
+				state.drawX += (bx - state.drawX) * k;
+				state.drawY += (by - state.drawY) * k;
+				var bob = reduceMotion ? 0 : Math.sin(Date.now() / 620) * 2.2;
+				st.style.transform =
+					"translate3d(" +
+					Math.round(state.drawX) +
+					"px," +
+					Math.round(state.drawY + bob) +
+					"px,0)";
+			}
+			rafId = requestAnimationFrame(loop);
+		}
+
+		async function init() {
+			if (state.inited) {
+				if (frameReady) postToFrame({ type: "resume" });
+				return;
+			}
+			state.inited = true;
+			hint("召唤看板娘…");
+			var ok = await waitFrameReady();
+			if (!ok) {
+				failSoft("Live2D 运行库加载失败");
+				return;
+			}
+			await loadCatalogs();
+			applySize();
+			startFollow();
+			var saved = lsGet(KEY_SRC, "");
+			var pool = buildRotationPool();
+			var first = saved || (catalog.local[0] && catalog.local[0].url) || pickFromPool(pool, "");
+			var loaded = await applyModel(first, true);
+			if (!loaded && saved) {
+				lsDel(KEY_SRC);
+				loaded = await applyModel(pickFromPool(pool, saved), true);
+			}
+			if (!loaded) {
+				failSoft("模型加载失败，可能是网络问题");
+				return;
+			}
+			startRotate();
+		}
+
+		// ------------------------------ 事件绑定 ------------------------------
+		function bind() {
+			if (bind.done) return;
+			bind.done = true;
+			var root = document;
+
+			root.addEventListener(
+				"mousemove",
+				function (e) {
+					state.pointerX = e.clientX;
+					state.pointerY = e.clientY;
+					state.lastMove = Date.now();
+					var st = els().stage;
+					if (st && state.enabled) {
+						st.classList.add("is-visible");
+						st.classList.remove("is-hidden");
+					}
+				},
+				{ passive: true },
+			);
+
+			// 输入框 / 可编辑区域里把角色让开，别挡着打字
+			root.addEventListener(
+				"pointerover",
+				function (e) {
+					var st = els().stage;
+					if (!st || !state.enabled) return;
+					var t = e.target;
+					var typing =
+						t && t.closest && t.closest('input, textarea, select, [contenteditable="true"]');
+					st.classList.toggle("is-typing", !!typing);
+				},
+				true,
+			);
+
+			root.addEventListener("mouseleave", function () {
+				var st = els().stage;
+				if (st) st.classList.remove("is-visible");
+			});
+
+			// 渲染 iframe 的回执（ready / loaded / error）
+			window.addEventListener("message", onFrameMessage);
+
+			// 点一下：随机做一个动作（和 AnimeCursor 的台词 / 星光同时发生）
+			root.addEventListener(
+				"click",
+				function () {
+					if (!state.enabled || !state.model) return;
+					if (Date.now() - state.lastMotion < 500) return;
+					state.lastMotion = Date.now();
+					if (Math.random() < 0.7) playMotion();
+				},
+				true,
+			);
+
+			root.addEventListener("visibilitychange", function () {
+				postToFrame({ type: document.hidden ? "pause" : "resume" });
+			});
+
+			root.addEventListener("keydown", function (e) {
+				if (e.key === "Escape") closePanel();
+				var t = e.target;
+				if (t && t.id === "acx-custom" && e.key === "Enter") addCustom();
+			});
+
+			// 所有按钮 / 列表项统一走事件代理（选择器都是本组件自己的，不会误伤站点其它按钮）
+			root.addEventListener(
+				"click",
+				function (e) {
+					var t = e.target;
+					if (!t || !t.closest) return;
+					if (t.closest("#acx-toggle")) {
+						e.preventDefault();
+						setOn(!state.enabled);
+						return;
+					}
+					if (t.closest("#acx-next")) {
+						e.preventDefault();
+						next();
+						return;
+					}
+					if (t.closest("#acx-open")) {
+						e.preventDefault();
+						var panel = els().panel;
+						if (panel) {
+							if (panel.hidden) openPanel();
+							else closePanel();
+						}
+						return;
+					}
+					if (t.closest("#acx-close")) {
+						e.preventDefault();
+						closePanel();
+						return;
+					}
+					if (t.closest("#acx-addbtn")) {
+						e.preventDefault();
+						addCustom();
+						return;
+					}
+					var del = t.closest(".acx-del");
+					if (del) {
+						e.preventDefault();
+						e.stopPropagation();
+						removeCustom(del.getAttribute("data-url"));
+						return;
+					}
+					var item = t.closest(".acx-item");
+					if (item) {
+						e.preventDefault();
+						pick(item.getAttribute("data-url"));
+					}
+				},
+				true,
+			);
+
+			var search = els().search;
+			if (search) {
+				search.addEventListener("input", function () {
+					renderList(search.value);
+				});
+			}
+			var rot = els().rotate;
+			if (rot) {
+				rot.addEventListener("change", function () {
+					state.rotate = Math.max(0, parseInt(rot.value, 10) || 0);
+					lsSet(KEY_ROT, state.rotate);
+				});
+			}
+			var sz = els().size;
+			if (sz) {
+				sz.addEventListener("change", function () {
+					state.size = SIZES[sz.value] ? sz.value : "m";
+					lsSet(KEY_SIZE, state.size);
+					applySize();
+				});
+			}
+			var idle = els().idle;
+			if (idle) {
+				idle.addEventListener("change", function () {
+					state.idleOnly = !!idle.checked;
+					lsSet(KEY_IDLE, state.idleOnly ? "1" : "0");
+				});
+			}
+		}
+
+		function boot() {
+			if (!document.getElementById("acx-stage")) return;
+			if (!state.booted) {
+				state.booted = true;
+				bind();
+				// iframe 可能已经就绪（浏览器缓存命中时），补问一次状态
+				postToFrame({ type: "ping" });
+			}
+			state.rotate = parseInt(lsGet(KEY_ROT, String(DEFAULT_ROTATE)), 10);
+			if (isNaN(state.rotate)) state.rotate = DEFAULT_ROTATE;
+			state.size = lsGet(KEY_SIZE, "m");
+			if (!SIZES[state.size]) state.size = "m";
+			state.idleOnly = lsGet(KEY_IDLE, "1") === "1";
+			var e = els();
+			if (e.rotate) e.rotate.value = String(state.rotate);
+			if (e.size) e.size.value = state.size;
+			if (e.idle) e.idle.checked = state.idleOnly;
+			applySize();
+			// 触屏设备默认关掉（省流量），可以手动点「🎭 看板娘」打开
+			setOn(lsGet(KEY_ON, coarse ? "0" : "1") === "1", true);
+		}
+
+		// 控制台 / 其它脚本都能直接调用
+		window.AnimeCursorLive2D = {
+			on: function () {
+				setOn(true);
+			},
+			off: function () {
+				setOn(false);
+			},
+			toggle: function () {
+				setOn(!state.enabled);
+			},
+			next: next,
+			pick: pick,
+			setModel: function (url) {
+				return applyModel(url);
+			},
+			setSize: function (k) {
+				state.size = SIZES[k] ? k : "m";
+				lsSet(KEY_SIZE, state.size);
+				var s = els().size;
+				if (s) s.value = state.size;
+				applySize();
+			},
+			setRotate: function (sec) {
+				state.rotate = Math.max(0, parseInt(sec, 10) || 0);
+				lsSet(KEY_ROT, state.rotate);
+				var r = els().rotate;
+				if (r) r.value = String(state.rotate);
+			},
+			pool: buildRotationPool,
+			state: state,
+		};
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", boot);
+		} else {
+			boot();
+		}
+		document.addEventListener("swup:page:view", boot);
+	})();
+</script>
