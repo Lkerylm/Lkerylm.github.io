@@ -482,6 +482,7 @@ const size = config.size || { width: 600, height: 700 };
 		let failedUrls = new Set();
 		let clickTimer = null;
 		let isFullscreen = false;
+		let fullscreenWatchdog = null;
 		let fullscreenDone = false;
 
 		let mouseTargetX = 0;
@@ -523,9 +524,16 @@ const size = config.size || { width: 600, height: 700 };
 			widget.style.bottom = "auto";
 			widget.style.zIndex = "9999996"; // 调整全屏时的层级
 			widget.style.display = "block";
-			widget.style.background = "radial-gradient(circle at 50% 40%, #22254a 0%, #0a0b12 70%, #050609 100%)";
+			// 少女系开场：樱粉 → 奶白 → 香芋紫，而不是原来压暗整站的深蓝
+			widget.style.background =
+				"radial-gradient(circle at 50% 34%, #fff6fb 0%, #ffe4f2 44%, #f0e6ff 76%, #fdf6ff 100%)";
 			nextBtn.style.display = "none";
 			setTimeout(layout, 50);
+			// 兜底：任何情况下 6 秒内一定退出全屏，避免遮罩卡住整站
+			clearTimeout(fullscreenWatchdog);
+			fullscreenWatchdog = setTimeout(() => {
+				if (isFullscreen) exitFullscreen();
+			}, 6000);
 		}
 
 		function exitFullscreen() {

@@ -1,0 +1,574 @@
+/* ============================================================
+   梦色少女 · 全新二次元皮肤 (anime-girl.css)
+   ------------------------------------------------------------
+   · 只做视觉：奶白 + 樱花粉 + 香芋紫的少女系配色
+   · 圆润卡片 / 丝带标题 / 糖果按钮 / 星星点点的纸张纹理
+   · 鼠标角色（AnimeCursor）与首页横卡配色保持一致
+   · 亮色为默认观感，暗色切换成「夜色紫」而非纯黑
+   ============================================================ */
+
+:root {
+  /* —— 少女系调色盘 —— */
+  --ag-pink: #ff7cb8;
+  --ag-pink-deep: #ef4f97;
+  --ag-pink-soft: #ffd7e8;
+  --ag-pink-mist: #fff0f7;
+  --ag-milk: #fffafd;
+  --ag-cream: #fff6ec;
+  --ag-lav: #c2a6ff;
+  --ag-sky: #a5dcff;
+  --ag-mint: #a9f0dc;
+  --ag-gold: #ffdf94;
+  --ag-ink: #59395c;
+  --ag-ink-soft: #8a678d;
+
+  --ag-rainbow: linear-gradient(
+    115deg,
+    #ff9ecb 0%,
+    #ffc4a8 24%,
+    #ffe79a 42%,
+    #a9f0dc 62%,
+    #a5dcff 80%,
+    #c2a6ff 100%
+  );
+  --ag-shadow:
+    0 18px 42px rgba(255, 124, 184, 0.16),
+    0 6px 18px rgba(194, 166, 255, 0.16);
+  --ag-shadow-hover:
+    0 26px 56px rgba(255, 124, 184, 0.26),
+    0 10px 28px rgba(194, 166, 255, 0.22);
+  --ag-radius: 1.5rem;
+
+  /* —— 覆盖主题变量：整站变成奶白粉 —— */
+  --radius-large: 1.5rem;
+  --primary: #ff6fb0;
+  --page-bg: #fff7fb;
+  --card-bg: #fffdfe;
+  --btn-content: #d9428c;
+  --btn-regular-bg: #ffe8f3;
+  --btn-regular-bg-hover: #ffd6e8;
+  --btn-regular-bg-active: #ffc3dd;
+  --btn-plain-bg-hover: #fff0f7;
+  --btn-plain-bg-active: #ffe6f2;
+  --btn-card-bg-hover: #fff5fa;
+  --btn-card-bg-active: #ffe9f4;
+  --deep-text: #4b2f4d;
+  --title-active: #e0448f;
+  --line-divider: rgba(255, 140, 190, 0.22);
+  --line-color: rgba(255, 140, 190, 0.3);
+  --meta-divider: rgba(240, 140, 185, 0.4);
+  --content-meta: rgba(122, 83, 118, 0.78);
+  --inline-code-bg: #ffe9f4;
+  --inline-code-color: #d9428c;
+  --selection-bg: #ffd6e8;
+  --float-panel-bg: #fffafd;
+  --toc-badge-bg: #ffe3f0;
+  --toc-btn-hover: #fff0f7;
+  --toc-btn-active: #ffe6f2;
+  --toc-item-active: #ef4f97;
+  --license-block-bg: rgba(255, 182, 213, 0.14);
+  --scrollbar-bg: rgba(255, 124, 184, 0.55);
+  --scrollbar-bg-hover: rgba(255, 124, 184, 0.75);
+  --scrollbar-bg-active: rgba(239, 79, 151, 0.9);
+}
+
+:root.dark {
+  --ag-ink: #f6e7f2;
+  --ag-ink-soft: #c7aec9;
+  --page-bg: #191223;
+  --card-bg: #241a30;
+  --primary: #ff9ecb;
+  --btn-content: #ffc2de;
+  --btn-regular-bg: #3a2a4a;
+  --btn-regular-bg-hover: #46335a;
+  --btn-regular-bg-active: #523d68;
+  --btn-plain-bg-hover: #33253f;
+  --btn-plain-bg-active: #3d2c4b;
+  --btn-card-bg-hover: #2e2239;
+  --btn-card-bg-active: #3a2a48;
+  --deep-text: #f7e9f4;
+  --line-divider: rgba(255, 158, 203, 0.16);
+  --line-color: rgba(255, 158, 203, 0.2);
+  --meta-divider: rgba(255, 158, 203, 0.3);
+  --content-meta: rgba(233, 206, 229, 0.72);
+  --inline-code-bg: #3a2a48;
+  --inline-code-color: #ffb6d5;
+  --selection-bg: #5a3a6a;
+  --float-panel-bg: #241a30;
+  --toc-badge-bg: #3a2a48;
+  --license-block-bg: rgba(255, 158, 203, 0.08);
+  --ag-shadow: 0 18px 42px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 158, 203, 0.08);
+  --ag-shadow-hover: 0 26px 56px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 158, 203, 0.18);
+}
+
+/* ---------- 页面底色：樱花纸 + 四角糖果光晕 ---------- */
+html:not(.dark) {
+  background-color: var(--page-bg);
+  background-image:
+    radial-gradient(circle at 8% -8%, rgba(255, 158, 203, 0.42), transparent 46%),
+    radial-gradient(circle at 98% 2%, rgba(194, 166, 255, 0.34), transparent 42%),
+    radial-gradient(circle at 92% 98%, rgba(165, 220, 255, 0.34), transparent 46%),
+    radial-gradient(circle at 2% 92%, rgba(255, 223, 148, 0.3), transparent 44%),
+    radial-gradient(rgba(255, 124, 184, 0.1) 1px, transparent 1.6px);
+  background-size: auto, auto, auto, auto, 24px 24px;
+  background-attachment: fixed;
+}
+
+html.dark {
+  background-color: var(--page-bg);
+  background-image:
+    radial-gradient(circle at 6% -6%, rgba(255, 124, 184, 0.22), transparent 48%),
+    radial-gradient(circle at 98% 4%, rgba(194, 166, 255, 0.2), transparent 44%),
+    radial-gradient(circle at 90% 100%, rgba(165, 220, 255, 0.16), transparent 46%),
+    radial-gradient(rgba(255, 158, 203, 0.07) 1px, transparent 1.6px);
+  background-size: auto, auto, auto, 24px 24px;
+  background-attachment: fixed;
+}
+
+/* 淡淡的星星纸纹，铺在内容之下 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.7) 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 62%, rgba(255, 214, 234, 0.7) 0 1.6px, transparent 3px),
+    radial-gradient(circle at 44% 84%, rgba(214, 226, 255, 0.7) 0 1.6px, transparent 3px);
+  background-size: 260px 260px, 320px 320px, 420px 420px;
+  mix-blend-mode: soft-light;
+}
+
+
+/* 滚动后的导航栏：奶白磨砂（比默认的半透明更干净） */
+body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semifull"].scrolled > div,
+body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semifull"][data-is-home="true"].scrolled > div,
+body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semi"] > div,
+body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semi"][data-is-home="true"] > div {
+  background: rgba(255, 250, 253, 0.9) !important;
+  border: 1px solid rgba(255, 158, 203, 0.3) !important;
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+}
+
+html.dark body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semifull"].scrolled > div,
+html.dark body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semifull"][data-is-home="true"].scrolled > div,
+html.dark body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semi"] > div,
+html.dark body:has(#wallpaper-wrapper) #navbar[data-transparent-mode="semi"][data-is-home="true"] > div {
+  background: rgba(32, 23, 42, 0.92) !important;
+  border: 1px solid rgba(255, 158, 203, 0.22) !important;
+}
+
+/* ---------- 卡片：奶油糖 + 粉色描边 + 落樱阴影 ---------- */
+.card-base {
+  border-radius: var(--ag-radius) !important;
+  border: 1.5px solid rgba(255, 158, 203, 0.26);
+  box-shadow: var(--ag-shadow);
+  transition:
+    transform 0.34s cubic-bezier(0.22, 0.9, 0.3, 1.2),
+    box-shadow 0.34s ease,
+    border-color 0.34s ease;
+}
+
+:root.dark .card-base {
+  border-color: rgba(255, 158, 203, 0.14);
+}
+
+@media (hover: hover) {
+  .card-base:hover {
+    border-color: rgba(255, 124, 184, 0.5);
+    box-shadow: var(--ag-shadow-hover);
+  }
+}
+
+/* ---------- 导航栏：奶白磨砂 + 丝带彩线 ---------- */
+#navbar > div {
+  border-radius: 0 0 1.6rem 1.6rem;
+  border-bottom: 1px solid rgba(255, 158, 203, 0.28);
+  box-shadow: 0 10px 30px rgba(255, 124, 184, 0.14);
+}
+
+html:not(.dark) #navbar > div {
+  background-color: rgba(255, 251, 253, 0.82) !important;
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+}
+
+html.dark #navbar > div {
+  background-color: rgba(30, 21, 40, 0.86) !important;
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+#navbar > div::after {
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  opacity: 1;
+}
+
+#navbar .navbar-title,
+#navbar a[href="/"] span {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+html:not(.dark) #navbar .navbar-title {
+  background-image: linear-gradient(120deg, #ef4f97, #b07cff 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+#navbar a:hover,
+#navbar button:hover {
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 158, 203, 0.22),
+    rgba(194, 166, 255, 0.2)
+  ) !important;
+}
+
+/* ---------- 横幅：圆角落地 + 落樱渐隐 ---------- */
+#wallpaper-wrapper {
+  border-radius: 0 0 2rem 2rem;
+}
+
+#wallpaper-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 30%;
+  z-index: 15;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 247, 251, 0) 0%,
+    rgba(255, 247, 251, 0.2) 58%,
+    rgba(255, 247, 251, 0.72) 100%
+  );
+}
+
+html.dark #wallpaper-wrapper::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(25, 18, 35, 0) 0%,
+    rgba(25, 18, 35, 0.24) 58%,
+    rgba(25, 18, 35, 0.8) 100%
+  );
+}
+
+.banner-dim-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(20, 12, 26, 0.28) 0%,
+    rgba(20, 12, 26, 0.12) 40%,
+    rgba(20, 12, 26, 0.4) 100%
+  );
+}
+
+.banner-title {
+  letter-spacing: 0.04em;
+  background-image: linear-gradient(
+    118deg,
+    #ffffff 0%,
+    #ffe6f2 34%,
+    #ffc2e2 58%,
+    #ffffff 100%
+  ) !important;
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none !important;
+  filter: drop-shadow(0 6px 20px rgba(96, 26, 72, 0.55));
+  animation: anime-rainbow-slide 12s linear infinite;
+}
+
+.banner-subtitle {
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: #fff4fa !important;
+  text-shadow: 0 2px 14px rgba(96, 26, 72, 0.6) !important;
+}
+
+/* 左下角的小开关：亮色改成奶白胶囊 */
+html:not(.dark) #anime-cursor-toggle,
+html:not(.dark) #anime-voice-open,
+html:not(.dark) #anime-wallpaper-open {
+  background: rgba(255, 250, 253, 0.9) !important;
+  border-color: rgba(255, 158, 203, 0.55) !important;
+  color: #c0457f !important;
+  box-shadow: 0 8px 22px rgba(255, 124, 184, 0.24) !important;
+}
+
+html.dark #anime-cursor-toggle,
+html.dark #anime-voice-open,
+html.dark #anime-wallpaper-open {
+  background: rgba(38, 27, 48, 0.88) !important;
+  border-color: rgba(255, 158, 203, 0.3) !important;
+  color: #ffc9e0 !important;
+}
+
+#banner-credit-desktop,
+#banner-credit-mobile {
+  border-radius: 999px !important;
+  padding: 2px 10px !important;
+  background: rgba(255, 250, 253, 0.55) !important;
+  backdrop-filter: blur(6px);
+  color: #a0507f !important;
+}
+
+html.dark #banner-credit-desktop,
+html.dark #banner-credit-mobile {
+  background: rgba(36, 26, 48, 0.6) !important;
+  color: #ffc9e0 !important;
+}
+
+/* ---------- 按钮：棉花糖胶囊 ---------- */
+.btn-regular,
+.btn-plain,
+.btn-card,
+.floating-btn,
+#navbar a,
+#navbar button {
+  border-radius: 999px;
+}
+
+.btn-regular,
+.floating-btn {
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s ease,
+    background-color 0.22s ease;
+}
+
+html:not(.dark) .btn-regular {
+  background-color: #ffe8f3;
+  color: #c93a80;
+  box-shadow: inset 0 0 0 1px rgba(255, 158, 203, 0.45);
+}
+
+html:not(.dark) .btn-regular:hover {
+  background-color: #ffd9ea;
+}
+
+@media (hover: hover) {
+  .btn-regular:hover,
+  .btn-plain:hover,
+  .floating-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(255, 124, 184, 0.28);
+  }
+}
+
+.btn-regular:active,
+.btn-plain:active,
+.floating-btn:active {
+  transform: scale(0.95);
+}
+
+/* ---------- 文章卡片：角落丝带 + 悬停浮起 ---------- */
+.post-card-wrapper {
+  border-radius: var(--ag-radius) !important;
+  overflow: hidden;
+}
+
+.post-card-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.35),
+    transparent 42%
+  );
+  opacity: 0;
+  transition: opacity 0.34s ease;
+}
+
+@media (hover: hover) {
+  .post-card-wrapper:hover {
+    transform: translateY(-6px);
+  }
+  .post-card-wrapper:hover::before {
+    opacity: 1;
+  }
+}
+
+.post-card-image img {
+  transition: transform 0.6s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+
+@media (hover: hover) {
+  .post-card-wrapper:hover .post-card-image img {
+    transform: scale(1.06);
+  }
+}
+
+.post-card-title {
+  color: var(--ag-ink);
+  transition: color 0.25s ease;
+}
+
+.post-card-wrapper:hover .post-card-title {
+  color: var(--ag-pink-deep);
+}
+
+/* 列表模式的左侧粉色竖条 */
+.list-mode .post-card-title::before {
+  background-image: linear-gradient(180deg, #ff9ecb, #c2a6ff) !important;
+}
+
+/* ---------- 侧边栏小组件：丝带标题 ---------- */
+.widget-title {
+  color: var(--ag-pink-deep) !important;
+  letter-spacing: 0.03em;
+}
+
+.widget-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 124, 184, 0.75), rgba(194, 166, 255, 0.1));
+}
+
+/* 侧边栏头像：粉色光圈 */
+#profile-avatar,
+.profile-avatar {
+  box-shadow: 0 0 0 3px rgba(255, 158, 203, 0.5), 0 10px 24px rgba(255, 124, 184, 0.25);
+}
+
+/* ---------- 置顶浮动按钮 / 目录 ---------- */
+.floating-btn {
+  border: 1.5px solid rgba(255, 158, 203, 0.35);
+  color: var(--ag-pink-deep);
+}
+
+html:not(.dark) .floating-btn {
+  background-color: rgba(255, 250, 253, 0.92);
+}
+
+/* ---------- 页脚：落樱丝带 ---------- */
+.footer {
+  color: var(--ag-ink-soft);
+}
+
+.footer::before {
+  content: "❀ ❀ ❀";
+  display: block;
+  text-align: center;
+  letter-spacing: 0.8em;
+  font-size: 12px;
+  color: rgba(255, 124, 184, 0.55);
+  margin-bottom: 8px;
+}
+
+/* ---------- 正文：可爱小装饰 ---------- */
+.custom-md h2 {
+  color: var(--ag-ink);
+}
+
+.custom-md h2::after {
+  content: "";
+  display: block;
+  width: 3.4rem;
+  height: 5px;
+  margin-top: 0.45rem;
+  border-radius: 999px;
+  background-image: var(--ag-rainbow);
+  background-size: 200% 100%;
+  animation: ag-flow 5s linear infinite;
+}
+
+.custom-md h3::before {
+  content: "✿ ";
+  color: var(--ag-pink);
+}
+
+.custom-md li::marker {
+  color: var(--ag-pink);
+}
+
+.custom-md blockquote {
+  border-left: 4px solid var(--ag-pink-soft);
+  border-radius: 0 1rem 1rem 0;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 158, 203, 0.12),
+    rgba(194, 166, 255, 0.1)
+  );
+}
+
+/* 图片：圆角 + 粉色描边 */
+.custom-md img {
+  border-radius: 1.1rem;
+}
+
+/* ---------- 滚动条 / 选中文本 ---------- */
+::selection {
+  background-color: rgba(255, 158, 203, 0.4);
+  color: #4b2f4d;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 232, 243, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background-image: linear-gradient(180deg, #ff9ecb, #c2a6ff);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-image: linear-gradient(180deg, #ff7cb8, #b18bff);
+}
+
+/* ---------- 动画 ---------- */
+@keyframes ag-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-md h2::after {
+    animation: none !important;
+  }
+  .post-card-wrapper:hover {
+    transform: none;
+  }
+}
+
+/* ---------- 手机端微调 ---------- */
+@media (max-width: 640px) {
+  :root {
+    --radius-large: 1.25rem;
+  }
+  #wallpaper-wrapper {
+    border-radius: 0 0 1.4rem 1.4rem;
+  }
+  #wallpaper-wrapper::after {
+    height: 30%;
+  }
+}
+

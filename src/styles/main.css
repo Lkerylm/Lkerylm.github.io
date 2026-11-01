@@ -6,6 +6,7 @@
 @import './transition.css'; 
 @import './custom-scrollbar.css';
 @import './anime-cute.css';
+@import './anime-girl.css';
 
 
 @plugin '@tailwindcss/typography';
