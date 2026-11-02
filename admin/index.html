@@ -1297,6 +1297,11 @@
 			hint("");
 			// 模型真的出来了才把「角色在位」标记打开（拖尾 / 文案样式都挂在这个 class 上）
 			document.documentElement.classList.add("acx-on");
+			// 模型到位后再打招呼，气泡不会孤零零地飘在页面上
+			if (state.enabled && !greetedOnce) {
+				greetedOnce = true;
+				say("我来陪你啦～");
+			}
 			playMotion();
 			lsSet(KEY_SRC, url);
 			state.lastRotate = Date.now();
@@ -1574,8 +1579,8 @@
 						st.classList.remove("is-hidden");
 					}
 					maybeTrail(e.clientX, e.clientY);
-					// 第一次动鼠标时打个招呼（模型可能还在下载，先说话不耽误）
-					if (state.enabled && !greetedOnce) {
+					// 第一次动鼠标时打个招呼（等模型真的出来再说，免得气泡悬空）
+					if (state.enabled && state.model && !greetedOnce) {
 						greetedOnce = true;
 						say("我来陪你啦～");
 					}
@@ -1618,6 +1623,8 @@
 					var x = typeof e.clientX === "number" && e.clientX ? e.clientX : state.pointerX;
 					var y = typeof e.clientY === "number" && e.clientY ? e.clientY : state.pointerY;
 					burst(x, y);
+					// 模型还没出来就先不弹台词（星光照旧，点哪儿都有反馈）
+					if (!state.model) return;
 
 					var line = LINES[Math.floor(Math.random() * LINES.length)];
 					if (t && t.closest) {
@@ -1637,7 +1644,6 @@
 						} catch (err) {}
 					}
 
-					if (!state.model) return;
 					if (Date.now() - state.lastMotion < 500) return;
 					state.lastMotion = Date.now();
 					if (Math.random() < 0.7) playMotion();
