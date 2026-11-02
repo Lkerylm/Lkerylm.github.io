@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Live2D cursor frame</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				/* 透明背景：角色要能“浮”在页面内容上 */
+				background: transparent;
+				overflow: hidden;
+				cursor: none;
+			}
+			#c {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<!--
+			鼠标 Live2D 角色的“独立渲染进程”。
+			为什么用 iframe：Cubism 4 的 CubismShader_WebGL 是模块级单例，把着色器绑在
+			第一个 WebGL 上下文上；同一页面里第二个 PIXI 渲染器会画不出东西
+			（控制台会刷 "no valid shader program"）。放进 iframe 后有了独立的 JS 作用域，
+			和右下角看板娘互不干扰。
+		-->
+		<canvas id="c"></canvas>
+
+		<script src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script>
+		<script src="/Firefly-live2d-main/load/pixi.min.js"></script>
+		<script src="/Firefly-live2d-main/load/cubism4.min.js"></script>
+		<script>
+			(function () {
+				var parentWin = window.parent;
+				var canvas = document.getElementById("c");
+				var app = null;
+				var model = null;
+				var loading = false;
+				var readyState = "";
+
+				function post(msg) {
+					try {
+						parentWin.postMessage(msg, "*");
+					} catch (e) {}
+				}
+
+				function withTimeout(promise, ms) {
+					return new Promise(function (resolve, reject) {
+						var done = false;
+						var timer = setTimeout(function () {
+							if (done) return;
+							done = true;
+							reject(new Error("timeout " + ms));
+							Promise.resolve(promise).then(
+								function (m) {
+									try {
+										m.destroy();
+									} catch (e) {}
+								},
+								function () {},
+							);
+						}, ms);
+						Promise.resolve(promise).then(
+							function (v) {
+								if (done) return;
+								done = true;
+								clearTimeout(timer);
+								resolve(v);
+							},
+							function (e) {
+								if (done) return;
+								done = true;
+								clearTimeout(timer);
+								reject(e);
+							},
+						);
+					});
+				}
+
+				function fit() {
+					if (!app || !model) return;
+					var w = (app.screen && app.screen.width) || canvas.clientWidth || 150;
+					var h = (app.screen && app.screen.height) || canvas.clientHeight || 196;
+					var b = model.getLocalBounds();
+					// 和右下角看板娘一样：按高度铺满，左右允许裁切，人物才够大
+					var s = (h * 1.02) / (b.height || 1);
+					if (!isFinite(s) || s <= 0) s = 1;
+					model.anchor.set(0.5, 1);
+					model.scale.set(s);
+					model.x = w / 2;
+					model.y = h;
+					try {
+						// 眼睛微微看向左上方（鼠标那边）
+						model.focus(-0.25, 0.18);
+					} catch (e) {}
+				}
+
+				function playMotion() {
+					if (!model) return;
+					var defs = {};
+					try {
+						defs =
+							(model.internalModel &&
+								model.internalModel.motionManager &&
+								model.internalModel.motionManager.definitions) ||
+							{};
+					} catch (e) {}
+					var groups = ["tap_body", "tap", "flick_head", "flick"];
+					for (var i = 0; i < groups.length; i++) {
+						if (defs[groups[i]] && defs[groups[i]].length) {
+							try {
+								Promise.resolve(model.motion(groups[i])).catch(function () {});
+							} catch (e) {}
+							return;
+						}
+					}
+					try {
+						Promise.resolve(model.motion()).catch(function () {});
+					} catch (e) {}
+				}
+
+				// 串行化换装：多个请求同时到达时排队执行，而不是直接丢掉
+				// （丢掉会被父页面当成「模型加载失败」写进 failed 列表，白瞎一个好模型）
+				var loadQueue = Promise.resolve();
+
+				function load(urls) {
+					var run = function () {
+						return doLoad(urls);
+					};
+					loadQueue = loadQueue.then(run, run);
+					return loadQueue;
+				}
+
+				async function doLoad(urls) {
+					if (!app) return false;
+					loading = true;
+					var next = null;
+					for (var i = 0; i < urls.length; i++) {
+						try {
+							next = await withTimeout(
+								PIXI.live2d.Live2DModel.from(urls[i], {
+									autoInteract: false,
+									crossOrigin: "anonymous",
+								}),
+								45000,
+							);
+							break;
+						} catch (e) {
+							console.warn("[acx-frame] 模型来源失败", urls[i], e && e.message ? e.message : e);
+						}
+					}
+					loading = false;
+					if (!next) return false;
+					var prev = model;
+					model = next;
+					try {
+						app.stage.addChild(next);
+					} catch (e) {}
+					fit();
+					playMotion();
+					if (prev && prev !== next) {
+						try {
+							app.stage.removeChild(prev);
+						} catch (e) {}
+						try {
+							prev.destroy();
+						} catch (e) {}
+					}
+					return true;
+				}
+
+				function boot() {
+					if (!(window.PIXI && PIXI.live2d && PIXI.live2d.Live2DModel)) {
+						readyState = "fatal";
+						post({ type: "fatal", reason: "libs" });
+						return;
+					}
+					try {
+						app = new PIXI.Application({
+							view: canvas,
+							width: canvas.clientWidth || 150,
+							height: canvas.clientHeight || 196,
+							transparent: true,
+							backgroundAlpha: 0,
+							antialias: true,
+							autoDensity: true,
+							resolution: Math.min(window.devicePixelRatio || 1, 2),
+						});
+					} catch (e) {
+						readyState = "fatal";
+						post({ type: "fatal", reason: "webgl" });
+						return;
+					}
+					try {
+						app.ticker.maxFPS = 30;
+					} catch (e) {}
+					readyState = "ready";
+					post({ type: "ready" });
+				}
+
+				window.addEventListener("message", async function (e) {
+					if (e.source !== parentWin) return;
+					var d = e.data || {};
+					if (d.type === "ping") {
+						// 父页面可能比 iframe 晚绑定 message 监听，用 ping 补一次状态
+						if (readyState) post({ type: readyState });
+						return;
+					}
+					if (d.type === "load") {
+						var ok = await load(Array.isArray(d.urls) ? d.urls : []);
+						post({ type: ok ? "loaded" : "error", id: d.id, url: d.url });
+					} else if (d.type === "size") {
+						if (!app) return;
+						var w = Math.max(40, Math.round(d.w || 150));
+						var h = Math.max(40, Math.round(d.h || 196));
+						try {
+							app.renderer.resize(w, h);
+						} catch (err) {}
+						fit();
+					} else if (d.type === "motion") {
+						playMotion();
+					} else if (d.type === "pause") {
+						if (app && app.ticker) {
+							try {
+								app.ticker.stop();
+							} catch (err) {}
+						}
+					} else if (d.type === "resume") {
+						if (app && app.ticker) {
+							try {
+								app.ticker.start();
+							} catch (err) {}
+						}
+					}
+				});
+
+				document.addEventListener("visibilitychange", function () {
+					if (!app || !app.ticker) return;
+					try {
+						if (document.hidden) app.ticker.stop();
+						else app.ticker.start();
+					} catch (e) {}
+				});
+
+				boot();
+			})();
+		</script>
+	</body>
+</html>
