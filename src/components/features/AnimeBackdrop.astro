@@ -1,8 +1,8 @@
 ---
-import AnimeCursor from "./AnimeCursor.astro";
+import { animeWallpaperFiles } from "@/utils/anime-wallpaper-utils";
+import AnimeCursorLive2D from "./AnimeCursorLive2D.astro";
 import AnimeVoice from "./AnimeVoice.astro";
 import AnimeWallpaperGallery from "./AnimeWallpaperGallery.astro";
-import { animeWallpaperFiles } from "@/utils/anime-wallpaper-utils";
 /**
  * 二次元全屏背景层
  * - 随机动漫壁纸（可手动切换，状态记忆）
@@ -104,7 +104,9 @@ const petalList = Array.from({ length: 16 }, (_, i) => ({
 <!-- 壁纸画廊 + 看板娘甜美声音：独立页面本身已是全屏壁纸，故不显示「全屏铺满」开关 -->
 <AnimeWallpaperGallery fullwall={false} />
 <AnimeVoice />
-<AnimeCursor />
+
+<!-- 独立页面（登录 / 注册 / 社区 / 后台）自己搭页面骨架、不走 Layout，这里补上跟随鼠标的 Live2D 角色 -->
+<AnimeCursorLive2D />
 
 <style is:global>
 	html {

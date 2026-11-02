@@ -3,7 +3,6 @@ import GoogleAnalytics from "@components/analytics/GoogleAnalytics.astro";
 import La51Analytics from "@components/analytics/La51Analytics.astro";
 import MicrosoftClarity from "@components/analytics/MicrosoftClarity.astro";
 import UmamiAnalytics from "@components/analytics/UmamiAnalytics.astro";
-import AnimeCursor from "@components/features/AnimeCursor.astro";
 import AnimeCursorLive2D from "@components/features/AnimeCursorLive2D.astro";
 import AnimeVoice from "@components/features/AnimeVoice.astro";
 import AnimeWallpaperGallery from "@components/features/AnimeWallpaperGallery.astro";
@@ -585,10 +584,7 @@ const websiteJsonLd = JSON.stringify({
     <!-- 看板娘甜美声音（多语音包可选，翻页播一句） -->
     <AnimeVoice />
 
-    <!-- 二次元鼠标角色（跟随光标 + 樱花拖尾 + 点击说话） -->
-    <AnimeCursor />
-
-    <!-- Live2D 鼠标陪伴角色（跟随光标 · 随机换装 · 可自选模型） -->
+    <!-- Live2D 鼠标陪伴角色（跟随光标 · 说话气泡 · 星光拖尾 · 随机换装 · 可自选模型） -->
     <AnimeCursorLive2D />
 
     <!-- Fancybox Manager -->

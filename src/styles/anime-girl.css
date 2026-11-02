@@ -3,7 +3,7 @@
    ------------------------------------------------------------
    · 只做视觉：奶白 + 樱花粉 + 香芋紫的少女系配色
    · 圆润卡片 / 丝带标题 / 糖果按钮 / 星星点点的纸张纹理
-   · 鼠标角色（AnimeCursor）与首页横卡配色保持一致
+   · 鼠标角色（AnimeCursorLive2D）与首页横卡配色保持一致
    · 亮色为默认观感，暗色切换成「夜色紫」而非纯黑
    ============================================================ */
 
@@ -295,7 +295,7 @@ html.dark #wallpaper-wrapper::after {
 }
 
 /* 左下角的小开关：亮色改成奶白胶囊 */
-html:not(.dark) #anime-cursor-toggle,
+html:not(.dark) #acx-toggle,
 html:not(.dark) #anime-voice-open,
 html:not(.dark) #anime-wallpaper-open {
   background: rgba(255, 250, 253, 0.9) !important;
@@ -304,7 +304,7 @@ html:not(.dark) #anime-wallpaper-open {
   box-shadow: 0 8px 22px rgba(255, 124, 184, 0.24) !important;
 }
 
-html.dark #anime-cursor-toggle,
+html.dark #acx-toggle,
 html.dark #anime-voice-open,
 html.dark #anime-wallpaper-open {
   background: rgba(38, 27, 48, 0.88) !important;

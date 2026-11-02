@@ -9,8 +9,13 @@
  *   · 模型   随机轮换（默认 2 分钟，且只在你不动鼠标时才换）
  *   · 换装   「⚙ 模型库」可搜索 200+ 个在线模型，点一下即换；
  *            也能粘贴自己的 .model3.json 地址加入，选中结果存 localStorage
- *   · 降级   WebGL / 运行库不可用时回落到 AnimeCursor.astro 的手绘 Q 版
+ *   · 台词   点一下会说话（气泡）+ 星光炸开 + 偶尔做一个 Live2D 动作
+ *   · 拖尾   移动时拖出樱花 / 星光（canvas 粒子，停下即停，不常驻耗电）
+ *   · 降级   WebGL / 运行库不可用时只留一条 [acx] 警告，不挡网站正常使用
  *   · 触屏   默认关闭（省流量），可点左下「🎭 看板娘」手动打开
+ *
+ * 这一只**替掉**了 3.0.0 的手绘 Q 版 AnimeCursor.astro：跟随、台词气泡、
+ * 点击星光、拖尾、Alt+C 快捷键全部搬到这里，全站只留一个跟随鼠标的角色。
  *
  * 渲染为什么放在 iframe：Cubism 4 的 CubismShader_WebGL 是模块级单例，着色器绑在
  * 第一个 WebGL 上下文上；同页第二个 PIXI 渲染器会画不出东西（控制台刷
@@ -27,6 +32,7 @@
  *   AnimeCursorLive2D.on() / .off() / .toggle() / .next()
  *   AnimeCursorLive2D.setModel("https://…/xxx.model3.json")
  *   AnimeCursorLive2D.setSize("s" | "m" | "l") / .setRotate(0|60|120|300)
+ *   AnimeCursorLive2D.say("想说的一句话") / .burst()
  */
 ---
 
@@ -49,6 +55,8 @@
 	>
 </div>
 
+<canvas id="acx-trail" class="acx-trail" aria-hidden="true"></canvas>
+
 <div id="acx-stage" class="acx-stage" aria-hidden="true">
 	<iframe
 		id="acx-frame"
@@ -58,6 +66,7 @@
 		scrolling="no"
 		tabindex="-1"
 		aria-hidden="true"></iframe>
+	<div id="acx-bubble" class="acx-bubble" role="presentation"></div>
 	<span id="acx-hint" class="acx-hint"></span>
 </div>
 
@@ -113,19 +122,57 @@
 </div>
 
 <style is:global>
-	/* 开启 Live2D 看板娘时：藏掉手绘 Q 版小人，其余（樱花拖尾 / 台词气泡 / 点击星光）照旧 */
-	html.acx-on #anime-cursor .anime-cursor-svg {
-		display: none !important;
+	/* 开启角色时的星光拖尾（只在移动时出现，停下就停） */
+	.acx-trail {
+		position: fixed;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 999998;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.3s ease;
 	}
-	html.acx-on .anime-cursor {
-		filter: none !important;
+	html.acx-on .acx-trail {
+		opacity: 1;
+	}
+
+	/* 点击时炸开的星光 */
+	.acx-burst {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 0;
+		height: 0;
+		z-index: 1000000;
+		pointer-events: none;
+	}
+	.acx-burst span {
+		position: absolute;
+		left: 0;
+		top: 0;
+		font-size: 12px;
+		line-height: 1;
+		color: #ffd6ec;
+		animation: acx-burst 0.62s ease-out forwards;
+	}
+	@keyframes acx-burst {
+		0% {
+			opacity: 0.95;
+			transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+		}
+		100% {
+			opacity: 0;
+			transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.15)
+				rotate(var(--tr));
+		}
 	}
 
 	/* ---------- 左下角按钮组 ---------- */
 	.acx-dock {
 		position: fixed;
 		left: 16px;
-		bottom: 192px;
+		bottom: 154px;
 		z-index: 999996;
 		display: flex;
 		align-items: center;
@@ -237,6 +284,48 @@
 	}
 	.acx-hint.is-show {
 		opacity: 1;
+	}
+	/* 台词气泡：挂在角色头顶，贴边自动翻到另一侧 / 翻到下方 */
+	.acx-bubble {
+		position: absolute;
+		left: 4px;
+		bottom: calc(100% - 34px);
+		max-width: 216px;
+		padding: 6px 10px;
+		border-radius: 12px 12px 12px 4px;
+		border: 1px solid rgba(255, 154, 200, 0.55);
+		background: rgba(28, 20, 40, 0.92);
+		color: #ffe6f2;
+		font-size: 12px;
+		line-height: 1.5;
+		white-space: nowrap;
+		box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+		opacity: 0;
+		transform: translateY(6px) scale(0.9);
+		transform-origin: 0 100%;
+		transition:
+			opacity 0.16s ease,
+			transform 0.18s ease;
+		z-index: 2;
+	}
+	.acx-bubble.is-open {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+	.acx-bubble.is-flip {
+		left: auto;
+		right: 4px;
+		border-radius: 12px 12px 4px 12px;
+		transform-origin: 100% 100%;
+	}
+	.acx-bubble.is-below {
+		bottom: auto;
+		top: calc(100% - 34px);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.acx-bubble {
+			transition: none;
+		}
 	}
 </style>
 
@@ -425,7 +514,7 @@
 	@media (max-width: 640px) {
 		.acx-dock {
 			left: 10px;
-			bottom: 184px;
+			bottom: 146px;
 		}
 		.acx-txt {
 			display: none;
@@ -551,6 +640,8 @@
 				idle: document.getElementById("acx-idle"),
 				customInput: document.getElementById("acx-custom"),
 				closeBtn: document.getElementById("acx-close"),
+				bubble: document.getElementById("acx-bubble"),
+				trail: document.getElementById("acx-trail"),
 			};
 		}
 
@@ -572,6 +663,177 @@
 					h.classList.remove("is-show");
 				}, ms);
 			}
+		}
+
+		// ------------------------------ 台词气泡 / 点击星光 ------------------------------
+		var LINES = [
+			"喵～在的在的！",
+			"别戳啦 (*/ω＼*)",
+			"今天也要元气满满哦",
+			"嘿咻～",
+			"要一起看番吗？",
+			"这里这里！",
+			"欸嘿，被你发现了",
+			"再点一下试试？",
+			"喜欢这个地方吗～",
+			"我会一直陪着你的",
+		];
+		var LINK_LINES = ["出发～", "点这里就对啦", "这就带你去！", "跟紧我哦"];
+		var IMG_LINES = ["这张好好看！", "好想住进这幅画里", "截图收藏啦～"];
+		var BURST_GLYPHS = ["✦", "★", "✧", "❀", "♡", "✿", "⋆"];
+		var bubbleTimer = null;
+		var clickCount = 0;
+		var greetedOnce = false;
+
+		function say(text, hold) {
+			var e = els();
+			if (!e.bubble || !text) return;
+			e.bubble.textContent = text;
+			// 贴着右 / 上边缘时把气泡翻到另一侧，别被视口裁掉
+			e.bubble.classList.toggle("is-flip", state.drawX > window.innerWidth - 268);
+			e.bubble.classList.toggle("is-below", state.drawY < 150);
+			e.bubble.classList.add("is-open");
+			if (bubbleTimer) clearTimeout(bubbleTimer);
+			bubbleTimer = setTimeout(function () {
+				var b = els().bubble;
+				if (b) b.classList.remove("is-open");
+			}, hold || 1600 + text.length * 26);
+		}
+
+		function burst(x, y) {
+			if (reduceMotion) return;
+			var layer = document.createElement("div");
+			layer.className = "acx-burst";
+			layer.style.transform = "translate3d(" + x + "px," + y + "px,0)";
+			var count = coarse ? 6 : 8;
+			for (var i = 0; i < count; i++) {
+				var span = document.createElement("span");
+				span.textContent = BURST_GLYPHS[Math.floor(Math.random() * BURST_GLYPHS.length)];
+				var angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+				var dist = 22 + Math.random() * 26;
+				span.style.setProperty("--tx", Math.round(Math.cos(angle) * dist) + "px");
+				span.style.setProperty("--ty", Math.round(Math.sin(angle) * dist) + "px");
+				span.style.setProperty("--tr", Math.round(Math.random() * 220 - 110) + "deg");
+				span.style.fontSize = 9 + Math.round(Math.random() * 7) + "px";
+				layer.appendChild(span);
+			}
+			document.body.appendChild(layer);
+			setTimeout(function () {
+				layer.remove();
+			}, 700);
+		}
+
+		// ------------------------------ 樱花 / 星光拖尾 ------------------------------
+		var parts = [];
+		var trailLooping = false;
+		var trailSpawnAt = 0;
+		var trailSize = { w: 0, h: 0 };
+
+		function trailCtx() {
+			var c = els().trail;
+			if (!c) return null;
+			if (c.__ctx) return c.__ctx;
+			c.__ctx = c.getContext("2d");
+			return c.__ctx;
+		}
+
+		function resizeTrail() {
+			var c = els().trail;
+			if (!c) return;
+			var dpr = Math.min(2, window.devicePixelRatio || 1);
+			trailSize.w = window.innerWidth;
+			trailSize.h = window.innerHeight;
+			c.width = Math.floor(trailSize.w * dpr);
+			c.height = Math.floor(trailSize.h * dpr);
+			c.style.width = trailSize.w + "px";
+			c.style.height = trailSize.h + "px";
+			var ctx = trailCtx();
+			if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+		}
+
+		function spawnTrail(x, y, big) {
+			var palette = ["#ffb6d5", "#ffd9ea", "#c9a4ff", "#9fd0ff", "#fff0b8"];
+			parts.push({
+				x: x,
+				y: y,
+				vx: (Math.random() - 0.5) * 0.7,
+				vy: 0.35 + Math.random() * 0.75,
+				rot: Math.random() * Math.PI,
+				vr: (Math.random() - 0.5) * 0.16,
+				r: (big ? 4 : 2.4) + Math.random() * 2,
+				alpha: big ? 0.85 : 0.6,
+				star: Math.random() < 0.28,
+				color: palette[Math.floor(Math.random() * palette.length)],
+			});
+			if (parts.length > 80) parts.splice(0, parts.length - 80);
+		}
+
+		function drawTrail(ctx, dt) {
+			var k = dt / 16.7;
+			ctx.clearRect(0, 0, trailSize.w, trailSize.h);
+			for (var i = parts.length - 1; i >= 0; i--) {
+				var p = parts[i];
+				p.x += p.vx * k;
+				p.y += p.vy * k;
+				p.vy += 0.012 * k;
+				p.rot += p.vr * k;
+				p.alpha -= 0.016 * k;
+				if (p.alpha <= 0.02 || p.y > trailSize.h + 20) {
+					parts.splice(i, 1);
+					continue;
+				}
+				ctx.save();
+				ctx.translate(p.x, p.y);
+				ctx.rotate(p.rot);
+				ctx.globalAlpha = Math.max(0, p.alpha);
+				ctx.fillStyle = p.color;
+				ctx.beginPath();
+				if (p.star) {
+					var r = p.r;
+					ctx.moveTo(0, -r);
+					ctx.lineTo(r * 0.32, -r * 0.3);
+					ctx.lineTo(r, 0);
+					ctx.lineTo(r * 0.32, r * 0.3);
+					ctx.lineTo(0, r);
+					ctx.lineTo(-r * 0.32, r * 0.3);
+					ctx.lineTo(-r, 0);
+					ctx.lineTo(-r * 0.32, -r * 0.3);
+					ctx.closePath();
+				} else {
+					ctx.ellipse(0, 0, p.r, p.r * 0.58, 0, 0, Math.PI * 2);
+				}
+				ctx.fill();
+				ctx.restore();
+			}
+		}
+
+		function trailLoop() {
+			if (trailLooping) return;
+			trailLooping = true;
+			var last = 0;
+			function step(ts) {
+				var dt = last ? Math.min(64, ts - last) : 16.7;
+				last = ts;
+				var ctx = trailCtx();
+				if (ctx) drawTrail(ctx, dt);
+				if (state.enabled && parts.length) {
+					requestAnimationFrame(step);
+				} else {
+					trailLooping = false;
+					parts.length = 0;
+					if (ctx) ctx.clearRect(0, 0, trailSize.w, trailSize.h);
+				}
+			}
+			requestAnimationFrame(step);
+		}
+
+		function maybeTrail(x, y) {
+			if (!state.enabled || reduceMotion || coarse) return;
+			var now = Date.now();
+			if (now - trailSpawnAt < 58) return;
+			trailSpawnAt = now;
+			spawnTrail(x + Math.random() * 6 - 3, y + Math.random() * 6 - 3, Math.random() < 0.22);
+			trailLoop();
 		}
 
 		// ------------------------------ 和渲染 iframe 通信 ------------------------------
@@ -792,7 +1054,7 @@
 			state.src = url;
 			delete state.failed[url];
 			hint("");
-			// 模型真的出来了才藏掉手绘 Q 版小人，避免中间空窗
+			// 模型真的出来了才把「角色在位」标记打开（拖尾 / 文案样式都挂在这个 class 上）
 			document.documentElement.classList.add("acx-on");
 			playMotion();
 			lsSet(KEY_SRC, url);
@@ -952,20 +1214,33 @@
 				closePanel();
 				document.documentElement.classList.remove("acx-on");
 				if (e.stage) e.stage.classList.remove("is-visible");
+				if (e.bubble) e.bubble.classList.remove("is-open");
+				parts.length = 0;
+				var tctx = trailCtx();
+				if (tctx) tctx.clearRect(0, 0, trailSize.w, trailSize.h);
 				postToFrame({ type: "pause" });
 			} else {
 				if (e.stage) e.stage.classList.add("is-visible");
+				resizeTrail();
 				init();
 				postToFrame({ type: "resume" });
 			}
-			if (!silent && window.AnimeCursor && window.AnimeCursor.say) {
-				window.AnimeCursor.say(state.enabled ? "换我上场陪你啦～" : "那我先歇一会儿～");
+			if (!silent) {
+				// 打开时说一句；关掉时角色已经下班，气泡看不见，就用按钮音效收尾
+				if (state.enabled) say("换我上场陪你啦～");
+				else if (window.AnimeSounds) {
+					try {
+						window.AnimeSounds.play("close", 0.16);
+					} catch (err) {}
+				}
 			}
 		}
 
 		function failSoft(msg) {
 			console.warn("[acx]", msg);
 			state.enabled = false;
+			// 记成「未初始化」，下次点开关还能再试一次（网络恢复后不用刷新）
+			state.inited = false;
 			lsSet(KEY_ON, "0");
 			document.documentElement.classList.remove("acx-on");
 			var e = els();
@@ -978,9 +1253,6 @@
 			if (e.open) e.open.hidden = true;
 			if (e.stage) e.stage.classList.remove("is-visible");
 			postToFrame({ type: "pause" });
-			if (window.AnimeCursor && window.AnimeCursor.say) {
-				window.AnimeCursor.say("Live2D 起不来，先用小手绘陪你啦～");
-			}
 		}
 
 		var rafId = 0;
@@ -1060,6 +1332,12 @@
 						st.classList.add("is-visible");
 						st.classList.remove("is-hidden");
 					}
+					maybeTrail(e.clientX, e.clientY);
+					// 第一次动鼠标时打个招呼（模型可能还在下载，先说话不耽误）
+					if (state.enabled && !greetedOnce) {
+						greetedOnce = true;
+						say("我来陪你啦～");
+					}
 				},
 				{ passive: true },
 			);
@@ -1081,16 +1359,44 @@
 			root.addEventListener("mouseleave", function () {
 				var st = els().stage;
 				if (st) st.classList.remove("is-visible");
+				var b = els().bubble;
+				if (b) b.classList.remove("is-open");
 			});
 
 			// 渲染 iframe 的回执（ready / loaded / error）
 			window.addEventListener("message", onFrameMessage);
 
-			// 点一下：随机做一个动作（和 AnimeCursor 的台词 / 星光同时发生）
+			// 点一下：说一句台词 + 星光炸开 + 偶尔做个 Live2D 动作
 			root.addEventListener(
 				"click",
-				function () {
-					if (!state.enabled || !state.model) return;
+				function (e) {
+					if (!state.enabled) return;
+					var t = e.target;
+					// 点自己的按钮 / 面板不算「和角色互动」
+					if (t && t.closest && t.closest("#acx-dock, #acx-panel")) return;
+					var x = typeof e.clientX === "number" && e.clientX ? e.clientX : state.pointerX;
+					var y = typeof e.clientY === "number" && e.clientY ? e.clientY : state.pointerY;
+					burst(x, y);
+
+					var line = LINES[Math.floor(Math.random() * LINES.length)];
+					if (t && t.closest) {
+						if (t.closest("a")) line = LINK_LINES[Math.floor(Math.random() * LINK_LINES.length)];
+						else if (t.closest("img, picture, .post-card-wrapper, [data-awg-kind]"))
+							line = IMG_LINES[Math.floor(Math.random() * IMG_LINES.length)];
+						else if (t.closest("#anime-wallpaper-panel")) line = "换好啦，喜欢这张吗？";
+						else if (t.closest("#anime-voice-panel")) line = "想要我多说几句吗～";
+					}
+					say(line);
+
+					// 每 5 次点击配一句看板娘语音，别太吵
+					clickCount += 1;
+					if (clickCount % 5 === 0 && window.AnimeVoice) {
+						try {
+							window.AnimeVoice.play();
+						} catch (err) {}
+					}
+
+					if (!state.model) return;
 					if (Date.now() - state.lastMotion < 500) return;
 					state.lastMotion = Date.now();
 					if (Math.random() < 0.7) playMotion();
@@ -1103,6 +1409,12 @@
 			});
 
 			root.addEventListener("keydown", function (e) {
+				// Alt + C 快速开关（和 3.0.0 的手绘角色保持一致的手感）
+				if (e.altKey && (e.key === "c" || e.key === "C")) {
+					e.preventDefault();
+					setOn(!state.enabled);
+					return;
+				}
 				if (e.key === "Escape") closePanel();
 				var t = e.target;
 				if (t && t.id === "acx-custom" && e.key === "Enter") addCustom();
@@ -1187,6 +1499,17 @@
 					lsSet(KEY_IDLE, state.idleOnly ? "1" : "0");
 				});
 			}
+
+			// 窗口尺寸变了：拖尾画布跟着重设，别拉花
+			var resizeTimer = null;
+			window.addEventListener(
+				"resize",
+				function () {
+					if (resizeTimer) clearTimeout(resizeTimer);
+					resizeTimer = setTimeout(resizeTrail, 200);
+				},
+				{ passive: true },
+			);
 		}
 
 		function boot() {
@@ -1207,6 +1530,7 @@
 			if (e.size) e.size.value = state.size;
 			if (e.idle) e.idle.checked = state.idleOnly;
 			applySize();
+			resizeTrail();
 			// 触屏设备默认关掉（省流量），可以手动点「🎭 看板娘」打开
 			setOn(lsGet(KEY_ON, coarse ? "0" : "1") === "1", true);
 		}
@@ -1224,6 +1548,13 @@
 			},
 			next: next,
 			pick: pick,
+			say: function (text, hold) {
+				say(text, hold);
+			},
+			burst: burst,
+			isOn: function () {
+				return state.enabled;
+			},
 			setModel: function (url) {
 				return applyModel(url);
 			},

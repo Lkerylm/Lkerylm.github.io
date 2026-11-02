@@ -716,7 +716,7 @@ const firstDesktop = groups[0].items[0]?.file || "/anime-wallpaper/desktop-01.av
 				var kind = kinds[i];
 				pick(kind, Math.floor(Math.random() * tileCount(kind)));
 			}
-			if (window.AnimeCursor) window.AnimeCursor.say("🎲 换了一组新壁纸～");
+			if (window.AnimeCursorLive2D && window.AnimeCursorLive2D.say) window.AnimeCursorLive2D.say("🎲 换了一组新壁纸～");
 		}
 
 		function resetPicks() {
