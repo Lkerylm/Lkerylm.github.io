@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>我的动漫小屋</ShortName>
+  <Description>我的动漫小屋是 Lkerylm 的个人博客，记录追番日常、动画杂谈、同人创作与二次元生活碎片，收藏每一份心动与美好。</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="32" height="32" type="image/png">https://lkerylm.github.io/favicon/anime-32.png</Image>
+  <Url type="text/html" method="get" template="https://lkerylm.github.io/search/?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://lkerylm.github.io/opensearch.xml"/>
+  <moz:SearchForm xmlns:moz="http://www.mozilla.org/2006/browser/search/">https://lkerylm.github.io/search/</moz:SearchForm>
+</OpenSearchDescription>
