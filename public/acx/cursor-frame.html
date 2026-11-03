@@ -84,6 +84,130 @@
 					});
 				}
 
+				// ---------- 「小动作」引擎：呼吸 / 眨眼 / 待机动作 / 东张西望 ----------
+				// 各家模型的动作组名不统一（Tap / tap_body / Idle / idle…），统一按小写匹配
+				var idleTimer = null;
+				var idleSince = 0;
+				var lastGaze = 0;
+				var paramIdx = {};
+				var petModel = null;
+				var blink = { next: 1500, start: 0, dur: 0, l: 0, r: 0 };
+
+				function paramIndexes() {
+					var out = {};
+					var core = null;
+					try {
+						core = model.internalModel.coreModel;
+					} catch (e) {}
+					if (!core || typeof core.getParameterIndex !== "function") return out;
+					var ids = ["ParamEyeLOpen", "ParamEyeROpen", "ParamBreath"];
+					for (var i = 0; i < ids.length; i++) {
+						try {
+							var idx = core.getParameterIndex(ids[i]);
+							if (typeof idx === "number" && idx >= 0) out[ids[i]] = idx;
+						} catch (e) {}
+					}
+					return out;
+				}
+
+				// 每帧跑在模型 update 之后：呼吸 + 眨眼。
+				// 眨眼系数乘在动作算出来的参数上，所以做动作时也不会被盖掉。
+				function lifeTick() {
+					if (!model || document.hidden) return;
+					var core = null;
+					try {
+						core = model.internalModel.coreModel;
+					} catch (e) {
+						return;
+					}
+					if (!core || typeof core.setParameterValueById !== "function") return;
+					var now = performance.now();
+					if (paramIdx.ParamBreath !== undefined) {
+						try {
+							core.setParameterValueById(
+								"ParamBreath",
+								0.5 + 0.5 * Math.sin(now / 1400),
+							);
+						} catch (e) {}
+					}
+					// 眨眼：每帧都按「睁眼基准值 × 系数」写回。
+					// 参数是持久的，要是只写到闭眼那一帧就断了，眼睛会一直闭着，
+					// 所以不眨眼时也要把值校准回基准（只在明显偏小时补，别抢动作的表现）
+					if (!blink.l) blink.l = 1;
+					if (!blink.r) blink.r = 1;
+					if (!blink.start && now > blink.next) {
+						var bL = 1;
+						var bR = 1;
+						try {
+							bL = core.getParameterValueById("ParamEyeLOpen");
+							bR = core.getParameterValueById("ParamEyeROpen");
+						} catch (e) {}
+						if (!(bL > 0)) bL = 1;
+						if (!(bR > 0)) bR = 1;
+						blink.start = now;
+						blink.dur = 300;
+						blink.l = bL;
+						blink.r = bR;
+						blink.next =
+							now + 2200 + Math.random() * 4200 + (Math.random() < 0.2 ? 900 : 0);
+					}
+					var blinking = !!blink.start;
+					var k = 1;
+					if (blinking) {
+						var e = now - blink.start;
+						if (e < 90) k = 1 - e / 90;
+						else if (e < 150) k = 0;
+						else if (e < blink.dur) k = (e - 150) / (blink.dur - 150);
+						else {
+							k = 1;
+							blink.start = 0;
+						}
+					}
+					try {
+						if (paramIdx.ParamEyeLOpen !== undefined) {
+							var curL = core.getParameterValueById("ParamEyeLOpen");
+							if (blinking || curL < blink.l * 0.9) {
+								core.setParameterValueById("ParamEyeLOpen", blink.l * k);
+							}
+						}
+						if (paramIdx.ParamEyeROpen !== undefined) {
+							var curR = core.getParameterValueById("ParamEyeROpen");
+							if (blinking || curR < blink.r * 0.9) {
+								core.setParameterValueById("ParamEyeROpen", blink.r * k);
+							}
+						}
+					} catch (err) {}
+				}
+
+				// 挂在模型自己的 update 后面，顺序最稳（换 ticker / 换渲染顺序都不影响）
+				function patchLife() {
+					try {
+						var im = model.internalModel;
+						if (!im || im.__acxPatched) return;
+						var orig = im.update;
+						im.update = function () {
+							var r = orig.apply(this, arguments);
+							try {
+								lifeTick();
+							} catch (e) {}
+							return r;
+						};
+						im.__acxPatched = true;
+					} catch (e) {}
+				}
+
+				function startLife() {
+					if (!model || petModel === model) return;
+					petModel = model;
+					paramIdx = paramIndexes();
+					blink = { next: performance.now() + 800, start: 0, dur: 0, l: 0, r: 0 };
+					lastGaze = 0;
+					patchLife();
+					gazeAround();
+					playIdleMotion();
+					scheduleIdle(3200 + Math.random() * 2600);
+				}
+
 				function fit() {
 					if (!app || !model) return;
 					var w = (app.screen && app.screen.width) || canvas.clientWidth || 150;
@@ -99,8 +223,153 @@
 					try {
 						// 眼睛微微看向左上方（鼠标那边）
 						model.focus(-0.25, 0.18);
+						// 模型到位后挂上「小动作」引擎（呼吸 / 眨眼 / 待机动作）
+						startLife();
 					} catch (e) {}
 				}
+
+				// 待机动作 / 东张西望：动作组名各家不统一，都按小写去找
+				function motionDefs() {
+					try {
+						var mm = model.internalModel.motionManager;
+						return (mm && mm.definitions) || {};
+					} catch (e) {
+						return {};
+					}
+				}
+
+				function findGroup(names) {
+					var defs = motionDefs();
+					var keys = Object.keys(defs);
+					for (var i = 0; i < names.length; i++) {
+						var want = names[i].toLowerCase();
+						for (var j = 0; j < keys.length; j++) {
+							if (
+								keys[j].toLowerCase() === want &&
+								defs[keys[j]] &&
+								defs[keys[j]].length
+							) {
+								return keys[j];
+							}
+						}
+					}
+					return "";
+				}
+
+				function tapGroups() {
+					var out = [];
+					var names = ["tap", "tap_body", "tapbody", "flick_head", "flick", "touch"];
+					for (var i = 0; i < names.length; i++) {
+						var g = findGroup([names[i]]);
+						if (g && out.indexOf(g) === -1) out.push(g);
+					}
+					return out;
+				}
+
+				function motionBusy() {
+					try {
+						var mm = model.internalModel.motionManager;
+						if (mm && typeof mm.playing === "boolean") return mm.playing;
+					} catch (e) {}
+					return false;
+				}
+
+				function playGroup(name) {
+					if (!model || !name) return false;
+					try {
+						Promise.resolve(model.motion(name)).catch(function () {});
+						return true;
+					} catch (e) {
+						return false;
+					}
+				}
+
+				// 待机动作：优先 Idle 组，没有就找名字像「待机」的组
+				function playIdleMotion() {
+					if (!model) return false;
+					var g = findGroup(["idle", "idle_0", "stand", "wait"]);
+					if (!g) {
+						var keys = Object.keys(motionDefs());
+						for (var i = 0; i < keys.length; i++) {
+							if (/idle|stand|breath|wait/i.test(keys[i])) {
+								g = keys[i];
+								break;
+							}
+						}
+					}
+					if (!g) return false;
+					idleSince = Date.now();
+					return playGroup(g);
+				}
+
+				// 眼神：一直盯着一个方向很假，隔几秒东张西望一下
+				function gazeAround() {
+					if (!model) return;
+					var now = Date.now();
+					if (now - lastGaze < 2000) return;
+					lastGaze = now;
+					var x, y;
+					if (Math.random() < 0.35) {
+						x = 0;
+						y = 0.12;
+					} else {
+						x = (Math.random() * 2 - 1) * 0.75;
+						y = (Math.random() * 2 - 1) * 0.45;
+					}
+					try {
+						model.focus(x, y);
+					} catch (e) {}
+				}
+
+				function scheduleIdle(ms) {
+					if (idleTimer) clearTimeout(idleTimer);
+					idleTimer = setTimeout(idleTick, ms || 4500 + Math.random() * 5000);
+				}
+
+				function idleTick() {
+					idleTimer = null;
+					if (!model || document.hidden || loading) {
+						scheduleIdle(2500);
+						return;
+					}
+					// 有些 Idle 动作是循环的，演太久就换一个，不然一直一个姿势
+					if (motionBusy() && Date.now() - idleSince > 11000) {
+						try {
+							model.internalModel.motionManager.stopAllMotions();
+						} catch (e) {}
+					}
+					if (!motionBusy()) playIdleMotion();
+					gazeAround();
+					scheduleIdle();
+				}
+
+				// 调试用：控制台里 __acxFrame.info() 看动作组 / 参数 / 当前有没有在动
+				window.__acxFrame = {
+					info: function () {
+						var eye = null;
+						var breath = null;
+						try {
+							var core = model.internalModel.coreModel;
+							eye = core.getParameterValueById("ParamEyeLOpen");
+							breath = core.getParameterValueById("ParamBreath");
+						} catch (e) {}
+						return {
+							model: !!model,
+							playing: motionBusy(),
+							groups: Object.keys(motionDefs()),
+							taps: tapGroups(),
+							params: Object.keys(paramIdx),
+							eye: eye,
+							breath: breath,
+							blinking: !!blink.start,
+							patched: !!(model && model.internalModel && model.internalModel.__acxPatched),
+						};
+					},
+					motion: function (g) {
+						return playGroup(g);
+					},
+					idle: playIdleMotion,
+				};
 
 				function playMotion() {
 					if (!model) return;
@@ -112,7 +381,7 @@
 								model.internalModel.motionManager.definitions) ||
 							{};
 					} catch (e) {}
-					var groups = ["tap_body", "tap", "flick_head", "flick"];
+					var groups = tapGroups();
 					for (var i = 0; i < groups.length; i++) {
 						if (defs[groups[i]] && defs[groups[i]].length) {
 							try {
@@ -147,6 +416,7 @@
 							next = await withTimeout(
 								PIXI.live2d.Live2DModel.from(urls[i], {
 									autoInteract: false,
+								sound: false,
 									crossOrigin: "anonymous",
 								}),
 								45000,

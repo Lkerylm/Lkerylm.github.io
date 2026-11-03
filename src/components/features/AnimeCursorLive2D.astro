@@ -5,11 +5,12 @@
  * 和右下角看板娘（Live2DWidget.astro）共用同一套运行库 / 同一批模型，
  * 区别是这只小可爱会**跟着鼠标跑**：
  *
- *   · 位置   跟随光标（右下 18px 起，贴边自动翻到另一侧，缓动 + 轻微呼吸）
+ *   · 位置   角色中心 = 光标位置（系统箭头隐藏，指哪儿点哪儿不偏，贴边也不推开）
+ *   · 小动作 待机自动换 Idle 动作（呼吸 / 眨眼 / 东张西望），点一下播 Tap 动作
  *   · 模型   随机轮换（默认 2 分钟，且只在你不动鼠标时才换）
  *   · 换装   「⚙ 模型库」可搜索 200+ 个在线模型，点一下即换；
  *            也能粘贴自己的 .model3.json 地址加入，选中结果存 localStorage
- *   · 台词   点一下会说话（气泡）+ 星光炸开 + 偶尔做一个 Live2D 动作
+ *   · 台词   点一下会说话（气泡）+ 星光炸开 + 角色弹一下
  *   · 拖尾   移动时拖出樱花 / 星光（canvas 粒子，停下即停，不常驻耗电）
  *   · 降级   WebGL / 运行库不可用时只留一条 [acx] 警告，不挡网站正常使用
  *   · 触屏   默认关闭（省流量），可点左下「🎭 看板娘」手动打开
@@ -255,6 +256,44 @@
 	.acx-stage.is-hidden,
 	.acx-stage.is-typing {
 		opacity: 0;
+	}
+	/* 角色就是「鼠标指针」：开启后系统箭头藏起来（只在本组件的按钮/面板上留着，方便点设置） */
+	html.acx-on.acx-cursor-none,
+	html.acx-on.acx-cursor-none body,
+	html.acx-on.acx-cursor-none body * {
+		cursor: none !important;
+	}
+	html.acx-on.acx-cursor-none #acx-dock,
+	html.acx-on.acx-cursor-none #acx-dock *,
+	html.acx-on.acx-cursor-none #acx-panel,
+	html.acx-on.acx-cursor-none #acx-panel * {
+		cursor: auto !important;
+	}
+	html.acx-on.acx-cursor-none #acx-dock button,
+	html.acx-on.acx-cursor-none #acx-panel button,
+	html.acx-on.acx-cursor-none #acx-panel select,
+	html.acx-on.acx-cursor-none #acx-panel label,
+	html.acx-on.acx-cursor-none #acx-panel .acx-item {
+		cursor: pointer !important;
+	}
+
+	/* 点一下：角色「弹一下」，系统箭头藏起来了也能立刻看到反馈 */
+	.acx-stage.is-pop .acx-frame {
+		animation: acx-pop 0.36s ease-out;
+	}
+	@keyframes acx-pop {
+		0% {
+			transform: scale(1);
+		}
+		35% {
+			transform: scale(0.94) translateY(3px);
+		}
+		70% {
+			transform: scale(1.03) translateY(-2px);
+		}
+		100% {
+			transform: scale(1);
+		}
 	}
 	.acx-frame {
 		display: block;
@@ -542,6 +581,9 @@
 		.acx-stage {
 			transition: none;
 		}
+		.acx-stage.is-pop .acx-frame {
+			animation: none;
+		}
 	}
 </style>
 
@@ -610,6 +652,7 @@
 			rotate: DEFAULT_ROTATE,
 			size: "m",
 			idleOnly: true,
+			typing: false,
 			lastMove: 0,
 			lastRotate: 0,
 			lastMotion: 0,
@@ -721,6 +764,20 @@
 			setTimeout(function () {
 				layer.remove();
 			}, 700);
+		}
+
+		// 点一下让角色「弹一下」：系统箭头藏起来后，这是最直观的点击反馈
+		function popStage() {
+			var st = els().stage;
+			if (!st || reduceMotion) return;
+			st.classList.remove("is-pop");
+			// 读一次布局，保证连点时动画也能重新播
+			void st.offsetWidth;
+			st.classList.add("is-pop");
+			setTimeout(function () {
+				var s = els().stage;
+				if (s) s.classList.remove("is-pop");
+			}, 400);
 		}
 
 		// ------------------------------ 樱花 / 星光拖尾 ------------------------------
@@ -1218,6 +1275,7 @@
 			if (!state.enabled) {
 				closePanel();
 				document.documentElement.classList.remove("acx-on");
+				document.documentElement.classList.remove("acx-cursor-none");
 				if (e.stage) e.stage.classList.remove("is-visible");
 				if (e.bubble) e.bubble.classList.remove("is-open");
 				parts.length = 0;
@@ -1226,6 +1284,8 @@
 				postToFrame({ type: "pause" });
 			} else {
 				if (e.stage) e.stage.classList.add("is-visible");
+				// 关掉时摘过 acx-on，再打开要补回来（拖尾、藏光标都挂在它上面）
+				if (state.model) document.documentElement.classList.add("acx-on");
 				resizeTrail();
 				init();
 				postToFrame({ type: "resume" });
@@ -1248,6 +1308,7 @@
 			state.inited = false;
 			lsSet(KEY_ON, "0");
 			document.documentElement.classList.remove("acx-on");
+			document.documentElement.classList.remove("acx-cursor-none");
 			var e = els();
 			if (e.toggle) {
 				e.toggle.classList.remove("is-on");
@@ -1263,29 +1324,47 @@
 		var rafId = 0;
 		function startFollow() {
 			if (rafId) return;
+			var lastHideCursor = null;
 			function loop() {
 				rafId = requestAnimationFrame(loop);
 				var st = els().stage;
-				if (!st || !state.enabled) return;
+				if (!st || !state.enabled) {
+					// 关掉（或元素还没就绪）时把系统光标放回来；
+					// 这里的 lastHideCursor 必须跟着归位，否则下次打开会因为「状态没变」而不再藏光标
+					if (lastHideCursor !== false) {
+						lastHideCursor = false;
+						document.documentElement.classList.remove("acx-cursor-none");
+					}
+					return;
+				}
 				var w = st.offsetWidth || stageSize().w;
 				var h = st.offsetHeight || stageSize().h;
-				// 默认站在光标右下；贴到视口边缘就翻到另一侧，别被裁掉
-				var bx = state.pointerX + 18;
-				if (bx + w > window.innerWidth - 6) bx = state.pointerX - w - 18;
-				var by = state.pointerY + 12;
-				if (by + h > window.innerHeight - 6) by = window.innerHeight - h - 6;
-				if (by < 6) by = 6;
-				if (bx < 6) bx = 6;
-				var k = reduceMotion ? 1 : 0.22;
+				// 角色中心 = 光标位置：它就是鼠标指针本身。
+				// 不做贴边夹取——一靠边就被推开的话，指哪儿点哪儿就对不上了
+				var bx = state.pointerX - w / 2;
+				var by = state.pointerY - h / 2;
+				// 模型没出来之前慢慢飘过去，出来之后严格跟手
+				var k = reduceMotion ? 1 : state.model ? 1 : 0.32;
 				state.drawX += (bx - state.drawX) * k;
 				state.drawY += (by - state.drawY) * k;
-				var bob = reduceMotion ? 0 : Math.sin(Date.now() / 620) * 2.2;
+				var bob = reduceMotion ? 0 : Math.sin(Date.now() / 620) * 1.2;
 				st.style.transform =
 					"translate3d(" +
 					Math.round(state.drawX) +
 					"px," +
 					Math.round(state.drawY + bob) +
 					"px,0)";
+				// 系统箭头只在「角色真的在」的时候藏起来；打字 / 触屏时让开
+				var hideCursor =
+					state.enabled &&
+					state.model &&
+					!coarse &&
+					!state.typing &&
+					st.classList.contains("is-visible");
+				if (hideCursor !== lastHideCursor) {
+					lastHideCursor = hideCursor;
+					document.documentElement.classList.toggle("acx-cursor-none", hideCursor);
+				}
 			}
 			rafId = requestAnimationFrame(loop);
 		}
@@ -1356,6 +1435,7 @@
 					var t = e.target;
 					var typing =
 						t && t.closest && t.closest('input, textarea, select, [contenteditable="true"]');
+					state.typing = !!typing;
 					st.classList.toggle("is-typing", !!typing);
 				},
 				true,
@@ -1366,6 +1446,8 @@
 				if (st) st.classList.remove("is-visible");
 				var b = els().bubble;
 				if (b) b.classList.remove("is-open");
+				state.typing = false;
+				document.documentElement.classList.remove("acx-cursor-none");
 			});
 
 			// 渲染 iframe 的回执（ready / loaded / error）
@@ -1382,6 +1464,7 @@
 					var x = typeof e.clientX === "number" && e.clientX ? e.clientX : state.pointerX;
 					var y = typeof e.clientY === "number" && e.clientY ? e.clientY : state.pointerY;
 					burst(x, y);
+					popStage();
 					// 模型还没出来就先不弹台词（星光照旧，点哪儿都有反馈）
 					if (!state.model) return;
 
