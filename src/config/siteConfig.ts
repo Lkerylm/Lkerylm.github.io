@@ -31,6 +31,9 @@ export const siteConfig: SiteConfig = {
 		"ACGN",
 		"Lkerylm",
 		"个人博客",
+		"动漫小屋",
+		"公益寻亲",
+		"寻找走失儿童",
 	],
 
 	// 主题色

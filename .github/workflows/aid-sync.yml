@@ -1,0 +1,43 @@
+name: Sync Aid Data
+
+# 定时同步公益寻亲数据（「实时更新」的后端方案）
+# 只有仓库 Variables 里配置了 AID_FEED_URL 才会真正执行，否则直接跳过。
+# 数据源必须是「你有权转载」的官方 / 授权渠道，脚本会丢弃没有官方来源链接的条目。
+
+on:
+  schedule:
+    - cron: "17 */6 * * *" # 每 6 小时同步一次
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: ${{ vars.AID_FEED_URL != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Sync missing-children data
+        env:
+          AID_FEED_URL: ${{ vars.AID_FEED_URL }}
+        run: node scripts/sync-aid.mjs
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "aid-bot"
+          git config user.email "aid-bot@users.noreply.github.com"
+          if [ -n "$(git status --porcelain public/data/aid/missing-children.json)" ]; then
+            git add public/data/aid/missing-children.json
+            git commit -m "chore(aid): 同步公益寻亲数据"
+            git push
+          else
+            echo "数据无变化，跳过提交"
+          fi

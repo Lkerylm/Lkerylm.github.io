@@ -4,9 +4,27 @@
  * - 动漫樱花 favicon（SVG + PNG）
  * - 苹果设备桌面图标
  * - 移动端状态栏主题色
+ * - OpenSearch（Edge / Chrome 地址栏可直接用本站搜索）
+ * - 基础 SEO（description / robots / og），让这些页面也能被搜索引擎收录
  *
  * 这些页面没有走 Layout.astro，所以需要单独引入。
  */
+import { siteConfig } from "@/config";
+
+interface Props {
+	title?: string;
+	description?: string;
+	/** 是否允许搜索引擎收录（后台 / 登录页建议 false） */
+	indexable?: boolean;
+}
+
+const { title, description, indexable = true } = Astro.props;
+const origin = Astro.site ? new URL(Astro.site).origin : siteConfig.site_url;
+const desc =
+	description ||
+	siteConfig.description ||
+	`${siteConfig.title} - ${siteConfig.subtitle}`;
+const pageTitle = title ? `${title} - ${siteConfig.title}` : siteConfig.title;
 ---
 
 <link rel="icon" type="image/svg+xml" href="/favicon/anime.svg" />
@@ -15,5 +33,25 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/anime-180.png" />
 <link rel="shortcut icon" href="/favicon/anime.ico" />
 <meta name="theme-color" content="#ff9ac8" />
-<meta name="apple-mobile-web-app-title" content="我的动漫小屋" />
-<meta name="application-name" content="我的动漫小屋" />
+<meta name="apple-mobile-web-app-title" content={siteConfig.title} />
+<meta name="application-name" content={siteConfig.title} />
+<meta name="author" content={siteConfig.title} />
+<meta name="description" content={desc} />
+{siteConfig.keywords && siteConfig.keywords.length > 0 && (
+  <meta name="keywords" content={siteConfig.keywords.join(", ")} />
+)}
+<meta name="robots" content={indexable ? "index, follow, max-image-preview:large" : "noindex, nofollow"} />
+<meta property="og:site_name" content={siteConfig.title} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={desc} />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={desc} />
+<link
+  rel="search"
+  type="application/opensearchdescription+xml"
+  title={siteConfig.title}
+  href={`${origin}/opensearch.xml`}
+/>
+

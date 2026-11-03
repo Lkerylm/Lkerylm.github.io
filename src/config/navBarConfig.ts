@@ -93,6 +93,13 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 
 			// 关于页面
 			LinkPreset.About,
+
+			// 公益寻亲（帮助走失孩子回家）—— 独立页面，可分享
+			{
+				name: "公益寻亲",
+				url: "/aid/",
+				icon: "mingcute:heart-fill",
+			},
 		],
 	});
 

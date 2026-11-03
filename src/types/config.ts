@@ -753,3 +753,25 @@ export type GalleryConfig = {
 	albums: GalleryAlbum[];
 	columnWidth?: number; // 瀑布流最小列宽(px)，默认 240，浏览器根据容器宽度自动计算列数
 };
+
+// 公益寻亲 · 官方渠道
+export type AidSource = {
+	name: string; // 渠道名称，例如「宝贝回家寻子网」
+	url: string; // 官方链接，支持 https:// 与 tel:
+	description?: string; // 一句话说明
+};
+
+// 公益寻亲配置（见 src/config/aidConfig.ts）
+export type AidConfig = {
+	enable: boolean; // 是否全站显示公益寻亲卡片
+	title: string; // 卡片标题
+	subtitle: string; // 卡片副标题
+	closeable: boolean; // 是否允许访客手动关闭
+	rememberDays: number; // 关闭后多少天内不再自动弹出
+	position: "bottom-right" | "bottom-left"; // 卡片位置
+	rotateSeconds: number; // 轮播间隔（秒）
+	refreshMinutes: number; // 数据刷新间隔（分钟）
+	dataUrl: string; // 数据 JSON 地址（相对站点根目录）
+	portalUrl: string; // 点击卡片默认跳转的官方公益链接
+	sources: AidSource[]; // 官方渠道列表
+};

@@ -12,6 +12,7 @@
     "type-check": "tsc --noEmit --isolatedDeclarations",
     "new-post": "node scripts/new-post.js",
     "indexnow": "node scripts/indexnow.mjs",
+    "aid-sync": "node scripts/sync-aid.mjs",
     "format": "biome format --write ./src",
     "lint": "biome check --write ./src",
     "preinstall": "npx only-allow pnpm",

@@ -1,0 +1,290 @@
+---
+import CutePageHero from "@components/common/CutePageHero.astro";
+import { aidConfig } from "@/config";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+
+/**
+ * 公益寻亲（帮走失 / 被拐的孩子回家）
+ *
+ * 合规说明（不侵权）：
+ * - 本页只转载「官方已公开发布」的文字要点，不转载任何照片、海报与原文；
+ * - 每条信息都保留官方来源链接，详情一律以官方页面为准；
+ * - 数据文件 public/data/aid/missing-children.json 可在运行时热更新（见 scripts/sync-aid.mjs）。
+ */
+const { dataUrl, sources } = aidConfig;
+const pageDescription =
+	"公益寻亲信息汇总：只转载官方已公开的文字要点、不转载照片，支持实时更新；发现线索请拨打 110 或联系官方平台。";
+---
+
+<MainGridLayout title="公益寻亲" description={pageDescription}>
+  <CutePageHero
+    emoji="🧸"
+    title="公益寻亲"
+    subtitle="多看一眼，也许就多一次团圆。这里只做公益信息的「轻量转发」，详情一律以官方发布为准。"
+    chips={["官方信息", "不转载照片", "实时更新", "可随时关闭"]}
+    tone="peach"
+  />
+
+  <!-- 官方渠道 -->
+  <section class="card-base rounded-(--radius-large) p-6 mb-4">
+    <h2 class="text-lg font-bold text-90 mb-1 flex items-center gap-2">
+      <span aria-hidden="true">🔗</span> 官方渠道直达
+    </h2>
+    <p class="text-sm text-75 mb-4">
+      寻亲、报警、核实信息，请认准下面这些官方渠道；任何要求转账、发红包的「内部渠道」都是诈骗。
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {
+        sources.map((source) => (
+          <a
+            class="group block rounded-xl border border-(--line-divider) bg-(--btn-regular-bg)/40 p-4 no-underline transition-all hover:-translate-y-0.5 hover:border-(--primary)/50"
+            href={source.url}
+            target={source.url.startsWith("tel:") ? undefined : "_blank"}
+            rel="noopener noreferrer"
+          >
+            <div class="font-semibold text-90 flex items-center justify-between gap-2">
+              <span>{source.name}</span>
+              <span class="text-(--primary) transition-transform group-hover:translate-x-0.5">
+                →
+              </span>
+            </div>
+            {source.description && (
+              <p class="mt-1 text-xs leading-relaxed text-75">{source.description}</p>
+            )}
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- 协查信息列表（运行时从 JSON 拉取，支持实时更新） -->
+  <section class="card-base rounded-(--radius-large) p-6 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+      <h2 class="text-lg font-bold text-90 flex items-center gap-2">
+        <span aria-hidden="true">📮</span> 协查信息
+      </h2>
+      <span
+        id="aid-page-live"
+        class="text-xs px-2 py-1 rounded-full bg-(--primary)/10 text-(--primary)"
+      >
+        同步中…
+      </span>
+    </div>
+    <p class="text-sm text-75 mb-4">
+      以下信息只保留文字要点，照片、海报与详情请点「查看官方详情」前往官方页面；
+      如信息已更新或孩子已回家，请以官方发布为准。
+    </p>
+
+    <div id="aid-page-list" class="flex flex-col gap-3">
+      <div class="text-sm text-75 animate-pulse">正在同步官方公益信息…</div>
+    </div>
+
+    <div
+      id="aid-page-empty"
+      class="hidden rounded-xl border border-dashed border-(--line-divider) p-6 text-center"
+    >
+      <div class="text-3xl mb-2" aria-hidden="true">🌱</div>
+      <p class="text-sm text-90 font-medium mb-1">暂时没有新的协查信息</p>
+      <p class="text-xs text-75">
+        这说明最近没有需要紧急扩散的公开协查，愿每个孩子都平安在家。
+      </p>
+      <div class="mt-3 flex flex-wrap justify-center gap-2">
+        {
+          sources.slice(0, 2).map((source) => (
+            <a
+              class="btn-regular rounded-lg px-3 py-1.5 text-xs font-medium"
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              前往{source.name}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <p id="aid-page-notice" class="mt-4 text-xs text-75 leading-relaxed"></p>
+  </section>
+
+  <!-- 如何正确帮助 -->
+  <section class="card-base rounded-(--radius-large) p-6 mb-4">
+    <h2 class="text-lg font-bold text-90 mb-4 flex items-center gap-2">
+      <span aria-hidden="true">🤝</span> 如何正确帮助
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {
+        [
+          {
+            emoji: "☎️",
+            title: "先报警，再扩散",
+            text: "发现走失、被拐儿童或可疑线索，第一时间拨打 110，由警方核实并发布，别自行带走孩子。",
+          },
+          {
+            emoji: "📝",
+            title: "只转发「官方原文」",
+            text: "转发时保留官方来源链接与发布日期，不改编、不添油加醋，也不要把孩子的照片二次加工。",
+          },
+          {
+            emoji: "🛡️",
+            title: "保护隐私与防骗",
+            text: "不公开孩子的实时位置与证件信息；任何「交钱就能找到人」的说法都是诈骗。",
+          },
+        ].map((step, index) => (
+          <div class="rounded-xl border border-(--line-divider) bg-(--btn-regular-bg)/30 p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl" aria-hidden="true">{step.emoji}</span>
+              <span class="text-xs font-bold text-(--primary)">STEP {index + 1}</span>
+            </div>
+            <p class="font-semibold text-90 mb-1 text-sm">{step.title}</p>
+            <p class="text-xs leading-relaxed text-75">{step.text}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- 合规 / 免责说明 -->
+  <section class="card-base rounded-(--radius-large) p-6">
+    <h2 class="text-lg font-bold text-90 mb-3 flex items-center gap-2">
+      <span aria-hidden="true">📄</span> 关于版权与隐私
+    </h2>
+    <ul class="space-y-2 text-xs leading-relaxed text-75 list-none pl-0">
+      <li>· 本页仅转载官方平台已公开发布的寻亲<strong>文字要点</strong>（姓名、性别、出生年、走失时间地点等事实信息），不转载照片、海报与原文排版。</li>
+      <li>· 每条信息都保留官方来源链接，详情、照片与最新进展请以官方页面为准；如权利人认为有不妥，可联系我们立即删除或更正。</li>
+      <li>· 数据文件 <code class="px-1 py-0.5 rounded bg-(--btn-regular-bg)">public/data/aid/missing-children.json</code> 独立维护，支持定时同步与热更新，页面每 5 分钟自动刷新一次。</li>
+      <li>· 本站不收集、不存储任何寻亲相关的个人信息，也不会把信息用于商业用途。</li>
+    </ul>
+  </section>
+</MainGridLayout>
+
+<script is:inline define:vars={{ DATA_URL: dataUrl }}>
+  (function () {
+    var list = document.getElementById("aid-page-list");
+    var empty = document.getElementById("aid-page-empty");
+    var live = document.getElementById("aid-page-live");
+    var notice = document.getElementById("aid-page-notice");
+    if (!list) return;
+
+    function str(v) {
+      return typeof v === "string" ? v : "";
+    }
+
+    function ago(iso) {
+      var t = Date.parse(iso || "");
+      if (isNaN(t)) return "官方信息";
+      var m = Math.floor(Math.max(0, Date.now() - t) / 60000);
+      if (m < 1) return "刚刚同步";
+      if (m < 60) return m + " 分钟前同步";
+      var h = Math.floor(m / 60);
+      if (h < 24) return h + " 小时前同步";
+      return Math.floor(h / 24) + " 天前同步";
+    }
+
+    function el(tag, className, text) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text) node.textContent = text;
+      return node;
+    }
+
+    function card(e) {
+      var wrap = el(
+        "article",
+        "rounded-xl border border-(--line-divider) bg-(--btn-regular-bg)/25 p-4 transition-colors hover:border-(--primary)/50",
+      );
+      var head = el("div", "flex flex-wrap items-center gap-2 mb-1.5");
+      head.appendChild(
+        el(
+          "span",
+          "text-lg",
+          str(e.gender) === "女" ? "👧" : str(e.gender) === "男" ? "👦" : "🧸",
+        ),
+      );
+      head.appendChild(el("h3", "font-bold text-90 text-sm", str(e.name) || "未公开姓名"));
+      if (str(e.missingDate)) {
+        head.appendChild(
+          el(
+            "span",
+            "text-[0.68rem] px-2 py-0.5 rounded-full bg-(--primary)/10 text-(--primary)",
+            str(e.missingDate) + " 走失",
+          ),
+        );
+      }
+      wrap.appendChild(head);
+
+      var bits = [];
+      if (str(e.gender)) bits.push(str(e.gender));
+      if (e.birthYear) bits.push(e.birthYear + " 年出生");
+      if (str(e.missingPlace)) bits.push(str(e.missingPlace));
+      if (bits.length) {
+        wrap.appendChild(el("p", "text-xs text-75 mb-1", bits.join(" · ")));
+      }
+      if (str(e.feature)) {
+        wrap.appendChild(el("p", "text-xs leading-relaxed text-75", str(e.feature)));
+      }
+
+      var foot = el("div", "flex flex-wrap items-center justify-between gap-2 mt-2.5");
+      foot.appendChild(
+        el("span", "text-[0.68rem] text-75", "来源：" + (str(e.source) || "官方平台") + " · 仅文字转载"),
+      );
+      var link = el("a", "btn-regular rounded-lg px-3 py-1 text-xs font-medium no-underline", "查看官方详情 →");
+      link.href = str(e.sourceUrl) || "https://www.baobeihuijia.com/";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      foot.appendChild(link);
+      wrap.appendChild(foot);
+      return wrap;
+    }
+
+    function render(d) {
+      var entries = d && Array.isArray(d.entries) ? d.entries : [];
+      entries = entries.filter(function (e) {
+        return e && (str(e.name) || str(e.sourceUrl));
+      });
+      entries.sort(function (a, b) {
+        return String(str(b.missingDate)).localeCompare(String(str(a.missingDate)));
+      });
+      list.textContent = "";
+      if (!entries.length) {
+        list.style.display = "none";
+        empty.classList.remove("hidden");
+      } else {
+        list.style.display = "";
+        empty.classList.add("hidden");
+        entries.forEach(function (e) {
+          list.appendChild(card(e));
+        });
+      }
+      if (notice) {
+        notice.textContent =
+          str(d && d.notice) ||
+          "本页仅转载官方已公开的寻亲文字要点，不转载任何照片；如信息已更新或孩子已回家，请以官方发布为准。";
+      }
+      live.textContent = ago(d && d.updatedAt);
+      if (d && d.updatedAt) live.title = "数据更新时间：" + d.updatedAt;
+    }
+
+    function load() {
+      fetch(DATA_URL + (DATA_URL.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now(), {
+        cache: "no-store",
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(render)
+        .catch(function () {
+          live.textContent = "离线 · 请稍后重试";
+        });
+    }
+
+    load();
+    setInterval(load, 5 * 60000);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) load();
+    });
+  })();
+</script>
+
+

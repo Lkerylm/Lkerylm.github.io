@@ -10,52 +10,91 @@ export const prerender = true;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>社区文章 - 我的动漫小屋</title>
-  <AnimeHeadMeta />
+  <AnimeHeadMeta title="社区文章" description="来自站内小伙伴的投稿：追番笔记、动画杂谈与日常碎片，一起在二次元小屋里冒泡吧。" />
   <script is:inline src="/firefly-api.js"></script>
   <style is:global>
     * { box-sizing: border-box; }
     body {
       margin: 0; min-height: 100vh;
-      background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
+      background:
+        radial-gradient(70% 50% at 12% 8%, rgba(255, 199, 224, 0.55), transparent 60%),
+        radial-gradient(60% 50% at 88% 92%, rgba(205, 216, 255, 0.5), transparent 60%),
+        linear-gradient(135deg, #fff7fb 0%, #f7f4ff 55%, #f2fbff 100%);
       font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
-      color: #fff; padding: 40px 20px;
+      color: #4a2b3a; padding: 40px 20px 64px;
     }
-    .container { max-width: 800px; margin: 0 auto; }
-    h1 { margin: 0 0 8px; font-size: 26px; }
-    .sub { color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 28px; }
+    .container { max-width: 820px; margin: 0 auto; }
+    .hero {
+      text-align: center; margin-bottom: 26px;
+    }
+    .hero-emoji { font-size: 40px; display: block; margin-bottom: 6px; }
+    h1 {
+      margin: 0 0 8px; font-size: 28px; font-weight: 800;
+      background: linear-gradient(120deg, #ff7ab6, #b18cff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .sub { color: #9a7d8c; font-size: 13px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+    .chip {
+      font-size: 11px; padding: 5px 12px; border-radius: 99px;
+      color: #b0316c; background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(255, 154, 200, 0.45);
+    }
     .post-list { display: flex; flex-direction: column; gap: 12px; }
     .post-item {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 18px 22px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 154, 200, 0.28);
+      border-radius: 16px;
+      padding: 16px 20px;
       display: block;
       text-decoration: none;
       color: inherit;
-      transition: all 0.2s;
+      box-shadow: 0 10px 24px -20px rgba(255, 120, 180, 0.9);
+      transition: all 0.22s ease;
     }
     .post-item:hover {
-      background: rgba(255,255,255,0.07);
-      transform: translateY(-1px);
-      border-color: rgba(255,154,200,0.3);
+      transform: translateY(-2px);
+      border-color: rgba(255, 122, 182, 0.6);
+      box-shadow: 0 16px 30px -20px rgba(255, 120, 180, 1);
     }
-    .post-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
-    .post-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
-    .empty { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
-    .links { margin-top: 32px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.5); }
-    .links a { color: #ff9ac8; text-decoration: none; margin: 0 12px; }
+    .post-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .post-meta { font-size: 12px; color: #a3909b; }
+    .empty { text-align: center; padding: 56px 20px; color: #a3909b; font-size: 14px; }
+    .empty .face { font-size: 34px; display: block; margin-bottom: 10px; }
+    .links {
+      margin-top: 28px; text-align: center; font-size: 13px;
+      color: #a3909b; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    }
+    .links a {
+      color: #b0316c; text-decoration: none;
+      padding: 6px 14px; border-radius: 99px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(255, 154, 200, 0.35);
+      transition: all 0.2s ease;
+    }
+    .links a:hover { background: #fff; transform: translateY(-1px); }
   </style>
 </head>
 <body>
   <AnimeBackdrop />
   <div class="container">
-    <h1>社区文章</h1>
-    <div class="sub">来自用户的投稿</div>
+    <header class="hero">
+      <span class="hero-emoji" aria-hidden="true">🫧</span>
+      <h1>社区文章</h1>
+      <p class="sub">来自站内小伙伴的投稿，一起在二次元小屋里冒个泡～</p>
+      <div class="chips">
+        <span class="chip">追番笔记</span>
+        <span class="chip">动画杂谈</span>
+        <span class="chip">日常碎片</span>
+        <span class="chip">欢迎投稿</span>
+      </div>
+    </header>
     <div id="list" class="empty">加载中…</div>
     <div class="links">
-      <a href="/">首页</a>
-      <a href="/dashboard/">用户中心</a>
-      <a href="/dashboard/new/">写文章</a>
+      <a href="/">🏠 回首页</a>
+      <a href="/dashboard/">🐱 用户中心</a>
+      <a href="/dashboard/new/">✍️ 写文章</a>
+      <a href="/aid/">🧸 公益寻亲</a>
     </div>
   </div>
 
@@ -70,7 +109,7 @@ export const prerender = true;
       const list = document.getElementById('list');
 
       if (!data.ok || !data.posts || data.posts.length === 0) {
-        list.textContent = '还没有公开的文章';
+        list.innerHTML = '<span class="face">🌱</span>还没有公开的文章，来写下第一篇吧～';
         return;
       }
 

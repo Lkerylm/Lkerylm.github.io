@@ -1,0 +1,630 @@
+---
+/**
+ * 公益寻亲 · 浮动卡片（全站）
+ *
+ * 需求对应：
+ * 1. 「可以手动关闭」     → 右上角 × ，关闭状态存 localStorage（rememberDays 天后自动恢复）；
+ *                           关掉后右下角留一个 🧸 小胶囊，点一下就能重新打开；
+ * 2. 「点击会跳转此链接」  → 点击卡片正文（文字区域）直接打开官方公益链接（新标签页）；
+ * 3. 「实时更新」         → 运行时拉取 /data/aid/missing-children.json，默认每 5 分钟刷新一次，
+ *                           切回标签页 / 网络恢复时也会立即补拉，并显示「x 分钟前同步」；
+ * 4. 「不侵权」           → 只展示官方已公开的文字要点，不转载照片、海报、原文；
+ *                           每条都带官方来源链接，底部明确「以官方发布为准」。
+ *
+ * 数据格式见 public/data/aid/missing-children.json，配置见 src/config/aidConfig.ts。
+ */
+import { aidConfig } from "@/config";
+
+const config = aidConfig;
+---
+
+{
+  config.enable && (
+    <div
+      id="aid-root"
+      class:list={["aid-root", `aid-root-${config.position}`]}
+      data-data-url={config.dataUrl}
+      data-portal={config.portalUrl}
+      data-rotate={config.rotateSeconds}
+      data-refresh={config.refreshMinutes}
+      data-remember={config.rememberDays}
+      aria-live="polite"
+    >
+      <aside id="aid-card" class="aid-card" aria-label={config.title}>
+        <div class="aid-top">
+          <span class="aid-badge">🧸 {config.title}</span>
+          <span id="aid-live" class="aid-live">
+            同步中…
+          </span>
+          {config.closeable && (
+            <button
+              id="aid-close"
+              type="button"
+              class="aid-close"
+              aria-label={`关闭${config.title}卡片`}
+              title="关闭（之后可在右下角 🧸 重新打开）"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        <a
+          id="aid-main"
+          class="aid-main"
+          href={config.portalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="点击前往官方公益平台"
+        >
+          <span id="aid-emoji" class="aid-emoji" aria-hidden="true">
+            🧸
+          </span>
+          <span class="aid-body">
+            <strong id="aid-title" class="aid-title">
+              {config.subtitle}
+            </strong>
+            <span id="aid-text" class="aid-text">
+              正在同步官方公益信息…
+            </span>
+          </span>
+          <span class="aid-go" aria-hidden="true">
+            →
+          </span>
+        </a>
+
+        <div class="aid-foot">
+          <a class="aid-more" href="/aid/">
+            如何正确帮助
+          </a>
+          <span id="aid-src" class="aid-src">
+            以官方发布为准
+          </span>
+        </div>
+      </aside>
+
+      <button
+        id="aid-pill"
+        type="button"
+        class="aid-pill is-hidden"
+        aria-label={`打开${config.title}卡片`}
+        title="公益寻亲"
+      >
+        🧸<span class="aid-pill-text">寻亲</span>
+      </button>
+    </div>
+  )
+}
+
+<style>
+  .aid-root {
+    position: fixed;
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none;
+    right: 1rem;
+    bottom: 11.5rem;
+    max-width: min(21rem, calc(100vw - 2rem));
+  }
+
+  .aid-root-bottom-left {
+    right: auto;
+    left: 1rem;
+    align-items: flex-start;
+  }
+
+  .aid-card {
+    pointer-events: auto;
+    width: 21rem;
+    max-width: 100%;
+    border-radius: 1.15rem;
+    padding: 0.7rem 0.8rem 0.6rem;
+    background:
+      linear-gradient(150deg, rgba(255, 255, 255, 0.94), rgba(255, 246, 251, 0.9)),
+      radial-gradient(120% 90% at 0% 0%, rgba(255, 154, 200, 0.35), transparent 60%);
+    border: 1px solid rgba(255, 154, 200, 0.45);
+    box-shadow:
+      0 12px 30px -12px rgba(255, 120, 180, 0.55),
+      0 2px 10px -4px rgba(30, 20, 40, 0.18);
+    backdrop-filter: blur(10px);
+    transition:
+      transform 0.25s ease,
+      opacity 0.25s ease,
+      box-shadow 0.25s ease;
+    animation: aid-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .aid-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 18px 36px -14px rgba(255, 120, 180, 0.62),
+      0 3px 12px -4px rgba(30, 20, 40, 0.2);
+  }
+
+  .aid-top {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .aid-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #b0316c;
+    white-space: nowrap;
+  }
+
+  .aid-live {
+    font-size: 0.62rem;
+    color: #b78f9f;
+    padding: 0.05rem 0.4rem;
+    border-radius: 99px;
+    background: rgba(255, 154, 200, 0.16);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .aid-close {
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.06);
+    color: #8a6f7a;
+    font-size: 0.85rem;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .aid-close:hover {
+    background: rgba(255, 90, 150, 0.16);
+    color: #c2306d;
+    transform: rotate(90deg);
+  }
+
+  .aid-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    text-decoration: none;
+    color: inherit;
+    padding: 0.4rem 0.45rem;
+    border-radius: 0.85rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px dashed rgba(255, 154, 200, 0.5);
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .aid-main:hover {
+    background: rgba(255, 244, 250, 0.95);
+    border-color: rgba(255, 120, 180, 0.75);
+  }
+
+  .aid-main:focus-visible {
+    outline: 2px solid #ff8dc0;
+    outline-offset: 2px;
+  }
+
+  .aid-emoji {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    filter: drop-shadow(0 2px 4px rgba(255, 140, 190, 0.45));
+    animation: aid-bob 3.2s ease-in-out infinite;
+  }
+
+  .aid-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .aid-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #7d2b52;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .aid-text {
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: #7a6470;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .aid-go {
+    align-self: center;
+    font-size: 0.8rem;
+    color: #e0709f;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .aid-main:hover .aid-go {
+    transform: translateX(3px);
+  }
+
+  .aid-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+    padding: 0 0.15rem;
+  }
+
+  .aid-more {
+    font-size: 0.65rem;
+    color: #d1518f;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(209, 81, 143, 0.45);
+  }
+
+  .aid-more:hover {
+    color: #b0316c;
+  }
+
+  .aid-src {
+    font-size: 0.6rem;
+    color: #a998a2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .aid-pill {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.6rem 0.4rem 0.5rem;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 154, 200, 0.5);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 20px -10px rgba(255, 120, 180, 0.7);
+    cursor: pointer;
+    font-size: 0.72rem;
+    color: #b0316c;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .aid-pill:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 24px -10px rgba(255, 120, 180, 0.85);
+  }
+
+  .aid-pill-text {
+    font-weight: 700;
+  }
+
+  .is-hidden {
+    display: none !important;
+  }
+
+  @keyframes aid-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes aid-bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-3deg);
+    }
+    50% {
+      transform: translateY(-3px) rotate(3deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .aid-root {
+      right: 0.75rem;
+      bottom: 12.5rem;
+      max-width: calc(100vw - 1.5rem);
+    }
+
+    .aid-root-bottom-left {
+      left: 0.75rem;
+    }
+
+    .aid-card {
+      width: 17.5rem;
+      padding: 0.6rem 0.65rem 0.55rem;
+    }
+
+    .aid-emoji {
+      font-size: 1.3rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aid-card,
+    .aid-emoji,
+    .aid-pill {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* 深色模式 */
+  :global(.dark) .aid-card {
+    background:
+      linear-gradient(150deg, rgba(38, 28, 36, 0.95), rgba(28, 20, 28, 0.92)),
+      radial-gradient(120% 90% at 0% 0%, rgba(255, 154, 200, 0.22), transparent 60%);
+    border-color: rgba(255, 154, 200, 0.3);
+  }
+
+  :global(.dark) .aid-badge,
+  :global(.dark) .aid-title {
+    color: #ffb8d8;
+  }
+
+  :global(.dark) .aid-text {
+    color: #d3bcc7;
+  }
+
+  :global(.dark) .aid-live {
+    color: #e0b6c7;
+    background: rgba(255, 154, 200, 0.14);
+  }
+
+  :global(.dark) .aid-main {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 154, 200, 0.28);
+  }
+
+  :global(.dark) .aid-main:hover {
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  :global(.dark) .aid-close {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2c6d2;
+  }
+
+  :global(.dark) .aid-pill {
+    background: rgba(40, 30, 38, 0.94);
+    color: #ffb8d8;
+  }
+
+  :global(.dark) .aid-src {
+    color: #a48f9b;
+  }
+</style>
+
+<script is:inline define:vars={{ portalUrl: config.portalUrl }}>
+  (function () {
+    var root = document.getElementById("aid-root");
+    if (!root || root.dataset.aidInit === "1") return;
+    root.dataset.aidInit = "1";
+
+    var card = document.getElementById("aid-card");
+    var pill = document.getElementById("aid-pill");
+    var closeBtn = document.getElementById("aid-close");
+    var main = document.getElementById("aid-main");
+    var emojiEl = document.getElementById("aid-emoji");
+    var titleEl = document.getElementById("aid-title");
+    var textEl = document.getElementById("aid-text");
+    var liveEl = document.getElementById("aid-live");
+    var srcEl = document.getElementById("aid-src");
+
+    var dataUrl = root.dataset.dataUrl || "/data/aid/missing-children.json";
+    var fallbackPortal = root.dataset.portal || portalUrl;
+    var rotateMs = Math.max(3, Number(root.dataset.rotate) || 8) * 1000;
+    var refreshMs = Math.max(1, Number(root.dataset.refresh) || 5) * 60000;
+    var rememberDays = Math.max(1, Number(root.dataset.remember) || 7);
+    var CLOSE_KEY = "aid_closed_until";
+
+    var state = {
+      entries: [],
+      tips: [],
+      updatedAt: null,
+      idx: 0,
+      rotateTimer: null,
+      rendered: false,
+    };
+
+    function str(v) {
+      return typeof v === "string" ? v : "";
+    }
+
+    function fmtAgo(iso) {
+      var t = Date.parse(iso || "");
+      if (isNaN(t)) return "官方信息 · 以发布为准";
+      var diff = Math.max(0, Date.now() - t);
+      var m = Math.floor(diff / 60000);
+      if (m < 1) return "刚刚同步";
+      if (m < 60) return m + " 分钟前同步";
+      var h = Math.floor(m / 60);
+      if (h < 24) return h + " 小时前同步";
+      return Math.floor(h / 24) + " 天前同步";
+    }
+
+    function entryLine(e) {
+      var bits = [];
+      if (str(e.gender)) bits.push(e.gender);
+      if (e.birthYear) bits.push(e.birthYear + " 年生");
+      if (str(e.missingDate)) bits.push(str(e.missingDate) + " 走失");
+      if (str(e.missingPlace)) bits.push(str(e.missingPlace));
+      return bits.join(" · ");
+    }
+
+    function render() {
+      state.rendered = true;
+      if (state.entries.length > 0) {
+        var i = state.idx % state.entries.length;
+        var e = state.entries[i];
+        var line = entryLine(e);
+        var feature = str(e.feature);
+        var gender = str(e.gender);
+        titleEl.textContent =
+          (str(e.name) || "未公开姓名") +
+          (gender === "女" ? " · 寻找她" : gender === "男" ? " · 寻找他" : "");
+        textEl.textContent = [line, feature].filter(Boolean).join("。");
+        emojiEl.textContent = gender === "女" ? "👧" : gender === "男" ? "👦" : "🧸";
+        main.href = str(e.sourceUrl) || fallbackPortal;
+        main.title = "点击查看官方详情（" + (str(e.source) || "官方平台") + "）";
+        srcEl.textContent =
+          "来源：" +
+          (str(e.source) || "官方平台") +
+          " · " +
+          (i + 1) +
+          "/" +
+          state.entries.length;
+      } else {
+        var tips = state.tips.length
+          ? state.tips
+          : ["发现走失儿童请立即拨打 110，并记住孩子当天的衣着与特征。"];
+        emojiEl.textContent = "🧸";
+        titleEl.textContent = "公益提示";
+        textEl.textContent = tips[state.idx % tips.length];
+        main.href = fallbackPortal;
+        main.title = "点击前往官方公益平台";
+        srcEl.textContent = "点击卡片直达官方公益平台";
+      }
+      restartRotate();
+    }
+
+    function rotateCount() {
+      if (state.entries.length > 0) return state.entries.length;
+      return Math.max(1, state.tips.length);
+    }
+
+    function restartRotate() {
+      if (state.rotateTimer) {
+        clearInterval(state.rotateTimer);
+        state.rotateTimer = null;
+      }
+      if (rotateCount() <= 1) return;
+      state.rotateTimer = setInterval(function () {
+        if (document.hidden) return;
+        state.idx = (state.idx + 1) % rotateCount();
+        render();
+      }, rotateMs);
+    }
+
+    function setLive(text, title) {
+      liveEl.textContent = text;
+      if (title) liveEl.title = title;
+    }
+
+    function fetchData(silent) {
+      var url = dataUrl + (dataUrl.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now();
+      fetch(url, { cache: "no-store" })
+        .then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(function (d) {
+          var list = d && Array.isArray(d.entries) ? d.entries : [];
+          state.entries = list.filter(function (e) {
+            return e && (str(e.name) || str(e.sourceUrl));
+          });
+          state.tips =
+            d && Array.isArray(d.tips)
+              ? d.tips.filter(function (t) {
+                  return typeof t === "string" && t.trim();
+                })
+              : [];
+          state.updatedAt = d && d.updatedAt ? d.updatedAt : null;
+          state.idx = 0;
+          setLive(
+            fmtAgo(state.updatedAt),
+            state.updatedAt ? "数据更新时间：" + state.updatedAt : "数据更新时间未知",
+          );
+          render();
+        })
+        .catch(function () {
+          if (!state.rendered) render();
+          setLive("离线 · 点击直达官方平台", "网络异常，展示内置内容");
+        });
+    }
+
+    function applyClosed(closed) {
+      card.classList.toggle("is-hidden", closed);
+      pill.classList.toggle("is-hidden", !closed);
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        try {
+          localStorage.setItem(
+            CLOSE_KEY,
+            String(Date.now() + rememberDays * 86400000),
+          );
+        } catch (e) {
+          /* 隐私模式下忽略 */
+        }
+        applyClosed(true);
+      });
+    }
+
+    pill.addEventListener("click", function () {
+      try {
+        localStorage.removeItem(CLOSE_KEY);
+      } catch (e) {
+        /* ignore */
+      }
+      applyClosed(false);
+      if (closeBtn) closeBtn.focus();
+    });
+
+    var closedUntil = 0;
+    try {
+      closedUntil = Number(localStorage.getItem(CLOSE_KEY) || 0);
+    } catch (e) {
+      closedUntil = 0;
+    }
+    applyClosed(closedUntil > Date.now());
+
+    fetchData(false);
+    setInterval(function () {
+      if (state.updatedAt) setLive(fmtAgo(state.updatedAt));
+    }, 60000);
+    setInterval(function () {
+      if (!document.hidden) fetchData(true);
+    }, refreshMs);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) fetchData(true);
+    });
+    window.addEventListener("online", function () {
+      fetchData(true);
+    });
+  })();
+</script>
+
+
+
+

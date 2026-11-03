@@ -1,4 +1,5 @@
 ---
+import CutePageHero from "@components/common/CutePageHero.astro";
 import { Icon } from "astro-icon/components";
 import BangumiSection from "@/components/pages/bangumi/BangumiSection.astro";
 import TabNav from "@/components/pages/bangumi/TabNav.astro";
@@ -209,22 +210,13 @@ const activeTab = tabs[0]?.id || "anime";
     <div class="card-base z-10 px-9 py-6 relative w-full">
         <!-- 页面标题 -->
         <div class="relative w-full mb-8">
-            <div class="mb-6">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="h-8 w-8 rounded-lg bg-(--primary) flex items-center justify-center text-white dark:text-black/70">
-                        <Icon name="mingcute:play-circle-fill" class="text-[1.5rem]"></Icon>
-                    </div>
-                    <div class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-                        {i18n(I18nKey.bangumi)}
-                    </div>
-                </div>
-                <p class="text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                    {i18n(I18nKey.bangumiSubtitle)}
-                </p>
-                <p class="text-xs text-neutral-500 dark:text-neutral-500 mt-2">
-                    {i18n(I18nKey.bangumiLastUpdated)} {buildTime}
-                </p>
-            </div>
+            <CutePageHero
+                emoji="📺"
+                title={i18n(I18nKey.bangumi)}
+                subtitle={i18n(I18nKey.bangumiSubtitle)}
+                chips={["追番进度", "书影音游", `更新于 ${buildTime}`]}
+                tone="mint"
+            />
 
       <!-- Tab 导航和内容 -->
       {tabs.length > 0 ? (

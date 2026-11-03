@@ -51,3 +51,18 @@ jobs:
           branch: pages # 部署到pages分支
           folder: dist # Astro默认构建输出目录
           clean: true # 清理目标分支中的旧文件
+
+      # 部署完成后主动通知 Bing / IndexNow（Edge 的默认搜索引擎就是 Bing）
+      # 这样新文章、/aid/ 公益寻亲页能更快被收录，在 Edge 地址栏搜站名更容易命中
+      - name: Notify Bing IndexNow
+        if: ${{ vars.SITE_URL != '' }}
+        run: pnpm indexnow
+        continue-on-error: true
+
+      # 顺手把站点地图再推一次（Bing 官方推荐的 sitemap 提交方式，可选）
+      - name: Ping sitemap to Bing
+        if: ${{ vars.SITE_URL != '' }}
+        run: |
+          curl -sS -m 30 "https://www.bing.com/ping?sitemap=${SITE_URL}/sitemap-index.xml" || true
+        continue-on-error: true
+

@@ -1,74 +1,218 @@
 ---
 import { Icon } from "astro-icon/components";
-import I18nKey from "@/i18n/i18nKey";
-import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { url } from "@/utils/url-utils";
+
+/**
+ * 404 · 走丢的小页面
+ * 粉紫渐变 + 漂浮小图标 + 软软的语气，
+ * 同时给「回首页 / 全站搜索 / 公益寻亲」三个出口。
+ */
 ---
 
-<MainGridLayout title={i18n(I18nKey.notFound)} description={i18n(I18nKey.notFoundDescription)}>
-    <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-96">
-        <div class="card-base z-10 px-9 py-12 relative w-full flex flex-col items-center justify-center text-center">
-            <!-- 404 大号数字 -->
-            <div class="text-8xl md:text-9xl font-bold text-(--primary) opacity-20 mb-4">
-                {i18n(I18nKey.notFound)}
-            </div>
-            
-            <!-- 404 图标 -->
-            <div class="mb-6">
-                <Icon name="mingcute:warning-fill" class="text-6xl text-(--primary)" />
-            </div>
-            
-            <!-- 标题 -->
-            <div class="text-3xl md:text-4xl font-bold mb-4 text-90">
-                {i18n(I18nKey.notFoundTitle)}
-            </div>
-            
-            <!-- 描述 -->
-            <p class="text-lg text-75 mb-8 max-w-md">
-                {i18n(I18nKey.notFoundDescription)}
-            </p>
-            
-            <!-- 返回首页按钮 -->
-            <a 
-                href={url("/")}
-                class="inline-flex items-center gap-2 px-6 py-3 bg-(--primary) text-white rounded-(--radius-large) hover:bg-(--btn-content) transition-colors duration-200 font-medium"
-            >
-                <Icon name="mingcute:home-5-fill" class="text-xl" />
-                {i18n(I18nKey.backToHome)}
-            </a>
-            
-            <!-- 装饰性元素 -->
-            <div class="absolute top-4 left-4 opacity-10">
-                <Icon name="mingcute:sob-fill" class="text-4xl text-(--primary)" />
-            </div>
-            <div class="absolute bottom-4 right-4 opacity-10">
-                <Icon name="mingcute:search-line" class="text-4xl text-(--primary)" />
-            </div>
-        </div>
+<MainGridLayout
+  title="页面走丢了"
+  description="呜…这个页面好像出去玩还没回来。回首页、搜一搜，或者去看看公益寻亲吧。"
+>
+  <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-96">
+    <div class="not-found-card card-base z-10 px-6 md:px-10 py-12 relative w-full flex flex-col items-center justify-center text-center">
+      <span class="nf-float nf-float-a" aria-hidden="true">🍥</span>
+      <span class="nf-float nf-float-b" aria-hidden="true">🎀</span>
+      <span class="nf-float nf-float-c" aria-hidden="true">✨</span>
+      <span class="nf-float nf-float-d" aria-hidden="true">🌸</span>
+
+      <div class="nf-num" aria-hidden="true">4<span class="nf-zero">0</span>4</div>
+
+      <h1 class="nf-title">呜…这个页面走丢了</h1>
+      <p class="nf-desc">
+        它可能被小狐狸叼去森林里玩了，也可能换了新名字。<br />
+        别担心，我们还有这些地方可以去～
+      </p>
+
+      <div class="nf-actions">
+        <a href={url("/")} class="nf-btn nf-btn-primary">
+          <Icon name="mingcute:home-5-fill" class="text-lg" />
+          回小屋首页
+        </a>
+        <a href={url("/search/")} class="nf-btn">
+          <Icon name="mingcute:search-3-line" class="text-lg" />
+          全站搜一搜
+        </a>
+        <a href={url("/aid/")} class="nf-btn nf-btn-aid">
+          <Icon name="mingcute:heart-fill" class="text-lg" />
+          公益寻亲
+        </a>
+      </div>
+
+      <p class="nf-hint">小提示：在 Edge 地址栏输入站名就能直接找到我们哦～</p>
     </div>
+  </div>
 </MainGridLayout>
 
-<style is:global>
-    /* 添加一些动画效果 */
-    .card-base {
-        animation: fadeInUp 0.6s ease-out;
+<style>
+  .not-found-card {
+    animation: nf-in 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    background-image:
+      radial-gradient(80% 60% at 15% 10%, rgba(255, 199, 224, 0.55), transparent 60%),
+      radial-gradient(70% 60% at 90% 90%, rgba(205, 216, 255, 0.45), transparent 60%);
+  }
+
+  .nf-num {
+    font-size: clamp(4.5rem, 14vw, 8rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    color: rgba(255, 154, 200, 0.28);
+    margin-bottom: 0.25rem;
+    user-select: none;
+  }
+
+  .nf-zero {
+    display: inline-block;
+    color: rgba(255, 154, 200, 0.65);
+    animation: nf-bob 3s ease-in-out infinite;
+  }
+
+  .nf-title {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #7d2b52;
+    margin-bottom: 0.6rem;
+  }
+
+  :global(.dark) .nf-title {
+    color: #ffb8d8;
+  }
+
+  .nf-desc {
+    font-size: 0.95rem;
+    line-height: 1.85;
+    color: #6f5a66;
+    max-width: 30rem;
+  }
+
+  :global(.dark) .nf-desc {
+    color: rgba(235, 220, 230, 0.82);
+  }
+
+  .nf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: 1.4rem 0 1rem;
+  }
+
+  .nf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.1rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #b0316c;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 154, 200, 0.5);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease;
+  }
+
+  .nf-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -12px rgba(255, 120, 180, 0.9);
+    background: #fff;
+  }
+
+  .nf-btn-primary {
+    color: #fff;
+    background: linear-gradient(135deg, #ff8dc0, #ffb37a);
+    border-color: transparent;
+  }
+
+  .nf-btn-aid {
+    color: #8c4323;
+    border-color: rgba(255, 190, 150, 0.7);
+    background: rgba(255, 248, 242, 0.9);
+  }
+
+  .nf-hint {
+    font-size: 0.72rem;
+    color: rgba(150, 130, 140, 0.85);
+  }
+
+  .nf-float {
+    position: absolute;
+    font-size: 1.4rem;
+    opacity: 0.75;
+    animation: nf-float 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .nf-float-a {
+    top: 12%;
+    left: 8%;
+  }
+
+  .nf-float-b {
+    top: 18%;
+    right: 10%;
+    animation-delay: 1.2s;
+  }
+
+  .nf-float-c {
+    bottom: 16%;
+    left: 14%;
+    animation-delay: 2.4s;
+  }
+
+  .nf-float-d {
+    bottom: 12%;
+    right: 12%;
+    animation-delay: 3.1s;
+  }
+
+  @keyframes nf-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
     }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
-    
-    /* 按钮悬停效果 */
-    a:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+  }
+
+  @keyframes nf-bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-4deg);
     }
+    50% {
+      transform: translateY(-8px) rotate(4deg);
+    }
+  }
+
+  @keyframes nf-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-6deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(6deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .not-found-card,
+    .nf-zero,
+    .nf-float {
+      animation: none !important;
+    }
+  }
 </style>
+
+
