@@ -4,7 +4,7 @@
  *
  * 需求对应：
  * 1. 「可以手动关闭」     → 右上角 × ，关闭状态存 localStorage（rememberDays 天后自动恢复）；
- *                           关掉后右下角留一个 🧸 小胶囊，点一下就能重新打开；
+ *                           关掉后左下角留一个 🧸 小胶囊，点一下就能重新打开；
  * 2. 「点击会跳转此链接」  → 点击卡片正文（文字区域）直接打开官方公益链接（新标签页）；
  * 3. 「实时更新」         → 运行时拉取 /data/aid/missing-children.json，默认每 5 分钟刷新一次，
  *                           切回标签页 / 网络恢复时也会立即补拉，并显示「x 分钟前同步」；
@@ -13,6 +13,7 @@
  *
  * 数据格式见 public/data/aid/missing-children.json，配置见 src/config/aidConfig.ts。
  */
+import AidArt from "@/components/common/AidArt.astro";
 import { aidConfig } from "@/config";
 
 const config = aidConfig;
@@ -30,24 +31,55 @@ const config = aidConfig;
       data-remember={config.rememberDays}
       aria-live="polite"
     >
+      {config.sideRail && (
+        <button
+          id="aid-rail"
+          class="aid-rail"
+          type="button"
+          aria-label="公益寻亲：点开查看"
+          title="公益寻亲 · 点开看看"
+        >
+          <span class="aid-rail-emoji" aria-hidden="true">🧸</span>
+          <span class="aid-rail-text">公益寻亲</span>
+        </button>
+      )}
+
       <aside id="aid-card" class="aid-card" aria-label={config.title}>
-        <div class="aid-top">
-          <span class="aid-badge">🧸 {config.title}</span>
-          <span id="aid-live" class="aid-live">
-            同步中…
+        {config.art && (
+          <span class="aid-art aid-art-left" aria-hidden="true">
+            <AidArt kind="girl" />
           </span>
-          {config.closeable && (
-            <button
-              id="aid-close"
-              type="button"
-              class="aid-close"
-              aria-label={`关闭${config.title}卡片`}
-              title="关闭（之后可在右下角 🧸 重新打开）"
-            >
-              ×
-            </button>
-          )}
-        </div>
+        )}
+        <div class="aid-inner">
+          <div class="aid-top">
+            <span class="aid-badge">🧸 {config.title}</span>
+            <span id="aid-live" class="aid-live">
+              同步中…
+            </span>
+            <label class="aid-switch" title="公益卡片开关：关掉后点左下角 🧸 还能打开">
+              <input
+                id="aid-switch"
+                type="checkbox"
+                role="switch"
+                checked
+                aria-label={`${config.title}卡片开关`}
+              />
+              <span class="aid-switch-track" aria-hidden="true">
+                <span class="aid-switch-thumb" />
+              </span>
+            </label>
+            {config.closeable && (
+              <button
+                id="aid-close"
+                type="button"
+                class="aid-close"
+                aria-label={`关闭${config.title}卡片`}
+                title="关闭（之后可在左下角 🧸 重新打开）"
+              >
+                ×
+              </button>
+            )}
+          </div>
 
         <a
           id="aid-main"
@@ -81,6 +113,12 @@ const config = aidConfig;
             以官方发布为准
           </span>
         </div>
+        </div>
+        {config.art && (
+          <span class="aid-art aid-art-right" aria-hidden="true">
+            <AidArt kind="teddy" />
+          </span>
+        )}
       </aside>
 
       <button
@@ -99,14 +137,17 @@ const config = aidConfig;
 <style>
   .aid-root {
     position: fixed;
-    z-index: 1002;
+    /* 必须盖在 Live2D 看板娘（z-index 999999）和左下角那排小胶囊（999996）之上，
+       否则卡片只会露出一角、还点不到 */
+    z-index: 1000003;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 0.5rem;
     pointer-events: none;
-    right: 1rem;
-    bottom: 11.5rem;
+    right: 1.25rem;
+    /* 左下角那排小胶囊（音效 / 壁纸 / 声音 / 看板娘 / BGM）最高约 230px，卡片叠在它们头顶 */
+    bottom: 15.5rem;
     max-width: min(21rem, calc(100vw - 2rem));
   }
 
@@ -351,7 +392,7 @@ const config = aidConfig;
   @media (max-width: 768px) {
     .aid-root {
       right: 0.75rem;
-      bottom: 12.5rem;
+      bottom: 14.5rem;
       max-width: calc(100vw - 1.5rem);
     }
 
@@ -422,6 +463,207 @@ const config = aidConfig;
   :global(.dark) .aid-src {
     color: #a48f9b;
   }
+
+  /* ============================================================
+     两侧小插画 + 开关 + 左侧竖排书签（本次新增）
+     ============================================================ */
+
+  .aid-card {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    width: 24.6rem;
+    padding: 0.7rem 0.55rem 0.6rem;
+  }
+
+  .aid-inner {
+    flex: 1;
+    min-width: 0;
+    padding: 0 0.15rem;
+  }
+
+  .aid-art {
+    flex: none;
+    width: 2.85rem;
+    align-self: center;
+    pointer-events: none;
+    animation: aid-art-float 5.6s ease-in-out infinite;
+  }
+
+  .aid-art-left {
+    transform: rotate(-7deg);
+    margin-right: -0.1rem;
+  }
+
+  .aid-art-right {
+    transform: rotate(7deg);
+    margin-left: -0.1rem;
+    animation-delay: 1.1s;
+  }
+
+  @keyframes aid-art-float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -4px;
+    }
+  }
+
+  .aid-card.aid-repop {
+    animation: aid-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ---- 开 / 关 小开关 ---- */
+  .aid-switch {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.1rem;
+  }
+
+  .aid-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .aid-switch-track {
+    display: block;
+    width: 1.75rem;
+    height: 0.95rem;
+    border-radius: 99px;
+    background: rgba(255, 154, 200, 0.3);
+    border: 1px solid rgba(255, 154, 200, 0.5);
+    position: relative;
+    transition:
+      background 0.22s ease,
+      border-color 0.22s ease;
+  }
+
+  .aid-switch-thumb {
+    position: absolute;
+    top: 0.06rem;
+    left: 0.07rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(160, 60, 110, 0.4);
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .aid-switch input:checked + .aid-switch-track {
+    background: linear-gradient(120deg, #ff8dc0, #c084fc);
+    border-color: rgba(255, 141, 192, 0.85);
+  }
+
+  .aid-switch input:checked + .aid-switch-track .aid-switch-thumb {
+    transform: translateX(0.78rem);
+  }
+
+  .aid-switch input:focus-visible + .aid-switch-track {
+    outline: 2px solid #ff8dc0;
+    outline-offset: 2px;
+  }
+
+  /* ---- 左边缘竖排书签：宽屏才有，点一下打开卡片 ---- */
+  .aid-rail {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 1002;
+    pointer-events: auto;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.6rem 0.32rem 0.7rem;
+    border: 1px solid rgba(255, 154, 200, 0.5);
+    border-left: none;
+    border-radius: 0 0.9rem 0.9rem 0;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 242, 249, 0.92)
+    );
+    box-shadow: 4px 6px 18px -10px rgba(255, 120, 180, 0.8);
+    cursor: pointer;
+    transition:
+      transform 0.22s ease,
+      box-shadow 0.22s ease;
+  }
+
+  .aid-rail:hover {
+    transform: translateX(3px);
+    box-shadow: 6px 8px 22px -10px rgba(255, 120, 180, 0.95);
+  }
+
+  .aid-rail-emoji {
+    font-size: 0.95rem;
+    line-height: 1;
+    animation: aid-bob 3.2s ease-in-out infinite;
+  }
+
+  .aid-rail-text {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #b0316c;
+    letter-spacing: 0.12em;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  :global(.dark) .aid-rail {
+    background: linear-gradient(
+      180deg,
+      rgba(40, 30, 38, 0.96),
+      rgba(28, 20, 28, 0.94)
+    );
+    border-color: rgba(255, 154, 200, 0.3);
+  }
+
+  :global(.dark) .aid-rail-text {
+    color: #ffb8d8;
+  }
+
+  @media (min-width: 1280px) {
+    .aid-rail {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .aid-card {
+      width: 18.5rem;
+    }
+
+    .aid-art {
+      width: 2.15rem;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .aid-art {
+      display: none;
+    }
+
+    .aid-card {
+      width: 17rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aid-art,
+    .aid-rail-emoji {
+      animation: none !important;
+    }
+  }
 </style>
 
 <script is:inline define:vars={{ portalUrl: config.portalUrl }}>
@@ -433,6 +675,8 @@ const config = aidConfig;
     var card = document.getElementById("aid-card");
     var pill = document.getElementById("aid-pill");
     var closeBtn = document.getElementById("aid-close");
+    var switchEl = document.getElementById("aid-switch");
+    var railEl = document.getElementById("aid-rail");
     var main = document.getElementById("aid-main");
     var emojiEl = document.getElementById("aid-emoji");
     var titleEl = document.getElementById("aid-title");
@@ -446,6 +690,7 @@ const config = aidConfig;
     var refreshMs = Math.max(1, Number(root.dataset.refresh) || 5) * 60000;
     var rememberDays = Math.max(1, Number(root.dataset.remember) || 7);
     var CLOSE_KEY = "aid_closed_until";
+    var ENABLE_KEY = "aid_enabled";
 
     var state = {
       entries: [],
@@ -574,40 +819,83 @@ const config = aidConfig;
 
     function applyClosed(closed) {
       card.classList.toggle("is-hidden", closed);
+      if (railEl) railEl.classList.toggle("is-hidden", closed);
       pill.classList.toggle("is-hidden", !closed);
+    }
+
+    /* ---- 开 / 关总开关（localStorage 记住，下次打开网站还是你选的状态） ---- */
+    var enabled = true;
+    var closedUntil = 0;
+    try {
+      var rawEnabled = localStorage.getItem(ENABLE_KEY);
+      enabled = rawEnabled === null ? true : rawEnabled === "1";
+      closedUntil = Number(localStorage.getItem(CLOSE_KEY) || 0);
+    } catch (e) {
+      enabled = true;
+      closedUntil = 0;
+    }
+
+    function syncUI() {
+      var closed = !enabled || closedUntil > Date.now();
+      applyClosed(closed);
+      if (switchEl) switchEl.checked = enabled;
+      pill.setAttribute("aria-pressed", closed ? "false" : "true");
+      pill.title = enabled
+        ? "公益寻亲"
+        : "公益寻亲已经关掉了，点一下重新打开";
+    }
+
+    function setEnabled(next, focus) {
+      enabled = !!next;
+      try {
+        localStorage.setItem(ENABLE_KEY, enabled ? "1" : "0");
+      } catch (e) {
+        /* 隐私模式下忽略 */
+      }
+      if (enabled) {
+        closedUntil = 0;
+        try {
+          localStorage.removeItem(CLOSE_KEY);
+        } catch (e) {
+          /* ignore */
+        }
+        card.classList.remove("aid-repop");
+        void card.offsetWidth;
+        card.classList.add("aid-repop");
+      }
+      syncUI();
+      if (enabled && focus && closeBtn) closeBtn.focus();
+    }
+
+    if (switchEl) {
+      switchEl.addEventListener("change", function () {
+        setEnabled(switchEl.checked, false);
+      });
+    }
+
+    if (railEl) {
+      railEl.addEventListener("click", function () {
+        setEnabled(true, true);
+      });
     }
 
     if (closeBtn) {
       closeBtn.addEventListener("click", function () {
+        closedUntil = Date.now() + rememberDays * 86400000;
         try {
-          localStorage.setItem(
-            CLOSE_KEY,
-            String(Date.now() + rememberDays * 86400000),
-          );
+          localStorage.setItem(CLOSE_KEY, String(closedUntil));
         } catch (e) {
           /* 隐私模式下忽略 */
         }
-        applyClosed(true);
+        syncUI();
       });
     }
 
     pill.addEventListener("click", function () {
-      try {
-        localStorage.removeItem(CLOSE_KEY);
-      } catch (e) {
-        /* ignore */
-      }
-      applyClosed(false);
-      if (closeBtn) closeBtn.focus();
+      setEnabled(true, true);
     });
 
-    var closedUntil = 0;
-    try {
-      closedUntil = Number(localStorage.getItem(CLOSE_KEY) || 0);
-    } catch (e) {
-      closedUntil = 0;
-    }
-    applyClosed(closedUntil > Date.now());
+    syncUI();
 
     fetchData(false);
     setInterval(function () {

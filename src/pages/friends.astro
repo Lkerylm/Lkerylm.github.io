@@ -1,7 +1,7 @@
 ---
 import { getEntry, render } from "astro:content";
 import Comment from "@components/comment/index.astro";
-import CutePageHero from "@components/common/CutePageHero.astro";
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import Markdown from "@components/common/Markdown.astro";
 import { Icon } from "astro-icon/components";
 import {
@@ -49,7 +49,10 @@ const description =
   >
     <div class="card-base z-10 px-9 py-6 relative w-full">
       <!-- 页面标题和描述 -->
-      <CutePageHero
+      <AnimePageHero
+        kicker="FRIENDS · 二次元邻居"
+        video="/welcome.mp4"
+        image="/anime-wallpaper/desktop-18.avif"
         emoji="🫧"
         title={title}
         subtitle={description}
@@ -79,7 +82,7 @@ const description =
         )
       }
 
-      <div class="friends-grid my-4">
+      <div class="friends-grid my-4 anime-reveal-list">
         {
           items.map((item) => (
             <a

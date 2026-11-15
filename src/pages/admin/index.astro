@@ -1,6 +1,7 @@
 ---
 import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
 import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+import "@/styles/anime-console.css";
 export const prerender = true;
 ---
 
@@ -13,21 +14,21 @@ export const prerender = true;
   <AnimeHeadMeta />
   <script is:inline src="/firefly-api.js"></script>
   <style is:global>
-    * { box-sizing: border-box; }
-    body {
+    body.console-admin *{ box-sizing: border-box; }
+    body.console-admin{
       margin: 0; min-height: 100vh;
       background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
       font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
       color: #fff; padding: 32px 20px;
     }
-    .container { max-width: 1000px; margin: 0 auto; }
-    .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-    .head h1 { margin: 0; font-size: 26px; }
-    .head .links a { color: #ff9ac8; text-decoration: none; font-size: 13px; margin-left: 16px; }
-    .head .links a:hover { text-decoration: underline; }
+    body.console-admin .container{ max-width: 1000px; margin: 0 auto; }
+    body.console-admin .head{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    body.console-admin .head h1{ margin: 0; font-size: 26px; }
+    body.console-admin .head .links a{ color: #ff9ac8; text-decoration: none; font-size: 13px; margin-left: 16px; }
+    body.console-admin .head .links a:hover{ text-decoration: underline; }
 
-    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
-    .tab {
+    body.console-admin .tabs{ display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
+    body.console-admin .tab{
       padding: 10px 20px; font-size: 14px;
       background: none; border: none;
       color: rgba(255,255,255,0.6);
@@ -35,11 +36,11 @@ export const prerender = true;
       border-bottom: 2px solid transparent;
       transition: all 0.2s; font-family: inherit;
     }
-    .tab:hover { color: #fff; background: rgba(255,255,255,0.04); }
-    .tab.active { color: #ff9ac8; border-bottom-color: #ff9ac8; }
+    body.console-admin .tab:hover{ color: #fff; background: rgba(255,255,255,0.04); }
+    body.console-admin .tab.active{ color: #ff9ac8; border-bottom-color: #ff9ac8; }
 
-    .panel { display: none; }
-    .panel.active {
+    body.console-admin .panel{ display: none; }
+    body.console-admin .panel.active{
       display: block;
       background: rgba(10, 12, 22, 0.58);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -49,22 +50,22 @@ export const prerender = true;
     }
 
     /* 统计卡片 */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-    .stat-card {
+    body.console-admin .stats{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    body.console-admin .stat-card{
       padding: 22px 24px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px;
       transition: all 0.2s;
     }
-    .stat-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); }
-    .stat-card .label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-    .stat-card .value { font-size: 32px; font-weight: 700; color: #ff9ac8; }
-    .stat-card .unit { font-size: 14px; color: rgba(255,255,255,0.4); margin-left: 4px; }
+    body.console-admin .stat-card:hover{ background: rgba(255,255,255,0.07); transform: translateY(-2px); }
+    body.console-admin .stat-card .label{ font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    body.console-admin .stat-card .value{ font-size: 32px; font-weight: 700; color: #ff9ac8; }
+    body.console-admin .stat-card .unit{ font-size: 14px; color: rgba(255,255,255,0.4); margin-left: 4px; }
 
     /* 列表 */
-    .list { display: flex; flex-direction: column; gap: 10px; }
-    .item {
+    body.console-admin .list{ display: flex; flex-direction: column; gap: 10px; }
+    body.console-admin .item{
       display: flex; justify-content: space-between;
       align-items: center; gap: 16px;
       padding: 14px 18px;
@@ -74,26 +75,26 @@ export const prerender = true;
       transition: all 0.2s;
       flex-wrap: wrap;
     }
-    .item:hover { background: rgba(255,255,255,0.1); }
-    .item-info { flex: 1; min-width: 200px; }
-    .item-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
-    .item-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
-    .item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    body.console-admin .item:hover{ background: rgba(255,255,255,0.1); }
+    body.console-admin .item-info{ flex: 1; min-width: 200px; }
+    body.console-admin .item-title{ font-size: 15px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
+    body.console-admin .item-meta{ font-size: 12px; color: rgba(255,255,255,0.5); }
+    body.console-admin .item-actions{ display: flex; gap: 8px; flex-wrap: wrap; }
 
-    button.act {
+    body.console-admin button.act{
       padding: 7px 14px; font-size: 13px;
       border-radius: 8px; cursor: pointer; border: none;
       transition: all 0.2s; font-family: inherit;
     }
-    .act-approve { background: linear-gradient(135deg, #64ff96, #22c55e); color: #fff; }
-    .act-reject  { background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
-    .act-promote { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }
-    .act-demote  { background: rgba(255,200,80,0.15); color: #ffd060; border: 1px solid rgba(255,200,80,0.3); }
-    .act-delete  { background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
-    .act:hover:not(:disabled) { transform: translateY(-1px); }
-    .act:disabled { opacity: 0.5; cursor: not-allowed; }
+    body.console-admin .act-approve{ background: linear-gradient(135deg, #64ff96, #22c55e); color: #fff; }
+    body.console-admin .act-reject{ background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    body.console-admin .act-promote{ background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; }
+    body.console-admin .act-demote{ background: rgba(255,200,80,0.15); color: #ffd060; border: 1px solid rgba(255,200,80,0.3); }
+    body.console-admin .act-delete{ background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    body.console-admin .act:hover:not(:disabled){ transform: translateY(-1px); }
+    body.console-admin .act:disabled{ opacity: 0.5; cursor: not-allowed; }
 
-    .badge {
+    body.console-admin .badge{
       display: inline-block;
       padding: 3px 10px;
       border-radius: 6px;
@@ -101,57 +102,57 @@ export const prerender = true;
       font-weight: 600;
       margin-left: 8px;
     }
-    .badge-admin    { background: rgba(167,139,250,0.2); color: #c4b5fd; }
-    .badge-pending  { background: rgba(255,200,80,0.15); color: #ffd060; }
-    .badge-approved { background: rgba(100,255,150,0.15); color: #a8ffc4; }
-    .badge-rejected { background: rgba(255,80,80,0.15); color: #ffb0b0; }
+    body.console-admin .badge-admin{ background: rgba(167,139,250,0.2); color: #c4b5fd; }
+    body.console-admin .badge-pending{ background: rgba(255,200,80,0.15); color: #ffd060; }
+    body.console-admin .badge-approved{ background: rgba(100,255,150,0.15); color: #a8ffc4; }
+    body.console-admin .badge-rejected{ background: rgba(255,80,80,0.15); color: #ffb0b0; }
 
-    .empty { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); font-size: 14px; }
-    .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+    body.console-admin .empty{ text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); font-size: 14px; }
+    body.console-admin .loading{ text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
 
-    .pulse {
+    body.console-admin .pulse{
       display: flex; align-items: center; gap: 8px;
       font-size: 12px; color: rgba(255,255,255,0.55);
       margin-bottom: 14px;
     }
-    .pulse-dot {
+    body.console-admin .pulse-dot{
       width: 8px; height: 8px; border-radius: 50%;
       background: #34d399; flex: none;
       animation: pulse 2s infinite;
     }
-    @keyframes pulse {
+    @keyframes pulse{
       0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
       70% { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
       100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
     }
-    .item.new { animation: flash 1.6s ease; }
-    @keyframes flash {
+    body.console-admin .item.new{ animation: flash 1.6s ease; }
+    @keyframes flash{
       from { background: rgba(255,154,200,0.18); border-color: rgba(255,154,200,0.5); }
       to { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); }
     }
-    .act-chip {
+    body.console-admin .act-chip{
       display: inline-block; font-size: 11px; padding: 3px 8px;
       border-radius: 6px; margin-right: 8px;
       background: rgba(255,154,200,0.15); color: #ff9ac8;
       vertical-align: middle;
     }
-    .act-login { background: rgba(125,211,252,0.15); color: #7dd3fc; }
-    .act-logout { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
-    .act-post_create, .act-post_approve, .act-register { background: rgba(100,255,150,0.16); color: #a8ffc4; }
-    .act-post_reject, .act-post_delete, .act-comment_delete, .act-login_failed, .act-admin_delete {
+    body.console-admin .act-login{ background: rgba(125,211,252,0.15); color: #7dd3fc; }
+    body.console-admin .act-logout{ background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+    body.console-admin .act-post_create, body.console-admin .act-post_approve, body.console-admin .act-register{ background: rgba(100,255,150,0.16); color: #a8ffc4; }
+    body.console-admin .act-post_reject, body.console-admin .act-post_delete, body.console-admin .act-comment_delete, body.console-admin .act-login_failed, body.console-admin .act-admin_delete{
       background: rgba(255,80,80,0.15); color: #ffb0b0;
     }
-    .act-admin_promote, .act-admin_demote, .act-admin_reset { background: rgba(167,139,250,0.2); color: #c4b5fd; }
+    body.console-admin .act-admin_promote, body.console-admin .act-admin_demote, body.console-admin .act-admin_reset{ background: rgba(167,139,250,0.2); color: #c4b5fd; }
 
 
-    @media (max-width: 640px) {
-      .item { flex-direction: column; align-items: flex-start; }
-      .item-actions { width: 100%; }
-      button.act { flex: 1; }
+    @media (max-width: 640px){
+      body.console-admin .item{ flex-direction: column; align-items: flex-start; }
+      body.console-admin .item-actions{ width: 100%; }
+      body.console-admin button.act{ flex: 1; }
     }
   </style>
 </head>
-<body>
+<body class="console-admin">
   <AnimeBackdrop />
   <div class="container">
     <div class="head">

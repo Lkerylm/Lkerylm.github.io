@@ -1,6 +1,7 @@
 ---
 import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
 import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+import "@/styles/anime-console.css";
 export const prerender = true;
 ---
 
@@ -13,26 +14,26 @@ export const prerender = true;
   <AnimeHeadMeta />
   <script is:inline src="/firefly-api.js"></script>
   <style is:global>
-    * { box-sizing: border-box; }
-    body {
+    body.console-review *{ box-sizing: border-box; }
+    body.console-review{
       margin: 0; min-height: 100vh;
       background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
       font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
       color: #fff; padding: 40px 20px;
     }
-    .container { max-width: 900px; margin: 0 auto; }
-    h1 { margin: 0 0 8px; font-size: 26px; }
-    .sub { color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 28px; }
-    .post-list { display: flex; flex-direction: column; gap: 16px; }
-    .post-item {
+    body.console-review .container{ max-width: 900px; margin: 0 auto; }
+    body.console-review h1{ margin: 0 0 8px; font-size: 26px; }
+    body.console-review .sub{ color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 28px; }
+    body.console-review .post-list{ display: flex; flex-direction: column; gap: 16px; }
+    body.console-review .post-item{
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 12px;
       padding: 20px 24px;
     }
-    .post-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-    .post-meta { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
-    .post-content {
+    body.console-review .post-title{ font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    body.console-review .post-meta{ font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+    body.console-review .post-content{
       font-size: 14px; line-height: 1.7;
       color: rgba(255,255,255,0.85);
       background: rgba(0,0,0,0.25);
@@ -43,8 +44,8 @@ export const prerender = true;
       white-space: pre-wrap;
       margin-bottom: 16px;
     }
-    .post-actions { display: flex; gap: 10px; }
-    button {
+    body.console-review .post-actions{ display: flex; gap: 10px; }
+    body.console-review button{
       padding: 10px 20px;
       border-radius: 8px;
       font-size: 14px;
@@ -53,22 +54,22 @@ export const prerender = true;
       border: none;
       transition: all 0.2s;
     }
-    .btn-approve { background: linear-gradient(135deg, #64ff96, #22c55e); color: #fff; }
-    .btn-reject  { background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
-    button:hover { transform: translateY(-1px); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .empty { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
-    .status-badge {
+    body.console-review .btn-approve{ background: linear-gradient(135deg, #64ff96, #22c55e); color: #fff; }
+    body.console-review .btn-reject{ background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    body.console-review button:hover{ transform: translateY(-1px); }
+    body.console-review button:disabled{ opacity: 0.5; cursor: not-allowed; }
+    body.console-review .empty{ text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
+    body.console-review .status-badge{
       display: inline-block; padding: 4px 10px;
       border-radius: 6px; font-size: 12px; margin-left: 8px;
     }
-    .status-badge.pending  { background: rgba(255,200,80,0.15); color: #ffd060; }
-    .status-badge.approved { background: rgba(100,255,150,0.15); color: #a8ffc4; }
-    .status-badge.rejected { background: rgba(255,80,80,0.15); color: #ffb0b0; }
-    .back { color: #ff9ac8; text-decoration: none; font-size: 14px; }
+    body.console-review .status-badge.pending{ background: rgba(255,200,80,0.15); color: #ffd060; }
+    body.console-review .status-badge.approved{ background: rgba(100,255,150,0.15); color: #a8ffc4; }
+    body.console-review .status-badge.rejected{ background: rgba(255,80,80,0.15); color: #ffb0b0; }
+    body.console-review .back{ color: #ff9ac8; text-decoration: none; font-size: 14px; }
   </style>
 </head>
-<body>
+<body class="console-review">
   <AnimeBackdrop />
   <div class="container">
     <h1>审核后台</h1>

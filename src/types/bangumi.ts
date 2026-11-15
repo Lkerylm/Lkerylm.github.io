@@ -36,6 +36,14 @@ export type SlimSubject = {
 	score: number; // 评分
 	rank: number; // 排名
 	tags: SubjectTag[]; // 标签
+	/** 没有封面图时（本地兜底清单）用来生成占位封面 */
+	coverArt?: CoverArt;
+};
+
+/** 占位封面：粉彩渐变 + emoji，避免离线时出现大片灰块 */
+export type CoverArt = {
+	emoji?: string;
+	gradient?: [string, string];
 };
 
 // 1: 书籍，2: 动画，3: 音乐，4: 游戏，6: 三次元

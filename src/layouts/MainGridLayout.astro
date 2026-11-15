@@ -689,8 +689,9 @@ const mobileQuality = Math.round(configQuality * 0.9);
 <!-- Main content -->
 <div class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? 'mobile-main-no-banner' : ''} ${!(isBannerMode && isBackgroundEnabled) ? 'no-banner-layout' : ''} ${transparentClass}`} style={`top: ${finalMainPanelTop}`}>
     
-    <!-- ✅【新增这一行】全宽插槽，用于放置需要横跨全屏的组件 -->
-    <div class="w-full pointer-events-auto">
+    <!-- 全宽插槽：作为 Swup 容器，切页时随页面内容一起被替换，
+         否则首页 hero（.hero-wrapper）会残留在其它页面上，把正文整体顶下去 -->
+    <div id="full-width-slot" class="w-full pointer-events-auto">
         <slot name="full-width" />
     </div>
 

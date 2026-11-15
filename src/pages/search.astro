@@ -1,8 +1,9 @@
 ---
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import AdvancedSearch from "@components/pages/AdvancedSearch.svelte";
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
-import MainGridLayout from "@layouts/MainGridLayout.astro";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { url } from "@/utils/url-utils";
 
 const title = i18n(I18nKey.search);
@@ -10,9 +11,29 @@ const description = "";
 ---
 
 <MainGridLayout title={title} description={description}>
-    <div class="min-h-[80vh]">
-        <AdvancedSearch client:load title={title} description={description} />
+  <div class="anime-page">
+    <AnimePageHero
+      kicker="SEARCH · 全站检索"
+      emoji="🔍"
+      title="搜索"
+      subtitle="输入关键词，让小狐狸把藏在角落里的文章叼出来～"
+      chips={["文章", "标签", "分类", "全文检索"]}
+      tone="grape"
+      image="/anime-wallpaper/desktop-12.avif"
+      compact
+    >
+      <a class="anime-hero-btn" href={url("/archive/")} data-sound="tap">
+        🗂️ 按时间翻
+      </a>
+      <a class="anime-hero-btn" href={url("/")} data-sound="tap">
+        ← 回首页
+      </a>
+    </AnimePageHero>
+
+    <div class="min-h-[70vh] anime-reveal">
+      <AdvancedSearch client:load title={title} description={description} />
     </div>
+  </div>
 </MainGridLayout>
 
 {import.meta.env.PROD && (

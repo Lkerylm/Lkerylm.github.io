@@ -1,6 +1,8 @@
 ---
 import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
 import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+import AnimePageHero from "@/components/common/AnimePageHero.astro";
+import "@/styles/anime-console.css";
 export const prerender = true;
 ---
 
@@ -13,8 +15,8 @@ export const prerender = true;
   <AnimeHeadMeta title="社区文章" description="来自站内小伙伴的投稿：追番笔记、动画杂谈与日常碎片，一起在二次元小屋里冒泡吧。" />
   <script is:inline src="/firefly-api.js"></script>
   <style is:global>
-    * { box-sizing: border-box; }
-    body {
+    body.console-community *{ box-sizing: border-box; }
+    body.console-community{
       margin: 0; min-height: 100vh;
       background:
         radial-gradient(70% 50% at 12% 8%, rgba(255, 199, 224, 0.55), transparent 60%),
@@ -23,25 +25,25 @@ export const prerender = true;
       font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
       color: #4a2b3a; padding: 40px 20px 64px;
     }
-    .container { max-width: 820px; margin: 0 auto; }
-    .hero {
+    body.console-community .container{ max-width: 820px; margin: 0 auto; }
+    body.console-community .hero{
       text-align: center; margin-bottom: 26px;
     }
-    .hero-emoji { font-size: 40px; display: block; margin-bottom: 6px; }
-    h1 {
+    body.console-community .hero-emoji{ font-size: 40px; display: block; margin-bottom: 6px; }
+    body.console-community h1{
       margin: 0 0 8px; font-size: 28px; font-weight: 800;
       background: linear-gradient(120deg, #ff7ab6, #b18cff);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    .sub { color: #9a7d8c; font-size: 13px; }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
-    .chip {
+    body.console-community .sub{ color: #9a7d8c; font-size: 13px; }
+    body.console-community .chips{ display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+    body.console-community .chip{
       font-size: 11px; padding: 5px 12px; border-radius: 99px;
       color: #b0316c; background: rgba(255, 255, 255, 0.8);
       border: 1px solid rgba(255, 154, 200, 0.45);
     }
-    .post-list { display: flex; flex-direction: column; gap: 12px; }
-    .post-item {
+    body.console-community .post-list{ display: flex; flex-direction: column; gap: 12px; }
+    body.console-community .post-item{
       background: rgba(255, 255, 255, 0.82);
       border: 1px solid rgba(255, 154, 200, 0.28);
       border-radius: 16px;
@@ -52,43 +54,46 @@ export const prerender = true;
       box-shadow: 0 10px 24px -20px rgba(255, 120, 180, 0.9);
       transition: all 0.22s ease;
     }
-    .post-item:hover {
+    body.console-community .post-item:hover{
       transform: translateY(-2px);
       border-color: rgba(255, 122, 182, 0.6);
       box-shadow: 0 16px 30px -20px rgba(255, 120, 180, 1);
     }
-    .post-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-    .post-meta { font-size: 12px; color: #a3909b; }
-    .empty { text-align: center; padding: 56px 20px; color: #a3909b; font-size: 14px; }
-    .empty .face { font-size: 34px; display: block; margin-bottom: 10px; }
-    .links {
+    body.console-community .post-title{ font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    body.console-community .post-meta{ font-size: 12px; color: #a3909b; }
+    body.console-community .empty{ text-align: center; padding: 56px 20px; color: #a3909b; font-size: 14px; }
+    body.console-community .empty .face{ font-size: 34px; display: block; margin-bottom: 10px; }
+    body.console-community .links{
       margin-top: 28px; text-align: center; font-size: 13px;
       color: #a3909b; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
     }
-    .links a {
+    body.console-community .links a{
       color: #b0316c; text-decoration: none;
       padding: 6px 14px; border-radius: 99px;
       background: rgba(255, 255, 255, 0.75);
       border: 1px solid rgba(255, 154, 200, 0.35);
       transition: all 0.2s ease;
     }
-    .links a:hover { background: #fff; transform: translateY(-1px); }
+    body.console-community .links a:hover{ background: #fff; transform: translateY(-1px); }
   </style>
 </head>
-<body>
+<body class="console-community">
   <AnimeBackdrop />
   <div class="container">
-    <header class="hero">
-      <span class="hero-emoji" aria-hidden="true">🫧</span>
-      <h1>社区文章</h1>
-      <p class="sub">来自站内小伙伴的投稿，一起在二次元小屋里冒个泡～</p>
-      <div class="chips">
-        <span class="chip">追番笔记</span>
-        <span class="chip">动画杂谈</span>
-        <span class="chip">日常碎片</span>
-        <span class="chip">欢迎投稿</span>
-      </div>
-    </header>
+    <AnimePageHero
+      kicker="COMMUNITY · 社区投稿"
+      emoji="🫧"
+      title="社区文章"
+      subtitle="来自站内小伙伴的投稿，一起在二次元小屋里冒个泡～"
+      chips={["追番笔记", "动画杂谈", "日常碎片", "欢迎投稿"]}
+      tone="sky"
+      video="/welcome.mp4"
+      image="/anime-wallpaper/desktop-09.avif"
+      compact
+    >
+      <a class="anime-hero-btn primary" href="/dashboard/new/">✍️ 写一篇文章</a>
+      <a class="anime-hero-btn" href="/">🏠 回首页</a>
+    </AnimePageHero>
     <div id="list" class="empty">加载中…</div>
     <div class="links">
       <a href="/">🏠 回首页</a>

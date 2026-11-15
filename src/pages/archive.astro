@@ -1,21 +1,37 @@
 ---
-import CutePageHero from "@components/common/CutePageHero.astro";
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import ArchivePanel from "@components/controls/ArchivePanel.svelte";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPostsList } from "@/utils/content-utils";
+import { url } from "@/utils/url-utils";
 
 const sortedPostsList = await getSortedPostsList();
+const total = sortedPostsList.length;
 ---
 
 <MainGridLayout title={i18n(I18nKey.archive)}>
-  <CutePageHero
-    emoji="🗂️"
-    title="时光归档"
-    subtitle="按年份排排坐的追番记忆，慢慢翻，别着急～"
-    chips={["全部文章", "按时间", "慢慢看"]}
-    tone="sky"
-  />
-  <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte" />
+  <div class="anime-page">
+    <AnimePageHero
+      kicker="ARCHIVE · 时光机"
+      emoji="🗂️"
+      title="时光归档"
+      subtitle="按年份排排坐的追番记忆，慢慢翻，别着急～"
+      chips={[`共 ${total} 篇`, "按时间", "慢慢看"]}
+      tone="sky"
+      image="/anime-wallpaper/desktop-08.avif"
+    >
+      <a class="anime-hero-btn primary" href={url("/")} data-sound="tap">
+        ← 回小屋首页
+      </a>
+      <a class="anime-hero-btn" href={url("/search/")} data-sound="open">
+        🔍 直接搜
+      </a>
+    </AnimePageHero>
+
+    <div class="anime-reveal">
+      <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte" />
+    </div>
+  </div>
 </MainGridLayout>

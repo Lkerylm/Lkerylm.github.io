@@ -1,6 +1,6 @@
 ---
 import Comment from "@components/comment/index.astro";
-import CutePageHero from "@components/common/CutePageHero.astro";
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import { Icon } from "astro-icon/components";
 import { commentConfig, siteConfig, sponsorConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
@@ -32,7 +32,9 @@ const showSponsorsList = sponsorConfig.showSponsorsList !== false;
     <div class="card-base z-10 px-9 py-6 relative w-full">
       <!-- 页面标题和描述 -->
       <div class="mb-8">
-        <CutePageHero
+        <AnimePageHero
+          kicker="SPONSOR · 请我喝奶茶"
+          image="/anime-wallpaper/desktop-21.avif"
           emoji="🍰"
           title={title}
           subtitle={description}
@@ -54,7 +56,7 @@ const showSponsorsList = sponsorConfig.showSponsorsList !== false;
 
       <!-- 赞助方式 -->
       <div class="mb-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 anime-reveal-list">
                     {enabledMethods.map((method) => (
                       <div class="flex flex-col items-center card-base p-6 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 hover:border-(--primary) transition-colors">
                         <!-- 图标和名称 -->

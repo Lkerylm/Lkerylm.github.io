@@ -1,0 +1,146 @@
+---
+/**
+ * 公益卡片两侧的小插画（纯手写 SVG，不引用任何外部图片）
+ *
+ * 为什么用 SVG：
+ * 1. 零版权风险 —— 全部是自己画的几何图形，不涉及任何现实人物照片 / 动漫角色；
+ * 2. 体积极小（< 2KB），不额外占带宽，深色模式自动适配；
+ * 3. 可以随便上色，和站点的糖果色系保持一致。
+ *
+ * 用法：<AidArt kind="girl" /> / <AidArt kind="teddy" />
+ */
+interface Props {
+	kind?: "girl" | "teddy";
+	class?: string;
+}
+
+const { kind = "girl", class: className = "" } = Astro.props;
+---
+
+{
+	kind === "teddy" ? (
+		<svg
+			class:list={["aid-art-svg", className]}
+			viewBox="0 0 64 72"
+			role="presentation"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<title>抱着爱心的小熊</title>
+			{/* 耳朵 */}
+			<circle cx="15" cy="21" r="9.5" fill="#ffd7a8" />
+			<circle cx="15" cy="21" r="5" fill="#ffc189" />
+			<circle cx="49" cy="21" r="9.5" fill="#ffd7a8" />
+			<circle cx="49" cy="21" r="5" fill="#ffc189" />
+			{/* 头 */}
+			<circle cx="32" cy="36" r="19" fill="#ffd7a8" />
+			<ellipse cx="32" cy="43" rx="9.5" ry="7.5" fill="#fff2df" />
+			{/* 眼睛 */}
+			<circle cx="24" cy="33.5" r="2.6" fill="#6b4a3a" />
+			<circle cx="40" cy="33.5" r="2.6" fill="#6b4a3a" />
+			<circle cx="24.9" cy="32.6" r="0.9" fill="#fff" />
+			<circle cx="40.9" cy="32.6" r="0.9" fill="#fff" />
+			{/* 腮红 */}
+			<ellipse cx="19" cy="41" rx="3.4" ry="2.2" fill="#ffa9c8" opacity="0.75" />
+			<ellipse cx="45" cy="41" rx="3.4" ry="2.2" fill="#ffa9c8" opacity="0.75" />
+			{/* 鼻子 + 嘴 */}
+			<ellipse cx="32" cy="40" rx="2.6" ry="2" fill="#6b4a3a" />
+			<path
+				d="M32 42.4v2.4M28.4 45.6c1.6 1.6 5.6 1.6 7.2 0"
+				stroke="#6b4a3a"
+				stroke-width="1.3"
+				stroke-linecap="round"
+				fill="none"
+			/>
+			{/* 抱着的爱心 */}
+			<path
+				d="M32 66c-6.4-4.4-10-7.9-10-11.4 0-2.3 1.8-4.1 4.1-4.1 1.6 0 3.1.9 3.9 2.2l2-3.1 2 3.1c.8-1.3 2.3-2.2 3.9-2.2 2.3 0 4.1 1.8 4.1 4.1 0 3.5-3.6 7-10 11.4Z"
+				fill="#ff8fbf"
+			/>
+			<path
+				d="M28.6 54.4c-.9.3-1.5 1.1-1.6 2"
+				stroke="#fff"
+				stroke-width="1.2"
+				stroke-linecap="round"
+				fill="none"
+				opacity="0.8"
+			/>
+			{/* 小爪子 */}
+			<circle cx="17" cy="55" r="6.4" fill="#ffd7a8" />
+			<circle cx="47" cy="55" r="6.4" fill="#ffd7a8" />
+			{/* 头顶小星星 */}
+			<path
+				d="M32 8.2l1.5 3.1 3.4.5-2.5 2.4.6 3.4-3-1.6-3 1.6.6-3.4-2.5-2.4 3.4-.5z"
+				fill="#ffe27a"
+			/>
+		</svg>
+	) : (
+		<svg
+			class:list={["aid-art-svg", className]}
+			viewBox="0 0 64 72"
+			role="presentation"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<title>扎双马尾的小女孩</title>
+			{/* 双马尾 */}
+			<circle cx="8" cy="36" r="9" fill="#ffb3d9" />
+			<circle cx="8" cy="36" r="4.6" fill="#ff9ccd" />
+			<circle cx="56" cy="36" r="9" fill="#ffb3d9" />
+			<circle cx="56" cy="36" r="4.6" fill="#ff9ccd" />
+			{/* 后发 */}
+			<ellipse cx="32" cy="39" rx="20" ry="21" fill="#ffb3d9" />
+			{/* 脸 */}
+			<ellipse cx="32" cy="38" rx="14.6" ry="15.2" fill="#ffe8d8" />
+			{/* 刘海 */}
+			<path
+				d="M17.6 33.2c1.4-8.4 7-13.4 14.4-13.4s13 5 14.4 13.4c-2.6-2.2-4.4-4.9-5.2-7-1.6 2.4-3.6 3.9-6.2 4.4 1.2-1.4 1.8-2.7 2-4.2-2.6 3-6 4.6-10 4.8 1-1 1.7-2 2.1-3-3 1.9-6.6 3.1-11.5 5Z"
+				fill="#ffb3d9"
+			/>
+			{/* 眼睛 */}
+			<ellipse cx="25" cy="39.4" rx="2.7" ry="3.3" fill="#5a3a4a" />
+			<ellipse cx="39" cy="39.4" rx="2.7" ry="3.3" fill="#5a3a4a" />
+			<circle cx="26.2" cy="38.2" r="1.1" fill="#fff" />
+			<circle cx="40.2" cy="38.2" r="1.1" fill="#fff" />
+			{/* 腮红 */}
+			<ellipse cx="20.4" cy="45" rx="3.2" ry="2.1" fill="#ffa9c8" opacity="0.8" />
+			<ellipse cx="43.6" cy="45" rx="3.2" ry="2.1" fill="#ffa9c8" opacity="0.8" />
+			{/* 微笑 */}
+			<path
+				d="M29.6 46.6c.9 1.2 3.9 1.2 4.8 0"
+				stroke="#d4738f"
+				stroke-width="1.4"
+				stroke-linecap="round"
+				fill="none"
+			/>
+			{/* 发夹 */}
+			<path
+				d="M45.4 20.6l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z"
+				fill="#ffe27a"
+			/>
+			{/* 领口 */}
+			<path d="M20 62c3.6-4 7.8-6 12-6s8.4 2 12 6z" fill="#ffd1e6" />
+			{/* 手心里的爱心 */}
+			<path
+				d="M32 71.4c-3.4-2.4-5.4-4.2-5.4-6.1 0-1.2 1-2.2 2.2-2.2.9 0 1.7.5 2.1 1.2l1.1-1.6 1.1 1.6c.4-.7 1.2-1.2 2.1-1.2 1.2 0 2.2 1 2.2 2.2 0 1.9-2 3.7-5.4 6.1Z"
+				fill="#ff8fbf"
+			/>
+		</svg>
+	)
+}
+
+<style>
+	.aid-art-svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		overflow: visible;
+		filter: drop-shadow(0 4px 8px rgba(255, 140, 190, 0.35));
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.aid-art-svg {
+			filter: none;
+		}
+	}
+</style>

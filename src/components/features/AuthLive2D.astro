@@ -1,0 +1,626 @@
+---
+/**
+ * 登录 / 注册页的 Live2D 舞台（可换模型）
+ *
+ * 需求对应：
+ * 1. 「登录和注册页面的 live2d 可以更换」→ 左上角 🎀 换一只，随时切换；
+ *    选过的模型记在 localStorage.firefly_auth_model，下次进来自动还是她；
+ * 2. 模型清单来自站点自带（/models-list.json）与官方免费素材（/models-safe-catalog.json），
+ *    全部为 Live2D 官方免费素材许可，不涉及任何盗版模型；
+ * 3. 全屏铺满、跟随鼠标眼神、自动待机动作，和深色登录卡片不抢焦点。
+ */
+---
+
+<div id="auth-l2d" class="auth-l2d" aria-hidden="true"></div>
+
+<div class="auth-l2d-picker">
+	<button
+		id="auth-l2d-open"
+		class="auth-l2d-btn"
+		type="button"
+		aria-expanded="false"
+		aria-controls="auth-l2d-panel"
+		title="换一只看板娘"
+	>
+		<span class="auth-l2d-btn-emoji" aria-hidden="true">🎀</span>
+		<span id="auth-l2d-label">换一只</span>
+	</button>
+
+	<div id="auth-l2d-panel" class="auth-l2d-panel" hidden>
+		<div class="auth-l2d-head">
+			<span>今天想和谁一起进小屋？</span>
+			<button id="auth-l2d-close" class="auth-l2d-x" type="button" aria-label="收起">
+				×
+			</button>
+		</div>
+		<div id="auth-l2d-list" class="auth-l2d-list">
+			<div class="auth-l2d-tip">正在读取模型清单…</div>
+		</div>
+		<div id="auth-l2d-msg" class="auth-l2d-msg"></div>
+	</div>
+</div>
+
+<script is:inline src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script>
+<script is:inline src="/Firefly-live2d-main/load/pixi.min.js"></script>
+<script is:inline src="/Firefly-live2d-main/load/cubism4.min.js"></script>
+
+<style is:global>
+	.auth-l2d {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 1;
+		pointer-events: none;
+		overflow: hidden;
+	}
+
+	.auth-l2d canvas {
+		background: transparent !important;
+		display: block !important;
+		position: absolute !important;
+		top: 0 !important;
+		left: 0 !important;
+	}
+
+	.auth-l2d-picker {
+		position: fixed;
+		top: 16px;
+		left: 16px;
+		z-index: 60;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+
+	.auth-l2d-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		height: 38px;
+		padding: 0 14px 0 11px;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.55);
+		background: rgba(30, 24, 40, 0.5);
+		color: #ffe3f1;
+		font-family: inherit;
+		font-size: 12.5px;
+		font-weight: 600;
+		cursor: pointer;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+		transition:
+			transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+			background 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.auth-l2d-btn:hover {
+		transform: translateY(-2px);
+		background: rgba(255, 138, 200, 0.28);
+		border-color: rgba(255, 154, 200, 0.8);
+	}
+
+	.auth-l2d-btn[data-busy="1"] {
+		opacity: 0.75;
+		pointer-events: none;
+	}
+
+	.auth-l2d-btn-emoji {
+		font-size: 14px;
+		line-height: 1;
+		animation: auth-l2d-bob 3.4s ease-in-out infinite;
+	}
+
+	.auth-l2d-panel {
+		width: 268px;
+		max-width: calc(100vw - 32px);
+		border-radius: 18px;
+		padding: 12px 12px 10px;
+		background: rgba(26, 22, 36, 0.92);
+		border: 1px solid rgba(255, 154, 200, 0.35);
+		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(18px);
+		-webkit-backdrop-filter: blur(18px);
+		color: #fff;
+		animation: auth-l2d-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.auth-l2d-panel[hidden] {
+		display: none;
+	}
+
+	.auth-l2d-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		font-size: 12.5px;
+		font-weight: 700;
+		color: #ffd0e6;
+		margin-bottom: 8px;
+	}
+
+	.auth-l2d-x {
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		border: none;
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffd0e6;
+		font-size: 14px;
+		line-height: 1;
+		cursor: pointer;
+	}
+
+	.auth-l2d-x:hover {
+		background: rgba(255, 138, 200, 0.25);
+	}
+
+	.auth-l2d-list {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		max-height: min(52vh, 330px);
+		overflow-y: auto;
+		padding-right: 2px;
+	}
+
+	.auth-l2d-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		padding: 8px 10px;
+		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: rgba(255, 255, 255, 0.05);
+		color: #fff;
+		font-family: inherit;
+		font-size: 12px;
+		text-align: left;
+		cursor: pointer;
+		transition:
+			background 0.18s ease,
+			border-color 0.18s ease,
+			transform 0.18s ease;
+	}
+
+	.auth-l2d-item:hover {
+		background: rgba(255, 138, 200, 0.18);
+		border-color: rgba(255, 154, 200, 0.55);
+		transform: translateX(2px);
+	}
+
+	.auth-l2d-item.is-active {
+		background: linear-gradient(
+			120deg,
+			rgba(255, 138, 200, 0.32),
+			rgba(184, 148, 255, 0.3)
+		);
+		border-color: rgba(255, 154, 200, 0.8);
+	}
+
+	.auth-l2d-item-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.auth-l2d-item-tag {
+		flex-shrink: 0;
+		font-size: 10px;
+		padding: 1px 7px;
+		border-radius: 99px;
+		background: rgba(255, 255, 255, 0.12);
+		color: #ffd0e6;
+	}
+
+	.auth-l2d-tip,
+	.auth-l2d-msg {
+		font-size: 11.5px;
+		line-height: 1.7;
+		color: rgba(255, 255, 255, 0.55);
+		padding: 4px 2px;
+	}
+
+	.auth-l2d-msg.err {
+		color: #ffb0b0;
+	}
+
+	.auth-l2d-msg.ok {
+		color: #a8ffc4;
+	}
+
+	@keyframes auth-l2d-in {
+		from {
+			opacity: 0;
+			transform: translateY(-6px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+
+@keyframes auth-l2d-bob {
+		0%,
+		100% {
+			transform: translateY(0) rotate(-6deg);
+		}
+		50% {
+			transform: translateY(-2px) rotate(6deg);
+		}
+	}
+
+	@media (max-width: 900px) {
+		.auth-l2d {
+			opacity: 0.4;
+		}
+
+		.auth-l2d-picker {
+			top: 12px;
+			left: 12px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.auth-l2d-btn-emoji,
+		.auth-l2d-panel {
+			animation: none !important;
+		}
+	}
+</style>
+
+<script is:inline>
+	(function () {
+		var stage = document.getElementById("auth-l2d");
+		if (!stage || window.__authL2D) return;
+		window.__authL2D = true;
+
+		var KEY = "firefly_auth_model";
+		var openBtn = document.getElementById("auth-l2d-open");
+		var panel = document.getElementById("auth-l2d-panel");
+		var listEl = document.getElementById("auth-l2d-list");
+		var msgEl = document.getElementById("auth-l2d-msg");
+		var labelEl = document.getElementById("auth-l2d-label");
+		var closeBtn = document.getElementById("auth-l2d-close");
+
+		var catalog = [];
+		var app = null;
+		var model = null;
+		var busy = false;
+		var currentUrl = "";
+
+		function getPref() {
+			try {
+				return localStorage.getItem(KEY) || "";
+			} catch (e) {
+				return "";
+			}
+		}
+
+		function setPref(v) {
+			try {
+				if (v) localStorage.setItem(KEY, v);
+				else localStorage.removeItem(KEY);
+			} catch (e) {
+				/* ignore */
+			}
+		}
+
+		function say(text, type) {
+			if (!msgEl) return;
+			msgEl.textContent = text || "";
+			msgEl.className = "auth-l2d-msg " + (type || "");
+		}
+
+		function shortName(url) {
+			var u = String(url || "").split("?")[0];
+			var file = u.split("/").pop() || u;
+			return file.replace(/\.model3\.json$/i, "").replace(/[_-]+/g, " ");
+		}
+
+		function nameOf(url) {
+			for (var i = 0; i < catalog.length; i++) {
+				if (catalog[i].url === url) return catalog[i].name;
+			}
+			return shortName(url);
+		}
+
+		function setExpanded(open) {
+			if (!panel || !openBtn) return;
+			panel.hidden = !open;
+			openBtn.setAttribute("aria-expanded", open ? "true" : "false");
+		}
+
+		/* ---------- 模型清单：本地的排前面，官方免费素材排后面 ---------- */
+		function loadCatalog() {
+			var tasks = [];
+
+			tasks.push(
+				fetch("/models-list.json", { cache: "no-store" })
+					.then(function (r) {
+						return r.ok ? r.json() : [];
+					})
+					.then(function (list) {
+						if (!Array.isArray(list)) return;
+						list.forEach(function (u) {
+							if (typeof u === "string" && u) {
+								catalog.push({
+									name: shortName(u),
+									url: u,
+									tag: "小屋",
+								});
+							}
+						});
+					})
+					.catch(function () {}),
+			);
+
+			tasks.push(
+				fetch("/models-safe-catalog.json", { cache: "no-store" })
+					.then(function (r) {
+						return r.ok ? r.json() : [];
+					})
+					.then(function (list) {
+						if (!Array.isArray(list)) return;
+						list.forEach(function (it) {
+							if (it && it.url) {
+								catalog.push({
+									name: it.name || shortName(it.url),
+									url: it.url,
+									tag: "官方免费",
+								});
+							}
+						});
+					})
+					.catch(function () {}),
+			);
+
+			return Promise.all(tasks);
+		}
+
+		function markActive() {
+			if (!listEl) return;
+			var items = listEl.querySelectorAll(".auth-l2d-item");
+			for (var i = 0; i < items.length; i++) {
+				items[i].classList.toggle(
+					"is-active",
+					items[i].getAttribute("data-url") === currentUrl,
+				);
+			}
+		}
+
+		function renderList() {
+			if (!listEl) return;
+			listEl.innerHTML = "";
+
+			var random = document.createElement("button");
+			random.type = "button";
+			random.className = "auth-l2d-item";
+			random.setAttribute("data-url", "__random__");
+			random.innerHTML =
+				'<span class="auth-l2d-item-name">🎲 随机来一只</span><span class="auth-l2d-item-tag">惊喜</span>';
+			random.addEventListener("click", function () {
+				pickRandom();
+			});
+			listEl.appendChild(random);
+
+			catalog.forEach(function (item, idx) {
+				var b = document.createElement("button");
+				b.type = "button";
+				b.className = "auth-l2d-item";
+				b.setAttribute("data-url", item.url);
+				b.innerHTML =
+					'<span class="auth-l2d-item-name"></span><span class="auth-l2d-item-tag"></span>';
+				b.querySelector(".auth-l2d-item-name").textContent = item.name;
+				b.querySelector(".auth-l2d-item-tag").textContent = item.tag;
+				b.addEventListener("click", function () {
+					loadModel([item.url]);
+				});
+				if (idx === 0) b.title = "站点自带的看板娘";
+				listEl.appendChild(b);
+			});
+
+			markActive();
+		}
+
+		function pickRandom() {
+			if (!catalog.length) return;
+			var pool = catalog.filter(function (it) {
+				return it.url !== currentUrl;
+			});
+			if (!pool.length) pool = catalog;
+			var pick = pool[Math.floor(Math.random() * pool.length)];
+			if (pick) loadModel([pick.url]);
+		}
+
+		/* ---------- PIXI 舞台 ---------- */
+		function initPixi() {
+			if (app) return app;
+			if (typeof PIXI === "undefined" || !PIXI.live2d) {
+				throw new Error("Live2D 库没加载出来");
+			}
+			var DPR = Math.min(window.devicePixelRatio || 1, 2);
+			app = new PIXI.Application({
+				width: window.innerWidth,
+				height: window.innerHeight,
+				resolution: DPR,
+				autoDensity: true,
+				antialias: true,
+				transparent: true,
+				backgroundAlpha: 0,
+			});
+			stage.appendChild(app.view);
+			return app;
+		}
+
+		var ORIG_H = 1;
+
+		function layout() {
+			if (!app || !model) return;
+			var W = window.innerWidth;
+			var H = window.innerHeight;
+			app.renderer.resize(W, H);
+			var s = (H * 0.95) / ORIG_H;
+			model.scale.set(s);
+			var isMobile = W < 900;
+			model.x = isMobile ? W / 2 : W * 0.3;
+			model.y = H + 20;
+		}
+
+		function loadOne(url) {
+			return PIXI.live2d.Live2DModel.from(url, {
+				autoInteract: false,
+			}).then(function (m) {
+				if (model) {
+					try {
+						app.stage.removeChild(model);
+					} catch (e) {
+						/* ignore */
+					}
+					try {
+						model.destroy();
+					} catch (e) {
+						/* ignore */
+					}
+				}
+				model = m;
+				try {
+					m.anchor.set(0.5, 1);
+				} catch (e) {
+					/* ignore */
+				}
+				app.stage.addChild(m);
+				try {
+					var bounds = m.getLocalBounds();
+					ORIG_H = (bounds && bounds.height) || 1;
+				} catch (e) {
+					ORIG_H = 1;
+				}
+				layout();
+				try {
+					m.motion("idle");
+				} catch (e) {
+					/* 没有 idle 动作也没关系 */
+				}
+				return m;
+			});
+		}
+
+		function loadModel(urls) {
+			if (busy || !urls || !urls.length) return;
+			busy = true;
+			if (openBtn) openBtn.dataset.busy = "1";
+			if (labelEl) labelEl.textContent = "加载中…";
+			say("正在把看板娘请出来…", "");
+
+			try {
+				initPixi();
+			} catch (e) {
+				busy = false;
+				if (openBtn) openBtn.dataset.busy = "0";
+				if (labelEl) labelEl.textContent = "换一只";
+				say("Live2D 没加载出来（刷新一下试试）", "err");
+				return;
+			}
+
+			var i = 0;
+
+			function next() {
+				if (i >= urls.length) {
+					busy = false;
+					if (openBtn) openBtn.dataset.busy = "0";
+					if (labelEl) labelEl.textContent = "换一只";
+					say("这只没加载出来，换一只试试～", "err");
+					return;
+				}
+				var url = urls[i++];
+				loadOne(url).then(
+					function () {
+						currentUrl = url;
+						setPref(url);
+						markActive();
+						busy = false;
+						if (openBtn) openBtn.dataset.busy = "0";
+						if (labelEl) labelEl.textContent = "换一只";
+						say("现在是 " + nameOf(url) + " 陪着你 ♪", "ok");
+					},
+					function () {
+						next();
+					},
+				);
+			}
+
+			next();
+		}
+
+		/* ---------- 交互 ---------- */
+		if (openBtn) {
+			openBtn.addEventListener("click", function () {
+				setExpanded(panel ? panel.hidden : true);
+			});
+		}
+
+		if (closeBtn) {
+			closeBtn.addEventListener("click", function () {
+				setExpanded(false);
+			});
+		}
+
+		document.addEventListener("click", function (e) {
+			if (!panel || panel.hidden) return;
+			if (panel.contains(e.target) || (openBtn && openBtn.contains(e.target)))
+				return;
+			setExpanded(false);
+		});
+
+		document.addEventListener("mousemove", function (e) {
+			if (!model) return;
+			var x = (e.clientX / window.innerWidth) * 2 - 1;
+			var y = (e.clientY / window.innerHeight) * 2 - 1;
+			try {
+				model.focus(x * 1.2, -y * 1.2);
+			} catch (e) {
+				/* ignore */
+			}
+		});
+
+		var resizeTimer = null;
+		window.addEventListener("resize", function () {
+			if (resizeTimer) clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(layout, 150);
+		});
+
+		/* ---------- 启动 ---------- */
+		loadCatalog().then(function () {
+			if (!catalog.length) {
+				say("没读到模型清单，刷新试试～", "err");
+				return;
+			}
+			renderList();
+
+			var pref = getPref();
+			var urls = [];
+			if (pref) urls.push(pref);
+			catalog.forEach(function (it) {
+				if (urls.indexOf(it.url) < 0) urls.push(it.url);
+			});
+
+			/* 没选过就从本地的看板娘里随机一只，和以前一样 */
+			if (!pref) {
+				var local = catalog.filter(function (it) {
+					return it.tag === "小屋";
+				});
+				var first = (local.length ? local : catalog)[0];
+				urls = [first.url].concat(urls);
+			}
+
+			loadModel(urls);
+		});
+	})();
+</script>

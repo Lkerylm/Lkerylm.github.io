@@ -1,5 +1,5 @@
 ---
-import CutePageHero from "@components/common/CutePageHero.astro";
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import { Icon } from "astro-icon/components";
 import AlbumCard from "@/components/pages/gallery/AlbumCard.astro";
 import { galleryConfig, siteConfig } from "@/config";
@@ -33,7 +33,10 @@ const allTags = [...new Set(albums.flatMap((a) => a.tags || []))].sort();
   >
     <div class="card-base z-10 px-9 py-6 relative w-full">
       <!-- 页面标题和描述 -->
-      <CutePageHero
+      <AnimePageHero
+        kicker="GALLERY · 二次元相册"
+        video="/welcome.mp4"
+        image="/anime-wallpaper/desktop-03.avif"
         emoji="🖼️"
         title={title}
         subtitle={description}
@@ -63,7 +66,7 @@ const allTags = [...new Set(albums.flatMap((a) => a.tags || []))].sort();
 
       <!-- 相册卡片网格 -->
       {albums.length > 0 ? (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-4 anime-reveal-list">
           {albums.map((album) => (
             <AlbumCard
               id={album.id}

@@ -1,0 +1,418 @@
+/* ============================================================
+   页面级二次元皮肤 (anime-pages.css)
+   ------------------------------------------------------------
+   与 anime-cute.css 分工：
+   - anime-cute.css：全局卡片 / 按钮 / 正文 / 点击星星
+   - anime-pages.css：页面容器、玻璃面板、区块标题、入场动效
+   仅做视觉增强，不改变任何布局与交互逻辑。
+   ============================================================ */
+
+/* ---------- 页面容器 ---------- */
+.anime-page {
+  position: relative;
+}
+
+.anime-page > .anime-panel + .anime-panel,
+.anime-page > .anime-panel + .anime-page-row {
+  margin-top: 1rem;
+}
+
+/* ---------- 玻璃面板 ---------- */
+.anime-panel {
+  position: relative;
+  overflow: hidden;
+  padding: 1.15rem 1.3rem;
+  border-radius: var(--radius-large, 1.35rem);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(255, 199, 224, 0.22), transparent 60%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(255, 250, 253, 0.88));
+  box-shadow:
+    0 18px 44px -34px rgba(255, 120, 180, 0.95),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  transition:
+    transform 0.32s cubic-bezier(0.22, 0.9, 0.3, 1.2),
+    box-shadow 0.32s ease,
+    border-color 0.32s ease;
+}
+
+.anime-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background-image: linear-gradient(90deg, #ff86c8, #ffd96b, #79e6cf, #7fc5ff, #b894ff);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.anime-panel::after {
+  content: "";
+  position: absolute;
+  right: -2.2rem;
+  top: -2.2rem;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 196, 225, 0.5), transparent 70%);
+  pointer-events: none;
+}
+
+:root.dark .anime-panel {
+  border-color: rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(184, 148, 255, 0.16), transparent 60%),
+    linear-gradient(160deg, rgba(38, 28, 48, 0.92), rgba(26, 22, 36, 0.92));
+  box-shadow: 0 18px 44px -30px rgba(0, 0, 0, 0.9);
+}
+
+:root.dark .anime-panel::after {
+  background: radial-gradient(circle, rgba(184, 148, 255, 0.22), transparent 70%);
+}
+
+.anime-panel.is-lift,
+.anime-lift {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 0.9, 0.3, 1.2),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+@media (hover: hover) {
+  .anime-panel.is-lift:hover,
+  .anime-lift:hover {
+    transform: translateY(-4px) rotate(-0.35deg);
+    border-color: rgba(255, 134, 200, 0.6);
+    box-shadow:
+      0 26px 54px -30px rgba(255, 120, 180, 1),
+      0 6px 18px -14px rgba(184, 148, 255, 0.9);
+  }
+}
+
+/* ---------- 区块标题 ---------- */
+.anime-block-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.95rem;
+  flex-wrap: wrap;
+}
+
+.anime-block-emoji {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  flex: 0 0 auto;
+  border-radius: 0.75rem;
+  font-size: 1.05rem;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffe4f1, #eef3ff);
+  border: 1px solid rgba(255, 154, 200, 0.42);
+  box-shadow: 0 6px 14px -12px rgba(255, 120, 180, 1);
+}
+
+:root.dark .anime-block-emoji {
+  background: linear-gradient(135deg, rgba(255, 134, 200, 0.28), rgba(127, 197, 255, 0.22));
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.anime-block-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #5d3a4d;
+}
+
+:root.dark .anime-block-title {
+  color: #f6e6ef;
+}
+
+.anime-block-title::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 3px;
+  margin-top: 0.3rem;
+  border-radius: 999px;
+  background-image: linear-gradient(90deg, #ff86c8, #b894ff, #7fc5ff);
+}
+
+.anime-block-extra {
+  margin-left: auto;
+  font-size: 0.76rem;
+  color: #a3808f;
+}
+
+:root.dark .anime-block-extra {
+  color: rgba(226, 208, 220, 0.72);
+}
+
+/* ---------- 胶囊 / 筛选按钮 ---------- */
+.anime-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.34rem 0.72rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  color: #b0316c;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 154, 200, 0.45);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.anime-pill:hover {
+  transform: translateY(-2px) rotate(-1.5deg);
+  box-shadow: 0 8px 18px -12px rgba(255, 120, 180, 1);
+}
+
+.anime-pill.is-active {
+  color: #fff;
+  background-image: linear-gradient(132deg, #ff7ab6, #b88cff);
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+:root.dark .anime-pill {
+  color: #ffd0e6;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* ---------- 图片框 ---------- */
+.anime-frame {
+  padding: 0.32rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, #fff, #ffeef7 58%, #eef4ff);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 16px 36px -28px rgba(255, 120, 180, 1),
+    0 1px 0 #fff inset;
+}
+
+.anime-frame img {
+  display: block;
+  width: 100%;
+  border-radius: 0.98rem;
+}
+
+:root.dark .anime-frame {
+  background: linear-gradient(135deg, #2b2137, #241d31 58%, #1d2233);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- 分隔线 ---------- */
+.anime-divider {
+  height: 1px;
+  margin: 1rem 0;
+  border: 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 134, 200, 0.55),
+    rgba(127, 197, 255, 0.55),
+    transparent
+  );
+}
+
+/* ---------- 主按钮 ---------- */
+.anime-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.62rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background-image: linear-gradient(132deg, #ff7ab6, #ff9ecb 46%, #b88cff);
+  box-shadow:
+    0 12px 26px -16px rgba(255, 120, 180, 1),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.anime-btn:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 18px 32px -18px rgba(255, 120, 180, 1);
+}
+
+.anime-btn:active {
+  transform: scale(0.96);
+}
+
+.anime-btn.ghost {
+  color: #b0316c;
+  background-image: none;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 154, 200, 0.55);
+  box-shadow: 0 8px 20px -16px rgba(255, 120, 180, 1);
+}
+
+:root.dark .anime-btn.ghost {
+  color: #ffd0e6;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ---------- 入场动效（错峰） ---------- */
+.anime-reveal {
+  animation: anime-page-rise 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anime-reveal-list > * {
+  animation: anime-page-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anime-reveal-list > *:nth-child(1) { animation-delay: 0.02s; }
+.anime-reveal-list > *:nth-child(2) { animation-delay: 0.06s; }
+.anime-reveal-list > *:nth-child(3) { animation-delay: 0.1s; }
+.anime-reveal-list > *:nth-child(4) { animation-delay: 0.14s; }
+.anime-reveal-list > *:nth-child(5) { animation-delay: 0.18s; }
+.anime-reveal-list > *:nth-child(6) { animation-delay: 0.22s; }
+.anime-reveal-list > *:nth-child(7) { animation-delay: 0.26s; }
+.anime-reveal-list > *:nth-child(8) { animation-delay: 0.3s; }
+.anime-reveal-list > *:nth-child(9) { animation-delay: 0.34s; }
+.anime-reveal-list > *:nth-child(10) { animation-delay: 0.38s; }
+.anime-reveal-list > *:nth-child(11) { animation-delay: 0.42s; }
+.anime-reveal-list > *:nth-child(n + 12) { animation-delay: 0.46s; }
+
+/* ---------- 装饰贴纸 ---------- */
+.anime-sticker {
+  position: absolute;
+  z-index: 3;
+  font-size: 1.15rem;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(255, 134, 200, 0.55));
+  animation: anime-page-float 4.6s ease-in-out infinite;
+}
+
+.anime-sticker.is-slow {
+  animation-duration: 7s;
+}
+
+/* ---------- 小卡片 / 快捷入口 ---------- */
+.anime-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.18rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 1.1rem;
+  text-decoration: none;
+  color: #5d3a4d;
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(255, 199, 224, 0.3), transparent 62%),
+    rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 154, 200, 0.4);
+  box-shadow: 0 12px 26px -22px rgba(255, 120, 180, 1);
+  transition:
+    transform 0.26s cubic-bezier(0.22, 0.9, 0.3, 1.2),
+    box-shadow 0.26s ease,
+    border-color 0.26s ease;
+}
+
+.anime-tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 134, 200, 0.7);
+  box-shadow: 0 20px 34px -24px rgba(255, 120, 180, 1);
+}
+
+:root.dark .anime-tile {
+  color: #f2e2ec;
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(184, 148, 255, 0.22), transparent 62%),
+    rgba(40, 30, 50, 0.85);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.anime-tile-emoji {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.anime-tile-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.anime-tile-desc {
+  font-size: 0.7rem;
+  color: #a3808f;
+}
+
+:root.dark .anime-tile-desc {
+  color: rgba(226, 208, 220, 0.7);
+}
+
+/* ---------- 关键帧 ---------- */
+@keyframes anime-page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.988);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes anime-page-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(5deg);
+  }
+}
+
+@keyframes anime-page-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 220% 50%;
+  }
+}
+
+/* ---------- 减少动态 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .anime-reveal,
+  .anime-reveal-list > *,
+  .anime-sticker {
+    animation: none !important;
+  }
+  .anime-panel.is-lift:hover,
+  .anime-lift:hover,
+  .anime-pill:hover,
+  .anime-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* ---------- 导航栏兜底 ---------- */
+/* 独立页面（后台 / 社区 / 用户中心 / 登录）的全局样式可能被一起打包进文章页，
+   这里把导航栏图标按钮的样式钉住，避免被 button padding 这类规则撑成圆圈 */
+#navbar button.btn-plain {
+  padding: 0;
+  background-color: transparent;
+  background-image: none;
+  border: 0;
+}

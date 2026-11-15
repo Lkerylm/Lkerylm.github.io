@@ -1,0 +1,332 @@
+/* ============================================================
+   独立页面二次元皮肤 (anime-console.css)
+   ------------------------------------------------------------
+   给不走 Layout.astro 的独立页面共用：
+   社区列表 / 社区正文 / 用户中心 / 写文章 / 个人资料 / 后台 / 审核
+
+   这些页面本身就是「深色玻璃 + 粉色霓虹」的语言（与登录注册一致），
+   这里统一底色、玻璃卡片、标题渐变、按钮与表单，不改变任何交互逻辑。
+   选择器加了 html body / !important，避免被页面内的局部样式盖掉。
+   ============================================================ */
+
+/* ---------- 页面底色 ---------- */
+html body {
+  background:
+    radial-gradient(62% 46% at 8% 0%, rgba(255, 122, 182, 0.22), transparent 60%),
+    radial-gradient(58% 46% at 92% 4%, rgba(148, 120, 255, 0.2), transparent 60%),
+    radial-gradient(70% 52% at 50% 100%, rgba(127, 197, 255, 0.12), transparent 62%),
+    linear-gradient(160deg, #171426 0%, #0b0a12 100%) !important;
+  background-attachment: fixed !important;
+  color: #f4eaf6;
+}
+
+/* 樱花光斑层 */
+html body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 20%, rgba(255, 154, 200, 0.6) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 12%, rgba(196, 164, 255, 0.5) 0 2px, transparent 3px),
+    radial-gradient(circle at 32% 68%, rgba(255, 210, 232, 0.42) 0 1.5px, transparent 3px),
+    radial-gradient(circle at 88% 74%, rgba(255, 154, 200, 0.38) 0 2px, transparent 3px),
+    radial-gradient(circle at 58% 34%, rgba(160, 220, 255, 0.32) 0 1.5px, transparent 3px);
+  opacity: 0.75;
+  animation: ac-drift 22s linear infinite;
+}
+
+/* 内容浮在光斑之上 */
+.container,
+.wrap,
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- 标题 ---------- */
+html body h1 {
+  background-image: linear-gradient(120deg, #ffd0e6, #ff86c8 42%, #b894ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  letter-spacing: 0.01em;
+}
+
+html body .sub,
+html body .user-info {
+  color: rgba(255, 214, 234, 0.66) !important;
+}
+
+/* ---------- 玻璃卡片 ---------- */
+html body .post-item,
+html body .card,
+html body .stat-card,
+html body .item,
+html body .panel,
+html body .hero,
+html body .header,
+html body .head {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.078), rgba(255, 255, 255, 0.028)) !important;
+  border: 1px solid rgba(255, 154, 200, 0.18) !important;
+  box-shadow:
+    0 18px 44px -34px rgba(255, 122, 182, 0.95),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+html body .post-item:hover,
+html body .card:hover,
+html body .stat-card:hover,
+html body .item:hover {
+  border-color: rgba(255, 154, 200, 0.5) !important;
+  box-shadow:
+    0 24px 52px -32px rgba(255, 122, 182, 1),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+
+html body .post-title,
+html body .item-title {
+  color: #ffe6f2;
+}
+
+html body .post-meta,
+html body .item-meta,
+html body .ctime {
+  color: rgba(255, 214, 234, 0.5) !important;
+}
+
+/* 顶部彩虹描边 */
+html body .hero,
+html body .header,
+html body .head {
+  position: relative;
+  overflow: hidden;
+}
+
+html body .hero::after,
+html body .header::after,
+html body .head::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background-image: linear-gradient(90deg, #ff86c8, #ffd96b, #79e6cf, #7fc5ff, #b894ff);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* ---------- 胶囊 / 标签 ---------- */
+html body .chip,
+html body .badge,
+html body .status,
+html body .status-badge,
+html body .act-chip,
+html body .tab {
+  background: rgba(255, 154, 200, 0.12) !important;
+  border: 1px solid rgba(255, 154, 200, 0.28) !important;
+  color: #ffc0dd !important;
+  border-radius: 999px;
+}
+
+html body .tab.active {
+  background-image: linear-gradient(132deg, #ff7ab6, #b88cff) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 26px -18px rgba(255, 122, 182, 1);
+}
+
+/* 状态色保持语义，只补充霓虹感 */
+html body .status.pending,
+html body .status-badge.pending,
+html body .badge-pending {
+  color: #ffd97a !important;
+  border-color: rgba(255, 217, 122, 0.4) !important;
+}
+
+html body .status.approved,
+html body .status-badge.approved,
+html body .badge-approved {
+  color: #9dffc7 !important;
+  border-color: rgba(157, 255, 199, 0.4) !important;
+}
+
+html body .status.rejected,
+html body .status-badge.rejected,
+html body .badge-rejected {
+  color: #ffb0c0 !important;
+  border-color: rgba(255, 176, 192, 0.4) !important;
+}
+
+/* ---------- 顶部面板装饰 ---------- */
+html body .hero {
+  padding: 32px 22px 26px;
+  border-radius: 22px;
+}
+
+html body .header,
+html body .head {
+  padding: 18px 20px;
+  border-radius: 20px;
+}
+
+html body .hero-emoji {
+  animation: ac-bob 4.2s ease-in-out infinite;
+}
+
+html body .notif-box {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(255, 154, 200, 0.2);
+  box-shadow: 0 18px 44px -34px rgba(255, 122, 182, 0.95);
+}
+
+html body .notif-box h2 {
+  font-size: 1rem !important;
+  margin: 0 0 12px !important;
+  color: #ffe6f2;
+}
+
+html body #notifCount {
+  font-size: 0.8rem !important;
+  color: #ff9ac8 !important;
+}
+
+html body .list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- 按钮 ---------- */
+html body .btn-primary {
+  background-image: linear-gradient(135deg, #ff86c8, #b894ff) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 30px -20px rgba(255, 122, 182, 1);
+}
+
+html body .btn-primary:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 20px 38px -20px rgba(255, 122, 182, 1);
+}
+
+html body .btn-ghost {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 154, 200, 0.24) !important;
+  color: #ffd0e6 !important;
+}
+
+html body .btn-ghost:hover {
+  background: rgba(255, 154, 200, 0.16) !important;
+  transform: translateY(-2px);
+}
+
+html body .btn,
+html body .act,
+html body a[href],
+html body button {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* ---------- 表单 ---------- */
+html body input,
+html body textarea,
+html body select {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 154, 200, 0.22) !important;
+  border-radius: 12px;
+  color: #fff;
+}
+
+html body input:focus,
+html body textarea:focus,
+html body select:focus {
+  outline: none;
+  border-color: rgba(255, 134, 200, 0.65) !important;
+  box-shadow: 0 0 0 3px rgba(255, 134, 200, 0.14);
+}
+
+/* ---------- 空状态 / 加载 ---------- */
+html body .empty,
+html body .loading {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px dashed rgba(255, 154, 200, 0.26);
+  border-radius: 18px;
+  color: rgba(255, 214, 234, 0.6) !important;
+}
+
+/* ---------- 链接胶囊 ---------- */
+html body .links a,
+html body .back {
+  color: #ffb3d9 !important;
+}
+
+html body .links a {
+  background: rgba(255, 154, 200, 0.1) !important;
+  border: 1px solid rgba(255, 154, 200, 0.24) !important;
+}
+
+html body .links a:hover {
+  background: rgba(255, 154, 200, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+/* ---------- 正文 / 评论 ---------- */
+html body .content,
+html body .comment {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.068), rgba(255, 255, 255, 0.026)) !important;
+  border: 1px solid rgba(255, 154, 200, 0.18) !important;
+  border-radius: 16px;
+}
+
+html body .cname {
+  color: #ffb3d9 !important;
+}
+
+/* ---------- 小装饰 ---------- */
+::selection {
+  background: rgba(255, 134, 200, 0.45);
+  color: #fff;
+}
+
+html body ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html body ::-webkit-scrollbar-thumb {
+  background-image: linear-gradient(180deg, #ff9ac8, #b894ff);
+  border-radius: 999px;
+}
+
+html body ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes ac-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-18px, 14px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body::before {
+    animation: none !important;
+  }
+}

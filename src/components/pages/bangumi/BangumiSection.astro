@@ -155,4 +155,12 @@ const defaultFilter = "all"; // 默认显示全部，用户可以通过筛选器
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 0.75rem;
   }
+
+  /* 手机：强制两列，避免 180px 下限把卡片撑成一列或挤成怪比例 */
+  @media (max-width: 639px) {
+    .bangumi-masonry {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+  }
 </style>

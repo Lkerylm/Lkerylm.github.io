@@ -149,7 +149,7 @@
     <div>
       <h1>下载「我的动漫小屋」App</h1>
       <p class="sub">手机上的画面和网站<b>完全一样</b>：同样的马卡龙配色、看板娘、壁纸和小鼠标角色。<br>
-        两个版本界面一致，区别只在于内容从哪里来。</p>
+        两个版本界面一致，区别只在于内容从哪里来 · 当前版本 <b>3.0.2</b>。</p>
     </div>
   </div>
 
@@ -164,8 +164,8 @@
       <li>需要联网（流量或 Wi-Fi 都行）</li>
       <li>收藏、阅读记录等保存在手机本地</li>
     </ul>
-    <a class="dl" href="/app/AnimeHome-3.0.1-online.apk" download>⬇️ 下载在线版 APK</a>
-    <div class="meta">包名 com.lkerylm.firefly.online · 3.0.1 · 可与离线版同时安装 · 已签名</div>
+    <a class="dl" href="/app/AnimeHome-3.0.2-online.apk" download>⬇️ 下载在线版 APK</a>
+    <div class="meta">包名 com.lkerylm.firefly.online · 3.0.2（versionCode 8）· 3.7 MB · 可与离线版同时安装 · 已签名</div>
   </div>
 
   <div class="card">
@@ -175,10 +175,28 @@
     <ul>
       <li>不联网也能打开所有文章和页面</li>
       <li>壁纸轮播、看板娘、跟随鼠标的 Live2D 少女一个不少</li>
+      <li><b>3.0.2 新增</b>：内置离线小页面（断网时自动显示，带重试按钮）</li>
       <li>缺点是不会自动更新，网站更新后要重新下载这个 APK</li>
     </ul>
-    <a class="dl ghost" href="/app/AnimeHome-3.0.1-offline.apk" download>⬇️ 下载离线版 APK</a>
-    <div class="meta">包名 com.lkerylm.firefly · versionCode 7 · 可覆盖安装旧版本</div>
+    <a class="dl ghost" href="/app/AnimeHome-3.0.2-offline.apk" download>⬇️ 下载离线版 APK</a>
+    <div class="meta">包名 com.lkerylm.firefly · 3.0.2（versionCode 9）· 47.2 MB · 可直接覆盖安装 3.0.1</div>
+  </div>
+
+  <div class="card">
+    <h2>iOS 版<span class="tag">添加到主屏幕 · 免装 App</span></h2>
+    <div class="desc">iPhone / iPad 装不了 APK，苹果也不允许随便装别人的安装包，
+      所以 iOS 走的是 <b>PWA</b>：用 Safari 打开本站 →「分享 → 添加到主屏幕」，
+      主屏上会多一个樱花图标，点开就是<b>没有地址栏的全屏小屋</b>，用起来和 App 一样。</div>
+    <ul>
+      <li>① Safari 打开 <code>lkerylm.github.io</code></li>
+      <li>② 点底部「分享」按钮 →「添加到主屏幕」→ 添加</li>
+      <li>③ 从主屏图标打开，就是全屏的小屋（在线版，内容永远最新）</li>
+      <li>④ 想离线看：联网时把想看的文章先翻一遍，会自动存进手机</li>
+    </ul>
+    <a class="dl" href="/ios/">📖 iOS 安装图文教程（3 步 · 带图）</a>
+    <a class="dl ghost" href="/" style="margin-top:10px">🍎 用 Safari 打开小屋（在线版）</a>
+    <a class="dl ghost" href="/offline/" style="margin-top:10px">📴 看看离线小页面</a>
+    <div class="meta">离线缓存由网站的 Service Worker 负责 · 逛过的页面、图片、样式都会留在手机里，断网也能翻</div>
   </div>
 
   <div class="card">
@@ -186,12 +204,15 @@
     <ul>
       <li>第一次安装时安卓会提示「未知来源应用」，在设置里允许本次安装即可</li>
       <li>两个版本包名不同，可以同时装在手机上对比</li>
+      <li>iPhone / iPad 不用装包，按上面「iOS 版」把网页添加到主屏幕就好</li>
+      <li>离线内容存在手机本地，想清掉可以在浏览器设置里清除本站网站数据</li>
       <li>App 只负责把网页装进手机，不会上传你的任何数据</li>
+      <li>想核对文件有没有下坏：站内的 <a href="/app/SHA256SUMS.txt">SHA256SUMS.txt</a> 里有四个包的校验值</li>
     </ul>
     <a class="dl ghost" href="/">← 返回网站首页</a>
   </div>
 
-  <div class="foot">「我的动漫小屋」3.0.1 · <a href="/">lkerylm.github.io</a></div>
+  <div class="foot">「我的动漫小屋」3.0.2 · <a href="/">lkerylm.github.io</a></div>
 </div>
 </body>
 </html>

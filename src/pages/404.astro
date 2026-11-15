@@ -1,21 +1,42 @@
 ---
 import { Icon } from "astro-icon/components";
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { url } from "@/utils/url-utils";
 
 /**
  * 404 · 走丢的小页面
- * 粉紫渐变 + 漂浮小图标 + 软软的语气，
+ * 动画头图 + 糖果色面板 + 漂浮小图标 + 软软的语气，
  * 同时给「回首页 / 全站搜索 / 公益寻亲」三个出口。
  */
+const exits = [
+	{ emoji: "🏠", label: "回小屋首页", desc: "从首页重新出发", href: url("/") },
+	{ emoji: "🔍", label: "全站搜一搜", desc: "换个名字也许还在", href: url("/search/") },
+	{ emoji: "🗂️", label: "时光归档", desc: "按年份翻旧番", href: url("/archive/") },
+	{ emoji: "🧸", label: "公益寻亲", desc: "顺手做件温暖的事", href: url("/aid/") },
+];
 ---
 
 <MainGridLayout
   title="页面走丢了"
   description="呜…这个页面好像出去玩还没回来。回首页、搜一搜，或者去看看公益寻亲吧。"
 >
-  <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-96">
-    <div class="not-found-card card-base z-10 px-6 md:px-10 py-12 relative w-full flex flex-col items-center justify-center text-center">
+  <div class="anime-page not-found-page">
+    <AnimePageHero
+      kicker="ERROR 404 · 迷路了"
+      emoji="🍥"
+      title="页面走丢了"
+      subtitle="它可能被小狐狸叼去森林里玩了，也可能换了新名字。别担心，我们还有这些地方可以去～"
+      chips={["迷路的小页面", "回首页", "搜一搜", "公益寻亲"]}
+      tone="grape"
+      video="/welcome.mp4"
+      image="/anime-wallpaper/desktop-02.avif"
+    >
+      <a class="anime-hero-btn primary" href={url("/")} data-sound="open">回小屋首页 →</a>
+      <a class="anime-hero-btn" href={url("/search/")} data-sound="tap">🔍 全站搜一搜</a>
+    </AnimePageHero>
+
+    <div class="anime-panel is-lift anime-reveal nf-card">
       <span class="nf-float nf-float-a" aria-hidden="true">🍥</span>
       <span class="nf-float nf-float-b" aria-hidden="true">🎀</span>
       <span class="nf-float nf-float-c" aria-hidden="true">✨</span>
@@ -23,22 +44,22 @@ import { url } from "@/utils/url-utils";
 
       <div class="nf-num" aria-hidden="true">4<span class="nf-zero">0</span>4</div>
 
-      <h1 class="nf-title">呜…这个页面走丢了</h1>
+      <h2 class="nf-title">呜…这个页面走丢了</h2>
       <p class="nf-desc">
         它可能被小狐狸叼去森林里玩了，也可能换了新名字。<br />
         别担心，我们还有这些地方可以去～
       </p>
 
       <div class="nf-actions">
-        <a href={url("/")} class="nf-btn nf-btn-primary">
+        <a href={url("/")} class="anime-btn" data-sound="open">
           <Icon name="mingcute:home-5-fill" class="text-lg" />
           回小屋首页
         </a>
-        <a href={url("/search/")} class="nf-btn">
+        <a href={url("/search/")} class="anime-btn ghost" data-sound="tap">
           <Icon name="mingcute:search-3-line" class="text-lg" />
           全站搜一搜
         </a>
-        <a href={url("/aid/")} class="nf-btn nf-btn-aid">
+        <a href={url("/aid/")} class="anime-btn ghost" data-sound="tap">
           <Icon name="mingcute:heart-fill" class="text-lg" />
           公益寻亲
         </a>
@@ -46,38 +67,61 @@ import { url } from "@/utils/url-utils";
 
       <p class="nf-hint">小提示：在 Edge 地址栏输入站名就能直接找到我们哦～</p>
     </div>
+
+    <div class="anime-panel anime-reveal">
+      <div class="anime-block-head">
+        <span class="anime-block-emoji" aria-hidden="true">🧭</span>
+        <h2 class="anime-block-title">换个入口再逛逛</h2>
+        <span class="anime-block-extra">四条回到二次元的小路</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 anime-reveal-list">
+        {exits.map((item) => (
+          <a class="anime-tile" href={item.href} data-sound="tap">
+            <span class="anime-tile-emoji" aria-hidden="true">{item.emoji}</span>
+            <span class="anime-tile-title">{item.label}</span>
+            <span class="anime-tile-desc">{item.desc}</span>
+          </a>
+        ))}
+      </div>
+    </div>
   </div>
 </MainGridLayout>
 
 <style>
-  .not-found-card {
-    animation: nf-in 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    background-image:
-      radial-gradient(80% 60% at 15% 10%, rgba(255, 199, 224, 0.55), transparent 60%),
-      radial-gradient(70% 60% at 90% 90%, rgba(205, 216, 255, 0.45), transparent 60%);
+  .not-found-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nf-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .nf-num {
-    font-size: clamp(4.5rem, 14vw, 8rem);
+    font-size: clamp(4rem, 13vw, 7rem);
     font-weight: 900;
     line-height: 1;
     letter-spacing: 0.08em;
-    color: rgba(255, 154, 200, 0.28);
-    margin-bottom: 0.25rem;
+    color: rgba(255, 154, 200, 0.3);
+    margin-bottom: 0.15rem;
     user-select: none;
   }
 
   .nf-zero {
     display: inline-block;
-    color: rgba(255, 154, 200, 0.65);
+    color: rgba(255, 154, 200, 0.7);
     animation: nf-bob 3s ease-in-out infinite;
   }
 
   .nf-title {
-    font-size: 1.55rem;
+    font-size: 1.45rem;
     font-weight: 800;
     color: #7d2b52;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.55rem;
   }
 
   :global(.dark) .nf-title {
@@ -85,7 +129,7 @@ import { url } from "@/utils/url-utils";
   }
 
   .nf-desc {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     line-height: 1.85;
     color: #6f5a66;
     max-width: 30rem;
@@ -100,43 +144,7 @@ import { url } from "@/utils/url-utils";
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.6rem;
-    margin: 1.4rem 0 1rem;
-  }
-
-  .nf-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem 1.1rem;
-    border-radius: 99px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: #b0316c;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(255, 154, 200, 0.5);
-    transition:
-      transform 0.2s ease,
-      box-shadow 0.2s ease,
-      background 0.2s ease;
-  }
-
-  .nf-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px -12px rgba(255, 120, 180, 0.9);
-    background: #fff;
-  }
-
-  .nf-btn-primary {
-    color: #fff;
-    background: linear-gradient(135deg, #ff8dc0, #ffb37a);
-    border-color: transparent;
-  }
-
-  .nf-btn-aid {
-    color: #8c4323;
-    border-color: rgba(255, 190, 150, 0.7);
-    background: rgba(255, 248, 242, 0.9);
+    margin: 1.35rem 0 0.9rem;
   }
 
   .nf-hint {
@@ -144,46 +152,40 @@ import { url } from "@/utils/url-utils";
     color: rgba(150, 130, 140, 0.85);
   }
 
+  :global(.dark) .nf-hint {
+    color: rgba(226, 208, 220, 0.6);
+  }
+
   .nf-float {
     position: absolute;
-    font-size: 1.4rem;
+    z-index: 2;
+    font-size: 1.35rem;
     opacity: 0.75;
     animation: nf-float 6s ease-in-out infinite;
     pointer-events: none;
   }
 
   .nf-float-a {
-    top: 12%;
-    left: 8%;
+    top: 10%;
+    left: 7%;
   }
 
   .nf-float-b {
-    top: 18%;
-    right: 10%;
+    top: 16%;
+    right: 9%;
     animation-delay: 1.2s;
   }
 
   .nf-float-c {
-    bottom: 16%;
-    left: 14%;
+    bottom: 14%;
+    left: 12%;
     animation-delay: 2.4s;
   }
 
   .nf-float-d {
-    bottom: 12%;
-    right: 12%;
+    bottom: 10%;
+    right: 11%;
     animation-delay: 3.1s;
-  }
-
-  @keyframes nf-in {
-    from {
-      opacity: 0;
-      transform: translateY(18px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   @keyframes nf-bob {
@@ -207,12 +209,9 @@ import { url } from "@/utils/url-utils";
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .not-found-card,
     .nf-zero,
     .nf-float {
       animation: none !important;
     }
   }
 </style>
-
-

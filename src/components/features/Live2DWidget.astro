@@ -1,6 +1,8 @@
 ---
+import type { Live2DModelConfig } from "@/types/config";
+
 interface Props {
-	config: any;
+	config: Live2DModelConfig;
 }
 const { config } = Astro.props;
 const size = config.size || { width: 600, height: 700 };
@@ -46,7 +48,41 @@ const size = config.size || { width: 600, height: 700 };
 			opacity: 0.75; transition: all 0.2s; font-family: inherit; padding: 0;
 		`}
 	>🎭</button>
+	<button
+		id="live2d-hide"
+		title="收起看板娘"
+		aria-label="收起看板娘"
+		style={`
+			position: absolute; top: 90px; right: 6px;
+			width: 34px; height: 34px;
+			border: none; border-radius: 50%;
+			background: rgba(0, 0, 0, 0.35); color: #fff;
+			font-size: 16px; cursor: pointer; z-index: 10;
+			display: flex; align-items: center; justify-content: center;
+			opacity: 0.75; transition: all 0.2s; font-family: inherit; padding: 0;
+		`}
+	>➖</button>
 </div>
+
+<!-- 收起后的小气球按钮：点一下把看板娘叫回来 -->
+<button
+	id="live2d-restore"
+	title="召唤看板娘"
+	aria-label="召唤看板娘"
+	style={`
+		position: fixed; right: 14px; bottom: 14px;
+		width: 46px; height: 46px;
+		border: 1px solid rgba(255, 154, 200, 0.55);
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.9);
+		box-shadow: 0 6px 18px rgba(255, 124, 184, 0.28);
+		color: #e0568f; font-size: 20px; line-height: 1;
+		align-items: center; justify-content: center;
+		cursor: pointer; z-index: 999998; display: none;
+		font-family: inherit; padding: 0;
+		transition: transform 0.25s ease;
+	`}
+>🎀</button>
 
 <div id="l2d-model-panel" style="
 	position: fixed; right: 12px; bottom: 12px;
@@ -189,7 +225,119 @@ const size = config.size || { width: 600, height: 700 };
 		0% { margin-left: -40%; }
 		100% { margin-left: 100%; }
 	}
+
+	/*
+	 * ⭐ 看板娘尺寸自适应：模型按 600×700 的 canvas 渲染，
+	 * 小屏上会盖住正文（尤其手机上几乎遮掉半屏），这里用整体缩放解决，
+	 * 缩放不影响 canvas 内部渲染，也不需要重新加载模型。
+	 */
+	#live2d-widget {
+		transform-origin: 100% 100%;
+		transition: transform 0.4s ease;
+	}
+
+	@media (max-width: 1599px) {
+		#live2d-widget { transform: scale(0.72); }
+	}
+
+	@media (max-width: 1279px) {
+		#live2d-widget { transform: scale(0.62); }
+	}
+
+	@media (max-width: 1023px) {
+		#live2d-widget { transform: scale(0.52); }
+	}
+
+	@media (max-width: 767px) {
+		#live2d-widget { transform: scale(0.42); }
+	}
+
+	@media (max-width: 479px) {
+		#live2d-widget { transform: scale(0.34); }
+	}
+
+	/* 模型面板 / 加载动画跟随缩放后的位置，避免飘在屏幕中间 */
+	@media (max-width: 767px) {
+		#l2d-model-panel { right: 8px; bottom: 8px; width: 240px; }
+	}
+
+	/* 手动收起看板娘：只改可见性，不影响 canvas 内部状态 */
+	#live2d-widget.l2d-hidden {
+		visibility: hidden !important;
+		opacity: 0 !important;
+		pointer-events: none !important;
+	}
+
+	#live2d-widget #live2d-hide:hover,
+	#live2d-restore:hover {
+		transform: scale(1.08);
+	}
 </style>
+
+<script is:inline>
+	// 🎀 看板娘收起 / 召唤（记住选择，跳页也不会自己冒出来）
+	(function () {
+		const KEY = "l2d_hidden_v1";
+
+		function readHidden() {
+			try {
+				return localStorage.getItem(KEY) === "1";
+			} catch (e) {
+				return false;
+			}
+		}
+
+		function writeHidden(hidden) {
+			try {
+				if (hidden) localStorage.setItem(KEY, "1");
+				else localStorage.removeItem(KEY);
+			} catch (e) {}
+		}
+
+		function apply(hidden) {
+			const widget = document.getElementById("live2d-widget");
+			const restore = document.getElementById("live2d-restore");
+			if (!widget || !restore) return;
+			widget.classList.toggle("l2d-hidden", hidden);
+			widget.style.pointerEvents = hidden ? "none" : "";
+			restore.style.display = hidden ? "flex" : "none";
+		}
+
+		function bind() {
+			const widget = document.getElementById("live2d-widget");
+			const hide = document.getElementById("live2d-hide");
+			const restore = document.getElementById("live2d-restore");
+			if (!widget || !hide || !restore) return;
+
+			if (!hide.dataset.l2dBound) {
+				hide.dataset.l2dBound = "1";
+				hide.addEventListener("click", (event) => {
+					event.preventDefault();
+					event.stopPropagation();
+					writeHidden(true);
+					apply(true);
+				});
+			}
+
+			if (!restore.dataset.l2dBound) {
+				restore.dataset.l2dBound = "1";
+				restore.addEventListener("click", () => {
+					writeHidden(false);
+					apply(false);
+				});
+			}
+
+			apply(readHidden());
+		}
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", bind);
+		} else {
+			bind();
+		}
+		document.addEventListener("astro:page-load", bind);
+	})();
+</script>
 
 <script is:inline defer src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script>
 <script is:inline defer src="/Firefly-live2d-main/load/pixi.min.js"></script>
@@ -199,7 +347,7 @@ const size = config.size || { width: 600, height: 700 };
 	(function () {
 		// ⭐ 核心修复：将 Live2D 相关元素移到 body 下，彻底摆脱父容器 overflow 和 transform 的影响
 		function moveElementsToBody() {
-			const ids = ['live2d-widget', 'l2d-model-panel', 'l2d-loading', 'l2d-sound-tip', 'l2d-splash', 'l2d-video-wrap', 'l2d-welcome'];
+			const ids = ['live2d-widget', 'live2d-restore', 'l2d-model-panel', 'l2d-loading', 'l2d-sound-tip', 'l2d-splash', 'l2d-video-wrap', 'l2d-welcome'];
 			ids.forEach(id => {
 				const el = document.getElementById(id);
 				if (el && el.parentElement !== document.body) {

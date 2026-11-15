@@ -769,6 +769,8 @@ export type AidConfig = {
 	closeable: boolean; // 是否允许访客手动关闭
 	rememberDays: number; // 关闭后多少天内不再自动弹出
 	position: "bottom-right" | "bottom-left"; // 卡片位置
+	art: boolean; // 卡片左右两侧是否显示小插画
+	sideRail: boolean; // 宽屏时是否在左边缘显示竖排书签入口
 	rotateSeconds: number; // 轮播间隔（秒）
 	refreshMinutes: number; // 数据刷新间隔（分钟）
 	dataUrl: string; // 数据 JSON 地址（相对站点根目录）

@@ -69,27 +69,41 @@ const hiddenCoverTagCount = Math.max(
 	displayTags.length - visibleCoverTags.length,
 	0,
 );
+
+const displayTitle = item.subject.name_cn || item.subject.name;
+const coverImage = item.subject?.images?.medium || "";
+const coverArt = item.subject.coverArt;
+
+// 本地兜底清单没有 Bangumi 条目 ID，就跳到站内搜索，避免链接到 /subject/0
+const subjectHref =
+	item.subject.id > 0
+		? `${subject_base_url}${item.subject.id}`
+		: `https://bgm.tv/subject_search/${encodeURIComponent(displayTitle)}`;
 ---
 
 <a
-  href={`${subject_base_url}${item.subject.id}`}
+  href={subjectHref}
   target="_blank"
   rel="noopener noreferrer nofollow"
   class="group relative overflow-hidden rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-[1.02] block"
 >
   <div class="aspect-2/3 relative overflow-hidden">
-    {item.subject?.images?.medium ? (
+    {coverImage ? (
       <img
-        src={loadImage ? item.subject.images.medium : undefined}
-        data-src={loadImage ? undefined : item.subject.images.medium}
+        src={loadImage ? coverImage : undefined}
+        data-src={loadImage ? undefined : coverImage}
         alt={item.subject.name_cn || item.subject.name}
         class="w-full h-full object-cover pointer-events-none transition-transform duration-500 group-hover:scale-105"
         loading="lazy"
         decoding="async"
       />
     ) : (
-      <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-        <div class="text-gray-400 text-4xl">📖</div>
+      <div
+        class="bangumi-cover-fallback"
+        style={`--cover-a:${coverArt?.gradient?.[0] ?? "#ffd9ea"};--cover-b:${coverArt?.gradient?.[1] ?? "#c9b8ff"};`}
+      >
+        <span class="bangumi-cover-halo" aria-hidden="true"></span>
+        <span class="bangumi-cover-emoji" aria-hidden="true">{coverArt?.emoji ?? "🌸"}</span>
       </div>
     )}
 
@@ -113,9 +127,14 @@ const hiddenCoverTagCount = Math.max(
         {item.subject.name_cn || item.subject.name}
       </h3>
 
-      {item.subject.date && (
-        <p class="text-xs text-white/60 mt-1">
-          {item.subject.date.substring(0, 4)}
+      {(item.subject.date || item.ep_status > 0) && (
+        <p class="text-xs text-white/60 mt-1 flex items-center gap-1.5 flex-wrap">
+          {item.subject.date && <span>{item.subject.date.substring(0, 4)}</span>}
+          {item.ep_status > 0 && item.subject.eps > 0 && (
+            <span>
+              进度 {item.ep_status}/{item.subject.eps}
+            </span>
+          )}
         </p>
       )}
 
@@ -142,3 +161,66 @@ const hiddenCoverTagCount = Math.max(
     </div>
   </div>
 </a>
+
+<style>
+  /* 没有封面图时的粉彩占位封面（本地兜底清单 / 接口缺图都用它） */
+  .bangumi-cover-fallback {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    background:
+      radial-gradient(120% 90% at 20% 0%, rgba(255, 255, 255, 0.85), transparent 62%),
+      linear-gradient(150deg, var(--cover-a, #ffd9ea), var(--cover-b, #c9b8ff));
+    overflow: hidden;
+  }
+
+  .bangumi-cover-fallback::after {
+    content: "";
+    position: absolute;
+    right: -30%;
+    bottom: -45%;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    filter: blur(2px);
+  }
+
+  .bangumi-cover-halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 112px;
+    height: 112px;
+    margin: -56px 0 0 -56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    filter: blur(6px);
+  }
+
+  .bangumi-cover-emoji {
+    position: relative;
+    z-index: 1;
+    font-size: 3rem;
+    line-height: 1;
+    filter: drop-shadow(0 4px 10px rgba(120, 80, 140, 0.25));
+    transition: transform 0.4s ease;
+  }
+
+  :global(.group:hover) .bangumi-cover-emoji {
+    transform: translateY(-3px) scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bangumi-cover-emoji {
+      transition: none;
+    }
+  }
+</style>

@@ -1,343 +1,714 @@
 ---
 import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
 import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+import AuthLive2D from "@/components/features/AuthLive2D.astro";
 import ServerConnect from "@/components/features/ServerConnect.astro";
+
 export const prerender = true;
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>注册 - 我的动漫小屋</title>
-  <AnimeHeadMeta />
-  <script is:inline src="/firefly-api.js"></script>
-  <style is:global>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at 50% 40%, #22254a 0%, #0a0b12 70%, #050609 100%);
-      font-family: "Noto Sans SC", system-ui, -apple-system, sans-serif;
-      color: #fff;
-      padding: 20px;
-      overflow: hidden;
-      position: relative;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      top: 40%; left: 50%;
-      width: 80vmin; height: 80vmin;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(167, 139, 250, 0.25) 0%, rgba(255, 154, 200, 0.12) 40%, transparent 70%);
-      border-radius: 50%;
-      filter: blur(40px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    #reg-l2d {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 1;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    #reg-l2d canvas {
-      background: transparent !important;
-      display: block !important;
-      position: absolute !important;
-      top: 0 !important; left: 0 !important;
-    }
-    .petals {
-      position: fixed; inset: 0;
-      pointer-events: none; z-index: 2; overflow: hidden;
-    }
-    .petal {
-      position: absolute; top: -5%;
-      width: 10px; height: 10px;
-      background: radial-gradient(circle, #ffc0d9 0%, #ff7ab8 60%, transparent 70%);
-      border-radius: 50% 0 50% 50%;
-      opacity: 0.85; filter: blur(0.3px);
-      animation: fall linear infinite;
-    }
-    @keyframes fall {
-      0%   { transform: translate3d(0, -5vh, 0) rotate(0deg); opacity: 0; }
-      10%  { opacity: 0.9; }
-      100% { transform: translate3d(30px, 110vh, 0) rotate(360deg); opacity: 0; }
-    }
-    .card {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 420px;
-      margin-left: auto;
-      margin-right: 8vw;
-      background: rgba(20, 20, 30, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      padding: 40px 34px;
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 60px rgba(167,139,250,0.1);
-      animation: cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(20px) scale(0.96); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .logo { text-align: center; margin-bottom: 6px; }
-    .logo-icon {
-      display: inline-block;
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #a78bfa, #ff9ac8);
-      box-shadow: 0 10px 30px rgba(167,139,250,0.4);
-      font-size: 26px; line-height: 52px;
-      text-align: center; margin-bottom: 12px;
-    }
-    h1 { margin: 0 0 6px; font-size: 24px; text-align: center; font-weight: 700; letter-spacing: 0.05em; }
-    .sub { text-align: center; color: rgba(255,255,255,0.5); font-size: 12px; margin-bottom: 26px; letter-spacing: 0.1em; }
-    label { display: block; font-size: 13px; margin-bottom: 8px; color: rgba(255,255,255,0.75); font-weight: 500; }
-    input {
-      width: 100%; padding: 12px 15px;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 12px;
-      color: #fff; font-size: 14px;
-      margin-bottom: 18px; outline: none;
-      transition: all 0.2s; font-family: inherit;
-    }
-    input:focus { border-color: #a78bfa; background: rgba(0,0,0,0.5); box-shadow: 0 0 0 4px rgba(167,139,250,0.12); }
-    input::placeholder { color: rgba(255,255,255,0.3); }
-    button {
-      width: 100%; padding: 13px;
-      background: linear-gradient(135deg, #a78bfa, #ff9ac8);
-      border: none; border-radius: 12px;
-      color: #fff; font-size: 15px; font-weight: 600;
-      cursor: pointer; margin-top: 6px;
-      letter-spacing: 0.1em; transition: all 0.25s;
-      font-family: inherit;
-      box-shadow: 0 10px 24px rgba(167,139,250,0.25);
-    }
-    button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(167,139,250,0.4); }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-    .msg { margin-top: 16px; padding: 11px 15px; border-radius: 10px; font-size: 13px; display: none; }
-    .msg.err { display: block; background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
-    .msg.ok  { display: block; background: rgba(100,255,150,0.15); color: #a8ffc4; border: 1px solid rgba(100,255,150,0.3); }
-    .links { margin-top: 20px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.5); }
-    .links a { color: #a78bfa; text-decoration: none; margin: 0 6px; transition: all 0.2s; }
-    .links a:hover { color: #fff; }
-    .divider { color: rgba(255,255,255,0.2); margin: 0 4px; }
-    @media (max-width: 900px) {
-      .card { margin-left: auto; margin-right: auto; }
-      #reg-l2d { opacity: 0.35; }
-    }
-  </style>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>注册 · 我的动漫小屋</title>
+	<AnimeHeadMeta />
+	<script is:inline src="/firefly-api.js"></script>
+	<style is:global>
+		body.console-register *{
+			box-sizing: border-box;
+		}
+
+		body.console-register{
+			margin: 0;
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: radial-gradient(
+				circle at 50% 38%,
+				#2a2350 0%,
+				#12111d 62%,
+				#07060c 100%
+			);
+			font-family: "Noto Sans SC", system-ui, -apple-system, "PingFang SC",
+				"Microsoft YaHei", sans-serif;
+			color: #fff;
+			padding: 20px;
+			overflow: hidden;
+			position: relative;
+		}
+
+		/* 卡片后方的一团柔光，让深色背景不那么闷 */
+		body.console-register body::before{
+			content: "";
+			position: fixed;
+			top: 38%;
+			left: 50%;
+			width: 86vmin;
+			height: 86vmin;
+			transform: translate(-50%, -50%);
+			background: radial-gradient(
+				circle,
+				rgba(255, 154, 200, 0.26) 0%,
+				rgba(150, 130, 255, 0.14) 42%,
+				transparent 72%
+			);
+			border-radius: 50%;
+			filter: blur(42px);
+			pointer-events: none;
+			z-index: 0;
+		}
+
+		/* 樱花：登录页的固定小浪漫 */
+		body.console-register .petals{
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
+			z-index: 2;
+			overflow: hidden;
+		}
+
+		body.console-register .petal{
+			position: absolute;
+			top: -5%;
+			width: 10px;
+			height: 10px;
+			background: radial-gradient(
+				circle,
+				#ffc0d9 0%,
+				#ff7ab8 60%,
+				transparent 70%
+			);
+			border-radius: 50% 0 50% 50%;
+			opacity: 0.85;
+			filter: blur(0.3px);
+			animation: fall linear infinite;
+		}
+
+		@keyframes fall{
+			0% {
+				transform: translate3d(0, -5vh, 0) rotate(0deg);
+				opacity: 0;
+			}
+			10% {
+				opacity: 0.9;
+			}
+			100% {
+				transform: translate3d(30px, 110vh, 0) rotate(360deg);
+				opacity: 0;
+			}
+		}
+
+		/* ===== 登录卡片 ===== */
+		body.console-register .card{
+			position: relative;
+			z-index: 10;
+			width: 100%;
+			max-width: 408px;
+			margin-left: auto;
+			margin-right: 7vw;
+			padding: 34px 32px 28px;
+			border-radius: 26px;
+			background: linear-gradient(
+				160deg,
+				rgba(46, 38, 64, 0.78) 0%,
+				rgba(24, 21, 34, 0.86) 100%
+			);
+			border: 1px solid rgba(255, 175, 214, 0.28);
+			backdrop-filter: blur(24px) saturate(1.2);
+			-webkit-backdrop-filter: blur(24px) saturate(1.2);
+			box-shadow:
+				0 24px 70px rgba(0, 0, 0, 0.62),
+				0 0 0 6px rgba(255, 154, 200, 0.05),
+				0 0 60px rgba(255, 154, 200, 0.12);
+			animation: cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		/* 卡片顶部一条粉紫渐变光带，像贴了张和纸胶带 */
+		body.console-register .card::before{
+			content: "";
+			position: absolute;
+			top: -1px;
+			left: 26px;
+			right: 26px;
+			height: 3px;
+			border-radius: 0 0 6px 6px;
+			background: linear-gradient(
+				90deg,
+				transparent,
+				#ff9ac8 18%,
+				#c4a4ff 52%,
+				#9ad7ff 82%,
+				transparent
+			);
+			opacity: 0.9;
+		}
+
+		@keyframes cardIn{
+			from {
+				opacity: 0;
+				transform: translateY(22px) scale(0.96);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+		}
+		/* ===== 标题 ===== */
+		body.console-register .card-head{
+			display: flex;
+			align-items: center;
+			gap: 13px;
+			margin-bottom: 18px;
+		}
+
+		body.console-register .mascot{
+			flex-shrink: 0;
+			width: 54px;
+			height: 54px;
+			border-radius: 50%;
+			display: grid;
+			place-items: center;
+			font-size: 26px;
+			line-height: 1;
+			background: linear-gradient(135deg, #ff9ac8, #a78bfa);
+			box-shadow:
+				0 10px 26px rgba(255, 154, 200, 0.36),
+				inset 0 -3px 8px rgba(0, 0, 0, 0.16);
+			animation: bob 4.2s ease-in-out infinite;
+		}
+
+		body.console-register .card-head h1{
+			margin: 0;
+			font-size: 21px;
+			font-weight: 700;
+			letter-spacing: 0.02em;
+		}
+
+		body.console-register .card-head .sub{
+			margin-top: 3px;
+			font-size: 11.5px;
+			letter-spacing: 0.16em;
+			color: rgba(255, 255, 255, 0.46);
+		}
+
+		@keyframes bob{
+			0%,
+			100% {
+				transform: translateY(0) rotate(-3deg);
+			}
+			50% {
+				transform: translateY(-4px) rotate(3deg);
+			}
+		}
+
+		/* ===== 表单 ===== */
+		body.console-register .field{
+			position: relative;
+			margin-bottom: 13px;
+		}
+
+		body.console-register .field .ico{
+			position: absolute;
+			left: 14px;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 14px;
+			line-height: 1;
+			opacity: 0.85;
+			pointer-events: none;
+		}
+
+		body.console-register .field input{
+			width: 100%;
+			height: 48px;
+			padding: 0 14px 0 40px;
+			border-radius: 14px;
+			border: 1px solid rgba(255, 255, 255, 0.12);
+			background: rgba(255, 255, 255, 0.06);
+			color: #fff;
+			font-family: inherit;
+			font-size: 14px;
+			transition:
+				border-color 0.2s ease,
+				background 0.2s ease,
+				box-shadow 0.2s ease;
+		}
+
+		body.console-register .field input::placeholder{
+			color: rgba(255, 255, 255, 0.3);
+		}
+
+		body.console-register .field input:focus{
+			outline: none;
+			border-color: rgba(255, 154, 200, 0.8);
+			background: rgba(255, 255, 255, 0.1);
+			box-shadow: 0 0 0 3px rgba(255, 154, 200, 0.16);
+		}
+
+		body.console-register .field input:-webkit-autofill{
+			-webkit-text-fill-color: #fff;
+			-webkit-box-shadow: 0 0 0 60px rgba(40, 34, 56, 0.9) inset;
+		}
+
+		body.console-register button[type="submit"]{
+			position: relative;
+			overflow: hidden;
+			width: 100%;
+			height: 48px;
+			margin-top: 8px;
+			border: none;
+			border-radius: 14px;
+			cursor: pointer;
+			font-family: inherit;
+			font-size: 15px;
+			font-weight: 700;
+			letter-spacing: 0.28em;
+			color: #351026;
+			background: linear-gradient(120deg, #ffb3d4, #ff9ac8 45%, #c4a4ff);
+			box-shadow: 0 12px 28px rgba(255, 154, 200, 0.36);
+			transition:
+				transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+				box-shadow 0.2s ease,
+				opacity 0.2s ease;
+		}
+
+		body.console-register button[type="submit"]::after{
+			content: "";
+			position: absolute;
+			top: 0;
+			left: -60%;
+			width: 45%;
+			height: 100%;
+			background: linear-gradient(
+				100deg,
+				transparent,
+				rgba(255, 255, 255, 0.55),
+				transparent
+			);
+			transform: skewX(-18deg);
+			animation: shine 3.6s ease-in-out infinite;
+		}
+
+		@keyframes shine{
+			0%,
+			62% {
+				left: -60%;
+			}
+			100% {
+				left: 120%;
+			}
+		}
+
+		body.console-register button[type="submit"]:hover{
+			transform: translateY(-2px);
+			box-shadow: 0 16px 34px rgba(255, 154, 200, 0.5);
+		}
+
+		body.console-register button[type="submit"]:active{
+			transform: scale(0.98);
+		}
+
+		body.console-register button[type="submit"]:disabled{
+			opacity: 0.65;
+			cursor: default;
+			transform: none;
+		}
+		/* ===== 提示 ===== */
+		body.console-register .msg{
+			display: none;
+			margin-top: 14px;
+			padding: 10px 13px;
+			border-radius: 12px;
+			font-size: 12.5px;
+			line-height: 1.65;
+		}
+
+		body.console-register .msg.show{
+			display: block;
+			animation: msgIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		body.console-register .msg.ok{
+			background: rgba(100, 255, 150, 0.14);
+			color: #a8ffc4;
+			border: 1px solid rgba(100, 255, 150, 0.3);
+		}
+
+		body.console-register .msg.err{
+			background: rgba(255, 110, 120, 0.14);
+			color: #ffb0b8;
+			border: 1px solid rgba(255, 110, 120, 0.3);
+		}
+
+		@keyframes msgIn{
+			from {
+				opacity: 0;
+				transform: translateY(-4px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		/* ===== 底部链接 ===== */
+		body.console-register .links{
+			margin-top: 18px;
+			text-align: center;
+			font-size: 12.5px;
+			color: rgba(255, 255, 255, 0.48);
+		}
+
+		body.console-register .links a{
+			color: #ffa9d3;
+			text-decoration: none;
+			margin: 0 4px;
+			border-bottom: 1px dashed rgba(255, 169, 211, 0.4);
+			transition:
+				color 0.2s ease,
+				border-color 0.2s ease;
+		}
+
+		body.console-register .links a:hover{
+			color: #fff;
+			border-color: #fff;
+		}
+
+		body.console-register .links .divider{
+			margin: 0 6px;
+			color: rgba(255, 255, 255, 0.22);
+		}
+
+		/* ===== 服务器状态小胶囊 ===== */
+		body.console-register .status{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			margin-top: 16px;
+			padding: 7px 12px;
+			border-radius: 999px;
+			font-size: 11.5px;
+			color: rgba(255, 255, 255, 0.5);
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		body.console-register .status .dot{
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			background: #b9b4c9;
+			transition: background 0.3s ease;
+		}
+
+		body.console-register .status[data-state="online"] .dot{
+			background: #63e6a2;
+			box-shadow: 0 0 0 0 rgba(99, 230, 162, 0.6);
+			animation: pulse 2.4s ease-out infinite;
+		}
+
+		body.console-register .status[data-state="offline"] .dot{
+			background: #ff9a9a;
+		}
+
+		@keyframes pulse{
+			0% {
+				box-shadow: 0 0 0 0 rgba(99, 230, 162, 0.55);
+			}
+			70% {
+				box-shadow: 0 0 0 7px rgba(99, 230, 162, 0);
+			}
+			100% {
+				box-shadow: 0 0 0 0 rgba(99, 230, 162, 0);
+			}
+		}
+
+		@media (max-width: 900px){
+			body.console-register .card{
+				margin-left: auto;
+				margin-right: auto;
+				padding: 30px 24px 24px;
+			}
+
+			body.console-register body::before{
+				opacity: 0.7;
+			}
+		}
+
+		@media (max-width: 420px){
+			body.console-register .card{
+				border-radius: 22px;
+			}
+
+			body.console-register .card-head h1{
+				font-size: 19px;
+			}
+
+			body.console-register .mascot{
+				width: 46px;
+				height: 46px;
+				font-size: 22px;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce){
+			body.console-register .card, body.console-register .mascot, body.console-register button[type="submit"]::after, body.console-register .petal, body.console-register .status[data-state="online"] .dot{
+				animation: none !important;
+			}
+		}
+	</style>
 </head>
-<body>
-  <AnimeBackdrop live2d="none" petals={false} />
-  <div id="reg-l2d"></div>
-  <div class="petals" id="petals"></div>
+<body class="console-register">
+	<AnimeBackdrop live2d="none" petals={false} />
+	<AuthLive2D />
+	<div id="petals" class="petals" aria-hidden="true"></div>
 
-  <div class="card">
-    <div class="logo">
-      <div class="logo-icon">✨</div>
-    </div>
-    <h1>创建账号</h1>
-    <div class="sub">はじめまして</div>
+	<main class="card">
+		<header class="card-head">
+			<div class="mascot" aria-hidden="true">✨</div>
+			<div>
+				<h1>创建账号</h1>
+				<div class="sub">はじめまして · NICE TO MEET YOU</div>
+			</div>
+		</header>
 
-    <form id="regForm">
-      <label>用户名</label>
-      <input type="text" id="username" required minlength="2" maxlength="20" placeholder="2~20 位" autocomplete="username" />
+		<form id="regForm" novalidate>
+			<div class="field">
+				<span class="ico" aria-hidden="true">👤</span>
+				<input
+					id="username"
+					name="username"
+					type="text"
+					required
+					minlength="2"
+					maxlength="20"
+					placeholder="用户名（2~20 位）"
+					autocomplete="username"
+				/>
+			</div>
+			<div class="field">
+				<span class="ico" aria-hidden="true">✉️</span>
+				<input
+					id="email"
+					name="email"
+					type="email"
+					required
+					placeholder="邮箱 you@example.com"
+					autocomplete="email"
+				/>
+			</div>
+			<div class="field">
+				<span class="ico" aria-hidden="true">🔒</span>
+				<input
+					id="password"
+					name="password"
+					type="password"
+					required
+					placeholder="密码"
+					autocomplete="current-password"
+				/>
+			</div>
+			<button type="submit" id="submitBtn">注 册</button>
+		</form>
 
-      <label>邮箱</label>
-      <input type="email" id="email" required placeholder="you@example.com" autocomplete="email" />
+		<div class="msg" id="msg" role="status" aria-live="polite"></div>
 
-      <label>密码</label>
-      <input type="password" id="password" required minlength="6" placeholder="至少 6 位" autocomplete="new-password" />
+		<nav class="links">
+			已经有账号啦？<a href="/login/">去登录</a>
+			<span class="divider">·</span>
+			<a href="/">返回首页</a>
+			<span class="divider">·</span>
+			<a href="/gallery/">先逛逛</a>
+		</nav>
 
-      <button type="submit" id="submitBtn">注 册</button>
-    </form>
+		<div class="status" id="serverStatus" data-state="unknown">
+			<span class="dot" aria-hidden="true"></span>
+			<span id="serverStatusText">正在确认小服务器…</span>
+		</div>
+	</main>
 
-    <div class="msg" id="msg"></div>
+	<ServerConnect />
 
-    <div class="links">
-      已有账号？<a href="/login/">去登录</a>
-      <span class="divider">·</span>
-      <a href="/">返回首页</a>
-    </div>
-  </div>
+	<script is:inline>
+		(function () {
+			var wrap = document.getElementById("petals");
+			if (!wrap) return;
+			for (var i = 0; i < 12; i++) {
+				var p = document.createElement("span");
+				p.className = "petal";
+				p.style.left = Math.random() * 100 + "%";
+				var size = 7 + Math.random() * 7;
+				p.style.width = size + "px";
+				p.style.height = size + "px";
+				p.style.animationDuration = 7 + Math.random() * 7 + "s";
+				p.style.animationDelay = -Math.random() * 9 + "s";
+				wrap.appendChild(p);
+			}
+		})();
 
-  <script is:inline src="/Firefly-live2d-main/load/live2dcubismcore.min.js"></script>
-  <script is:inline src="/Firefly-live2d-main/load/pixi.min.js"></script>
-  <script is:inline src="/Firefly-live2d-main/load/cubism4.min.js"></script>
+		/* 顶部小胶囊：告诉访客后端在不在（不在也能正常浏览） */
+		(function () {
+			var el = document.getElementById("serverStatus");
+			var text = document.getElementById("serverStatusText");
+			if (!el || !text) return;
 
-  <script is:inline>
-    (function() {
-      const wrap = document.getElementById('petals');
-      if (!wrap) return;
-      for (let i = 0; i < 10; i++) {
-        const p = document.createElement('span');
-        p.className = 'petal';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.animationDuration = (3 + Math.random() * 3) + 's';
-        p.style.animationDelay = (Math.random() * 4) + 's';
-        wrap.appendChild(p);
-      }
-    })();
+			function paint(s) {
+				if (!s) {
+					el.dataset.state = "unknown";
+					text.textContent = "正在确认小服务器…";
+					return;
+				}
+				el.dataset.state = s.ok ? "online" : "offline";
+				if (s.ok) {
+					text.textContent = "小服务器在线 · " + (s.base || "同源");
+				} else if (s.base) {
+					text.textContent = "连不上 " + s.base + "（点右下角 ⚙ 改地址）";
+				} else {
+					text.textContent = "未配置账号服务器 · 只浏览内容也完全 OK";
+				}
+			}
 
-    const PREFERRED_MODELS = [
-      // 想要固定模型就填路径，留空则从全部随机
-    ];
+			if (window.FireflyAPI && window.FireflyAPI.check) {
+				paint(window.FireflyAPI.status);
+				window.FireflyAPI.check()
+					.then(paint)
+					.catch(function () {
+						paint({ ok: false, base: "" });
+					});
+			} else {
+				paint(null);
+			}
 
-    (async () => {
-      const stage = document.getElementById('reg-l2d');
-      if (!stage) return;
-      if (typeof PIXI === 'undefined' || !PIXI.live2d) return;
+			window.addEventListener("firefly:backend", function (e) {
+				paint(e.detail);
+			});
+		})();
+	</script>
 
-      let pool = [];
-      if (PREFERRED_MODELS.length > 0) {
-        pool = PREFERRED_MODELS.slice();
-      } else {
-        try {
-          const res = await fetch('/models-list.json');
-          const all = await res.json();
-          pool = Array.isArray(all) ? all.slice() : [];
-        } catch (e) { return; }
-      }
-      if (!pool.length) return;
+	<script is:inline>
+		(function () {
+			var form = document.getElementById("regForm");
+			var msg = document.getElementById("msg");
+			var btn = document.getElementById("submitBtn");
+			if (!form || !msg || !btn) return;
 
-      const start = Math.floor(Math.random() * pool.length);
-      let model = null;
-      for (let i = 0; i < pool.length; i++) {
-        const path = pool[(start + i) % pool.length];
-        try {
-          model = await PIXI.live2d.Live2DModel.from(path);
-          console.log('✅ 注册页加载:', path);
-          break;
-        } catch (e) {
-          console.warn('✗ 跳过:', path);
-        }
-      }
-      if (!model) return;
+			var btnLabel = btn.textContent;
 
-      const DPR = Math.min(window.devicePixelRatio || 1, 2);
-      const app = new PIXI.Application({
-        width: window.innerWidth, height: window.innerHeight,
-        resolution: DPR, autoDensity: true,
-        antialias: true, transparent: true,
-        backgroundColor: 0x000000, backgroundAlpha: 0,
-      });
-      stage.appendChild(app.view);
-      app.stage.addChild(model);
+			function showMsg(text, type) {
+				msg.textContent = text;
+				msg.className = "msg show " + type;
+			}
 
-      const bounds = model.getLocalBounds();
-      const ORIG_H = bounds.height || 1;
-      model.anchor.set(0.5, 1);
-      model.scale.set(1);
+			function sound(name, vol) {
+				try {
+					if (window.AnimeSounds) window.AnimeSounds.play(name, vol);
+				} catch (e) {
+					/* 音效是锦上添花 */
+				}
+			}
 
-      function layoutModel() {
-        const W = window.innerWidth;
-        const H = window.innerHeight;
-        app.renderer.resize(W, H);
-        const s = (H * 0.95) / ORIG_H;
-        model.scale.set(s);
-        const isMobile = W < 900;
-        model.x = isMobile ? W / 2 : W * 0.3;
-        model.y = H + 20;
-      }
-      layoutModel();
+			function playWelcomeVoice() {
+				try {
+					var audio = new Audio("/tts/Nanami/2.mp3");
+					audio.volume = 0.7;
+					var p = audio.play();
+					if (p && p.catch) p.catch(function () {});
+				} catch (e) {
+					/* ignore */
+				}
+			}
 
-      let resizeTimer = null;
-      window.addEventListener('resize', () => {
-        if (resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(layoutModel, 150);
-      });
+			function unlock() {
+				btn.disabled = false;
+				btn.textContent = btnLabel;
+			}
 
-      try { model.motion('idle'); } catch (e) {}
+			form.addEventListener("submit", function (e) {
+				e.preventDefault();
+				msg.className = "msg";
 
-      document.addEventListener('mousemove', (e) => {
-        const x = (e.clientX / window.innerWidth) * 2 - 1;
-        const y = (e.clientY / window.innerHeight) * 2 - 1;
-        try { model.focus(x * 1.2, -y * 1.2); } catch (e) {}
-      });
-    })();
+				var username = (
+					document.getElementById("username").value || ""
+				).trim();
+				var email = (
+					document.getElementById("email").value || ""
+				).trim();
+				var password = document.getElementById("password").value || "";
 
-    // 注册逻辑
-    const form = document.getElementById('regForm');
-    const msg = document.getElementById('msg');
-    const btn = document.getElementById('submitBtn');
+				if (!username || !email || !password) {
+					showMsg("用户名、邮箱、密码都要填哦～", "err");
+					sound("error", 0.4);
+					return;
+				}
 
-    function showMsg(text, type) {
-      msg.textContent = text;
-      msg.className = 'msg ' + type;
-    }
-    function playWelcomeVoice() {
-      try {
-        const audio = new Audio('/tts/Nanami/2.mp3');
-        audio.volume = 0.9;
-        const p = audio.play();
-        if (p && p.catch) p.catch(() => {});
-      } catch (e) {}
-    }
+				if (username.length < 2) {
+					showMsg("用户名至少 2 个字～", "err");
+					sound("error", 0.4);
+					return;
+				}
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      btn.disabled = true;
-      btn.textContent = '注册中…';
-      msg.className = 'msg';
+				if (password.length < 6) {
+					showMsg("密码至少 6 位，安全一点～", "err");
+					sound("error", 0.4);
+					return;
+				}
 
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+				btn.disabled = true;
+				btn.textContent = "注册中…";
 
-      try {
-        const res = await fetch('/api/auth/register/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ username, email, password }),
-        });
-        if (res.status === 404 || res.status === 405) {
-          showMsg('还没有连上你的电脑：点右下角 ⚙ 服务器，填上 http://电脑IP:8787 再注册（只浏览内容不用注册）', 'err');
-          btn.disabled = false;
-          btn.textContent = '注 册';
-          return;
-        }
-        const data = await res.json();
-        if (data.ok) {
-          showMsg(
-            data.user && data.user.role === 'admin'
-              ? '注册成功！你是第一位用户，已自动成为管理员 🎉'
-              : '注册成功！正在跳转…',
-            'ok'
-          );
-          if (window.AnimeSounds) window.AnimeSounds.play('login', 0.45);
-          playWelcomeVoice();
-          setTimeout(() => {
-            location.href = data.user && data.user.role === 'admin' ? '/admin/' : '/dashboard/';
-          }, 1500);
-        } else {
-          showMsg(data.error || '注册失败', 'err');
-          if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
-          btn.disabled = false;
-          btn.textContent = '注 册';
-        }
-      } catch (err) {
-        showMsg('网络错误：点右下角 ⚙ 服务器确认地址是否正确，或稍后重试', 'err');
-        if (window.AnimeSounds) window.AnimeSounds.play('error', 0.4);
-        btn.disabled = false;
-        btn.textContent = '注 册';
-      }
-    });
-  </script>
-  <ServerConnect />
+				fetch("/api/auth/register/", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+					body: JSON.stringify({
+						username: username,
+						email: email,
+						password: password,
+					}),
+				})
+					.then(function (res) {
+						if (res.status === 404 || res.status === 405) {
+							throw new Error(
+								"还没有连上账号服务器：点右下角 ⚙ 服务器，填上 http://电脑IP:8787 再注册（只浏览内容不用注册）",
+							);
+						}
+						return res.json();
+					})
+					.then(function (data) {
+						if (data && data.ok) {
+							var isAdmin = data.user && data.user.role === "admin";
+							showMsg(
+								isAdmin
+									? "注册成功！你是第一位用户，已经自动成为管理员 🎉"
+									: "注册成功！小屋欢迎你，正在跳转…",
+								"ok",
+							);
+							sound("login", 0.45);
+							playWelcomeVoice();
+							setTimeout(function () {
+								location.href = isAdmin ? "/admin/" : "/dashboard/";
+							}, 1100);
+							return;
+						}
+						showMsg((data && data.error) || "注册失败了，换个名字试试？", "err");
+						sound("error", 0.4);
+						unlock();
+					})
+					.catch(function (err) {
+						showMsg(
+							(err && err.message) ||
+								"网络错误：看下右下角 ⚙ 里的服务器地址，或稍后再试",
+							"err",
+						);
+						sound("error", 0.4);
+						unlock();
+					});
+			});
+		})();
+	</script>
 </body>
 </html>

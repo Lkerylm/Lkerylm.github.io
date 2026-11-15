@@ -3,6 +3,10 @@ import type { GetStaticPaths } from "astro";
 import Pagination from "@/components/common/Pagination.astro";
 import PostPage from "@/components/layout/PostPage.astro";
 import { siteConfig } from "@/config";
+import {
+	localAnimeStatusText,
+	pickFeaturedAnime,
+} from "@/config/animeCollection";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@/utils/content-utils";
 
@@ -14,6 +18,11 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 const { page } = Astro.props;
 const len = page.data.length;
+
+// 首页「本季追番」速览：来自 src/config/animeCollection.ts 的本地清单
+const featuredAnime = pickFeaturedAnime(6);
+const animeProgress = (ep: number, totalEp: number) =>
+	totalEp > 0 ? Math.min(100, Math.round((ep / totalEp) * 100)) : 0;
 ---
 
 <MainGridLayout>
@@ -102,30 +111,50 @@ const len = page.data.length;
   </div>
   )}
 
-  <!-- 🔥 社区动态：依赖后端接口，静态部署由 anime-cute.css 里的 .cf-wrapper 规则隐藏 -->
-  <div slot="full-width" class="cf-wrapper">
-    <section id="community-feed" class="cf-section" data-astro-transition-persist="community-feed">
-      <div class="cf-header">
-        <h2>🔥 社区最新投稿</h2>
-        <a href="/community/" class="cf-more">查看全部 →</a>
+  <!-- 🌸 本季追番速览：本地清单驱动，静态部署（无后端）也能显示 -->
+  {page.currentPage === 1 && (
+  <section slot="full-width" class="home-anime">
+    <div class="home-anime-inner">
+      <div class="home-anime-head">
+        <h2>
+          🌸 本季追番
+          <a href="/bangumi/">全部 →</a>
+        </h2>
       </div>
-      <div id="cf-list" class="cf-list">
-        <div class="cf-loading">加载中…</div>
+
+      <div class="home-anime-grid">
+        {featuredAnime.map((anime) => (
+          <a
+            class="ha-card"
+            href="/bangumi/"
+            style={`--ha-a:${anime.gradient[0]};--ha-b:${anime.gradient[1]};`}
+            title={`${anime.nameCn} · ${localAnimeStatusText[anime.status]}`}
+          >
+            <span class="ha-emoji" aria-hidden="true">{anime.emoji}</span>
+            <span class="ha-name">{anime.nameCn}</span>
+            <span class="ha-meta">
+              {anime.year} · {localAnimeStatusText[anime.status]}
+              {anime.score > 0 && ` · ⭐ ${anime.score.toFixed(1)}`}
+            </span>
+            <span class="ha-bar" aria-hidden="true">
+              <i style={`width:${animeProgress(anime.ep, anime.totalEp)}%`}></i>
+            </span>
+          </a>
+        ))}
       </div>
-      <div class="cf-actions">
-        <a href="/dashboard/new/" class="cf-btn">✍️ 我要投稿</a>
-        <a href="/register/" class="cf-btn cf-btn-ghost">✨ 注册账号</a>
-      </div>
-      <div class="cf-comments-block">
-        <div class="cf-header">
-          <h2 class="cf-comments-title">💬 最新评论</h2>
-        </div>
-        <div id="cf-comments" class="cf-comments-list">
-          <div class="cf-loading">加载中…</div>
-        </div>
-      </div>
-    </section>
-  </div>
+
+      <!-- 🧸 公益寻亲：独立页面入口（不再用全站浮动卡片挡住内容） -->
+      <a class="home-aid" href="/aid/">
+        <span class="home-aid-emoji" aria-hidden="true">🧸</span>
+        <span class="home-aid-text">
+          <strong>公益寻亲</strong>
+          <small>多看一眼，也许就多一次团圆 · 官方信息公开汇总，随时可查</small>
+        </span>
+        <span class="home-aid-go">去看看 →</span>
+      </a>
+    </div>
+  </section>
+  )}
 
   <!-- 文章列表留在主内容区，不受影响 -->
   <PostPage page={page} />
@@ -156,6 +185,266 @@ const len = page.data.length;
   /* 与主内容网格 (#main-grid) 同步下移，避免横幅压在 banner 上 */
   body.enable-banner .hero-wrapper {
     transform: translateY(var(--banner-height-extend, 0px));
+  }
+
+  /* ===== 🌸 首页追番速览 + 公益寻亲入口 ===== */
+  .home-anime {
+    position: relative;
+    width: 100%;
+    padding: 0 16px;
+    margin: 0 0 20px;
+    box-sizing: border-box;
+    z-index: 39;
+  }
+
+  /* 和 hero / #main-grid 一起跟随 banner 下移 */
+  body.enable-banner .home-anime {
+    transform: translateY(var(--banner-height-extend, 0px));
+  }
+
+  .home-anime-inner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .home-anime-head {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin: 0 4px 10px;
+  }
+
+  .home-anime-head h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: rgba(78, 52, 92, 0.9);
+    letter-spacing: 0.02em;
+  }
+
+  html.dark .home-anime-head h2 {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .home-anime-head a {
+    font-size: 0.76rem;
+    color: #e0568f;
+    text-decoration: none;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 176, 208, 0.6);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+  }
+
+  .home-anime-head a:hover {
+    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  html.dark .home-anime-head a {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 176, 208, 0.35);
+    color: #ffb3d4;
+  }
+
+  .home-anime-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  @media (min-width: 640px) {
+    .home-anime-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-anime-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  .ha-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px 12px 13px;
+    border-radius: 18px;
+    overflow: hidden;
+    text-decoration: none;
+    color: rgba(64, 40, 74, 0.92);
+    background:
+      radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.85), transparent 60%),
+      linear-gradient(150deg, var(--ha-a, #ffd9ea), var(--ha-b, #c9b8ff));
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 22px rgba(190, 150, 220, 0.16);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ha-card::after {
+    content: "";
+    position: absolute;
+    right: -26px;
+    top: -32px;
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+  }
+
+  .ha-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px rgba(190, 150, 220, 0.28);
+  }
+
+  html.dark .ha-card {
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+  }
+
+  html.dark .ha-card::after {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .ha-emoji {
+    position: relative;
+    z-index: 1;
+    font-size: 1.4rem;
+    line-height: 1.2;
+  }
+
+  .ha-name {
+    position: relative;
+    z-index: 1;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ha-meta {
+    position: relative;
+    z-index: 1;
+    font-size: 0.66rem;
+    opacity: 0.78;
+  }
+
+  .ha-bar {
+    position: relative;
+    z-index: 1;
+    display: block;
+    height: 5px;
+    margin-top: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+  }
+
+  .ha-bar i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff8dc0, #a78bfa);
+  }
+
+  html.dark .ha-bar {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* 🧸 公益寻亲入口条 */
+  .home-aid {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 11px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 240, 247, 0.96),
+      rgba(242, 245, 255, 0.96)
+    );
+    border: 1px dashed rgba(255, 168, 205, 0.75);
+    box-shadow: 0 8px 20px rgba(255, 150, 190, 0.12);
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+  }
+
+  .home-aid:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 26px rgba(255, 150, 190, 0.22);
+  }
+
+  html.dark .home-aid {
+    background: linear-gradient(
+      120deg,
+      rgba(52, 36, 50, 0.95),
+      rgba(40, 42, 60, 0.95)
+    );
+    border-color: rgba(255, 168, 205, 0.35);
+  }
+
+  .home-aid-emoji {
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+
+  .home-aid-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .home-aid-text strong {
+    font-size: 0.9rem;
+    color: #d4387c;
+  }
+
+  html.dark .home-aid-text strong {
+    color: #ffa6cf;
+  }
+
+  .home-aid-text small {
+    font-size: 0.72rem;
+    color: rgba(90, 74, 96, 0.78);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  html.dark .home-aid-text small {
+    color: rgba(255, 255, 255, 0.66);
+  }
+
+  .home-aid-go {
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    color: #e0568f;
+    white-space: nowrap;
+  }
+
+  html.dark .home-aid-go {
+    color: #ffb3d4;
+  }
+
+  @media (max-width: 639px) {
+    .home-aid-text small {
+      white-space: normal;
+    }
   }
 
   .hero-card {
@@ -290,7 +579,8 @@ const len = page.data.length;
 
   /* 平板/手机非首页：主网格不位移，横幅也要跟着取消位移 */
   @media (max-width: 1023px) {
-    body.enable-banner:not(.lg\:is-home) .hero-wrapper {
+    body.enable-banner:not(.lg\:is-home) .hero-wrapper,
+    body.enable-banner:not(.lg\:is-home) .home-anime {
       transform: none;
     }
   }
@@ -356,395 +646,4 @@ const len = page.data.length;
     }
   }
 
-  /* 🎯 社区动态容器：全宽居中 */
-  .cf-wrapper {
-    width: 100%;
-    margin: 0 0 30px;
-    z-index: 50;
-    display: flex;
-    justify-content: center;
-    padding: 0 16px;
-    box-sizing: border-box;
-  }
-
-  /* 卡片主体：极透玻璃态，清晰透出壁纸 */
-  .cf-section {
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px 24px;
-    /* ⭐ 背景透明度降到极低，几乎完全透明 */
-    background: rgba(10, 12, 22, 0.02); 
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
-    /* ⭐ 模糊度从 20px 降到 4px，只做极其轻微的柔化，保证壁纸细节可见 */
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-    color: #fff;
-    transition: transform 0.3s ease;
-    box-sizing: border-box;
-  }
-
-  .cf-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
-  }
-
-  /* ===== 首页 anime 横幅 ===== */
-  .anime-hero {
-    position: relative;
-    margin: 2px 0 18px;
-    padding: 16px 4px 4px;
-    text-align: center;
-    overflow: hidden;
-  }
-  .anime-hero::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -18px;
-    width: 78%;
-    height: 1px;
-    transform: translateX(-50%);
-    background: linear-gradient(90deg, transparent, rgba(255, 154, 200, .75), rgba(167, 139, 250, .75), transparent);
-  }
-  .ah-jp {
-    display: inline-block;
-    margin-bottom: 10px;
-    padding: 3px 12px;
-    border-radius: 999px;
-    background: #ffe4f1;
-    color: #d9428c;
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: .16em;
-    box-shadow: 0 4px 12px rgba(255, 124, 184, .18);
-  }
-  .ah-title {
-    font-size: clamp(21px, 2.6vw, 31px);
-    font-weight: 800;
-    color: #5b3a55;
-    line-height: 1.3;
-    letter-spacing: .01em;
-  }
-  .ah-title span {
-    background: linear-gradient(120deg, #ff5fa8 8%, #ff9a6c 48%, #a67bff 92%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 3px 10px rgba(255, 95, 168, .25));
-  }
-  .ah-desc {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #8a678d;
-    letter-spacing: .02em;
-  }
-  .ah-chips {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 8px;
-    margin-top: 14px;
-  }
-  .ah-chips a {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    height: 32px;
-    padding: 0 14px;
-    border-radius: 999px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #c0457f;
-    text-decoration: none;
-    background: #fffdfe;
-    border: 1.5px solid #ffd7e8;
-    box-shadow: 0 4px 12px rgba(255, 124, 184, .12);
-    transition: transform .18s cubic-bezier(.34, 1.56, .64, 1), background .18s ease, border-color .18s ease, color .18s ease;
-  }
-  .ah-chips a:hover {
-    transform: translateY(-2px) rotate(-1deg);
-    background: linear-gradient(135deg, #ffe3ef, #efe6ff);
-    border-color: #ffb3d3;
-    color: #b02e6f;
-  }
-  html.dark .ah-jp {
-    background: rgba(255, 124, 184, .2);
-    color: #ffc2de;
-  }
-  html.dark .ah-title {
-    color: #fbe8f4;
-  }
-  html.dark .ah-desc {
-    color: #cdb2cc;
-  }
-  html.dark .ah-chips a {
-    background: rgba(255, 255, 255, .06);
-    border-color: rgba(255, 158, 203, .35);
-    color: #ffc9e0;
-  }
-  .cf-header h2 {
-    margin: 0; font-size: 20px; font-weight: 700;
-    color: #ff7ab8;
-    display: flex; align-items: center; gap: 6px;
-    /* ⭐ 强烈的文字阴影，保证透明背景下文字依然锐利 */
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5);
-  }
-  .cf-comments-title { font-size: 17px !important; }
-  .cf-more {
-    font-size: 13px; color: #ff7ab8;
-    text-decoration: none; opacity: 0.95;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
-  }
-  .cf-more:hover { opacity: 1; }
-
-  .cf-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .cf-loading, .cf-empty {
-    grid-column: 1 / -1;
-    text-align: center; color: rgba(255, 255, 255, 0.9);
-    padding: 20px 0; font-size: 13px;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
-  }
-  .cf-card {
-    display: flex; flex-direction: column; gap: 10px;
-    padding: 14px 16px;
-    /* ⭐ 内部帖子：基本无底色，仅靠边框区分 */
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    text-decoration: none; color: inherit;
-    transition: all 0.25s;
-    min-height: 100px;
-  }
-  .cf-card:hover {
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 154, 200, 0.4);
-    box-shadow: 0 8px 24px rgba(255, 154, 200, 0.2);
-  }
-  .cf-title {
-    font-size: 15px; font-weight: 600; color: #fff;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    word-break: break-word;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-  }
-  .cf-excerpt {
-    font-size: 12.5px; line-height: 1.5;
-    color: rgba(255, 255, 255, 0.9);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    flex: 1;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-  }
-  .cf-meta {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12px; color: rgba(255, 255, 255, 0.8);
-    margin-top: auto; padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    flex-wrap: wrap;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-  }
-  .cf-avatar {
-    width: 20px; height: 20px; border-radius: 50%;
-    background: linear-gradient(135deg, #ff9ac8, #a78bfa);
-    background-size: cover; background-position: center;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700; color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  }
-  .cf-author { color: rgba(255, 255, 255, 0.95); }
-  .cf-dot { color: rgba(255, 255, 255, 0.5); }
-  .cf-comments { margin-left: auto; color: #ff9ac8; font-weight: 500; }
-  .cf-actions {
-    display: flex; gap: 10px;
-    justify-content: center; flex-wrap: wrap;
-  }
-  .cf-btn {
-    padding: 8px 22px; font-size: 13px; font-weight: 500;
-    border-radius: 8px; text-decoration: none;
-    background: linear-gradient(135deg, #ff9ac8, #a78bfa);
-    color: #fff; transition: all 0.25s;
-    box-shadow: 0 6px 16px rgba(255, 154, 200, 0.3);
-  }
-  .cf-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(255, 154, 200, 0.45); }
-  .cf-btn-ghost {
-    background: rgba(255, 255, 255, 0.06);
-    color: #ff9ac8;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: none;
-    text-shadow: none;
-  }
-  .cf-comments-block {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .cf-comments-list {
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .cf-c-item {
-    display: flex; gap: 10px;
-    padding: 10px 14px;
-    /* ⭐ 内部评论：基本无底色 */
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    text-decoration: none; color: inherit;
-    transition: all 0.2s;
-  }
-  .cf-c-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 154, 200, 0.3);
-  }
-  .cf-c-avatar {
-    width: 28px; height: 28px; border-radius: 50%;
-    background: linear-gradient(135deg, #ff9ac8, #a78bfa);
-    background-size: cover; background-position: center;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  }
-  .cf-c-body { flex: 1; min-width: 0; }
-  .cf-c-content {
-    font-size: 13px; line-height: 1.5;
-    color: rgba(255, 255, 255, 0.95);
-    margin-bottom: 3px; word-break: break-word;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-  }
-  .cf-c-meta { font-size: 11px; color: rgba(255, 255, 255, 0.7); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
-
-  @media (max-width: 768px) {
-    .cf-wrapper { margin-top: -8vh; padding: 0 12px; }
-    .cf-section { padding: 16px; border-radius: 16px; }
-    .cf-list { grid-template-columns: 1fr; }
-    .cf-c-content { white-space: normal; }
-  }
 </style>
-
-<script is:inline>
-  // 数据加载与防崩溃逻辑（完全保留）
-  (function () {
-    let isLoaded = false;
-    function escapeHtml(s) {
-      const div = document.createElement("div");
-      div.textContent = String(s);
-      return div.innerHTML;
-    }
-    function stripMarkdown(text) {
-      return String(text)
-        .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
-        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-        .replace(/[#>*`_~\-]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-    async function loadPosts() {
-      const list = document.getElementById("cf-list");
-      if (!list) return;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-      try {
-        const res = await fetch("/api/posts/public.json", { signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
-        if (!data.ok || !data.posts || data.posts.length === 0) {
-          list.innerHTML = '<div class="cf-empty">还没有公开的文章，来做第一个吧～</div>';
-          return;
-        }
-        const latest = data.posts.slice(0, 4);
-        list.innerHTML = latest.map((p) => {
-          let dateStr = "";
-          try {
-            const date = new Date((p.created_at || 0) * 1000);
-            dateStr = date.toLocaleDateString("zh-CN", { month: "numeric", day: "numeric" });
-          } catch (e) { dateStr = "刚刚"; }
-          const excerpt = stripMarkdown(p.content || "").slice(0, 80);
-          const avatarHtml = p.author_avatar
-            ? '<div class="cf-avatar" style="background-image: url(' + escapeHtml(p.author_avatar) + ');"></div>'
-            : '<div class="cf-avatar">' + escapeHtml((p.author || "?").charAt(0).toUpperCase()) + "</div>";
-          return (
-            '<a class="cf-card" href="/community/' + encodeURIComponent(p.slug || "") + '/">' +
-              '<div class="cf-title">' + escapeHtml(p.title || "无标题") + "</div>" +
-              (excerpt ? '<div class="cf-excerpt">' + escapeHtml(excerpt) + (excerpt.length >= 80 ? "…" : "") + "</div>" : "") +
-              '<div class="cf-meta">' + avatarHtml +
-                '<span class="cf-author">' + escapeHtml(p.author || "未知用户") + "</span>" +
-                '<span class="cf-dot">·</span>' +
-                "<span>" + dateStr + "</span>" +
-                '<span class="cf-comments">💬 ' + (p.comment_count || 0) + "</span>" +
-              "</div>" +
-            "</a>"
-          );
-        }).join("");
-      } catch (err) {
-        clearTimeout(timeoutId);
-        list.innerHTML = '<div class="cf-empty">加载失败，请稍后刷新重试</div>';
-      }
-    }
-    async function loadComments() {
-      const box = document.getElementById("cf-comments");
-      if (!box) return;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-      try {
-        const res = await fetch("/api/comments/recent.json", { signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
-        if (!data.ok || !data.comments || data.comments.length === 0) {
-          box.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.6);font-size:12px;padding:16px 0;text-shadow:0 1px 3px rgba(0,0,0,0.8);">还没有评论</div>';
-          return;
-        }
-        box.innerHTML = data.comments.slice(0, 5).map((c) => {
-          let dateStr = "";
-          try {
-            const date = new Date((c.created_at || 0) * 1000);
-            dateStr = date.toLocaleDateString("zh-CN", { month: "numeric", day: "numeric" });
-          } catch (e) { dateStr = "刚刚"; }
-          const avatarHtml = c.avatar
-            ? '<div class="cf-c-avatar" style="background-image: url(' + escapeHtml(c.avatar) + ');"></div>'
-            : '<div class="cf-c-avatar">' + escapeHtml((c.author || "?").charAt(0).toUpperCase()) + "</div>";
-          return (
-            '<a class="cf-c-item" href="/community/' + encodeURIComponent(c.post_slug || "") + '/">' +
-              avatarHtml +
-              '<div class="cf-c-body">' +
-                '<div class="cf-c-content">' + escapeHtml(c.content || "") + "</div>" +
-                '<div class="cf-c-meta">' + escapeHtml(c.author || "匿名") + " · 于《" + escapeHtml(c.post_title || "未知文章") + "》 · " + dateStr + "</div>" +
-              "</div>" +
-            "</a>"
-          );
-        }).join("");
-      } catch (err) {
-        clearTimeout(timeoutId);
-        box.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.6);font-size:12px;padding:16px 0;text-shadow:0 1px 3px rgba(0,0,0,0.8);">加载失败，请稍后刷新</div>';
-      }
-    }
-    function init() {
-      const isHome = location.pathname === "/" || location.pathname === "/index.html" || location.pathname.replace(/\/$/, "") === "";
-      if (!isHome) return;
-      if (isLoaded) return;
-      isLoaded = true;
-      loadPosts();
-      loadComments();
-    }
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", init);
-    } else { init(); }
-    document.addEventListener("astro:page-load", () => { isLoaded = false; init(); });
-  })();
-</script>

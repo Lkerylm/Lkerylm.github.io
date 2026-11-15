@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>掉线啦 · 我的动漫小屋</title>
+<meta name="theme-color" content="#ffe9f4">
+<meta name="robots" content="noindex">
+<!-- 这个页面会被 Service Worker 预缓存，所以样式必须全部内联，不能依赖外部文件 -->
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --pink:#ff8ab8; --pink-deep:#e0448f; --taro:#b79cff;
+    --line:#ffd3e6; --ink:#6b4a5c; --ink-soft:#9a7c8d;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:28px 16px calc(28px + env(safe-area-inset-bottom));color:var(--ink);position:relative;overflow-x:hidden;
+    font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+    background:
+      radial-gradient(680px 420px at 12% -8%,rgba(255,196,225,.75) 0%,transparent 62%),
+      radial-gradient(620px 400px at 104% 2%,rgba(199,182,255,.6) 0%,transparent 60%),
+      radial-gradient(560px 420px at 50% 112%,rgba(178,231,255,.55) 0%,transparent 62%),
+      linear-gradient(180deg,#fffafd 0%,#fff3f9 55%,#f7f2ff 100%);
+    background-attachment:fixed;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7;
+    background-image:
+      radial-gradient(circle at 18% 22%,rgba(255,255,255,.95) 0 3px,transparent 4px),
+      radial-gradient(circle at 76% 14%,rgba(255,209,232,.95) 0 4px,transparent 5px),
+      radial-gradient(circle at 44% 66%,rgba(214,204,255,.9) 0 3px,transparent 4px),
+      radial-gradient(circle at 88% 74%,rgba(255,255,255,.9) 0 3px,transparent 4px);
+    background-size:360px 360px,420px 420px,480px 480px,320px 320px;
+  }
+  .wrap{position:relative;z-index:1;width:100%;max-width:460px;text-align:center}
+  .mascot{width:104px;height:104px;filter:drop-shadow(0 12px 20px rgba(255,138,184,.35));animation:floaty 4.5s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  h1{
+    font-size:23px;margin:10px 0 8px;font-weight:800;letter-spacing:.01em;
+    background:linear-gradient(120deg,#ff6fa8 0%,#ff9ecb 38%,#b79cff 82%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .sub{color:var(--ink-soft);font-size:13px;line-height:1.8;margin:0 0 18px}
+  .card{
+    text-align:left;background:rgba(255,255,255,.88);border:1.5px solid var(--line);
+    border-radius:22px;padding:18px 18px 16px;
+    box-shadow:0 14px 34px rgba(255,158,203,.18),inset 0 1px 0 #fff;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  }
+  .card h2{margin:0 0 10px;font-size:14px;color:#5c3d4d;display:flex;align-items:center;gap:7px}
+  ul{margin:0;padding-left:18px;font-size:13px;line-height:1.95;color:#7b5b6c}
+  ul li::marker{color:var(--pink)}
+  b{color:var(--pink-deep);font-weight:600}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .btn{
+    flex:1 1 130px;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:12px 16px;border-radius:999px;font-size:13.5px;font-weight:700;text-decoration:none;
+    color:#fff;background:linear-gradient(135deg,#ff8ab8,#b79cff);
+    border:0;cursor:pointer;font-family:inherit;
+    box-shadow:0 10px 22px rgba(255,138,184,.34);
+    transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(255,138,184,.46)}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{
+    color:var(--pink-deep);background:rgba(255,255,255,.92);
+    border:1.5px solid #ffc4de;box-shadow:0 8px 18px rgba(255,158,203,.2);
+  }
+  .status{
+    margin-top:14px;font-size:12px;color:var(--ink-soft);
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:#ff9ecb;box-shadow:0 0 0 4px rgba(255,158,203,.22)}
+  .dot.on{background:#5fd3a3;box-shadow:0 0 0 4px rgba(95,211,163,.22)}
+  .foot{margin-top:18px;font-size:11.5px;color:#b39aa8}
+  .foot a{color:var(--pink-deep);text-decoration:none}
+  @media (prefers-color-scheme:dark){
+    body{color:#f3e6ee;background:
+      radial-gradient(680px 420px at 12% -8%,rgba(120,60,95,.7) 0%,transparent 62%),
+      radial-gradient(620px 400px at 104% 2%,rgba(90,70,150,.6) 0%,transparent 60%),
+      linear-gradient(180deg,#1b1420 0%,#1e1726 60%,#181420 100%)}
+    .card{background:rgba(38,29,46,.86);border-color:rgba(255,154,200,.28);box-shadow:0 14px 34px rgba(0,0,0,.34)}
+    .card h2{color:#ffd7e9}
+    ul{color:#d7c3d2}
+    .btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,154,200,.4);color:#ffb3d4}
+    .foot{color:#a48fa0}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <svg class="mascot" viewBox="0 0 96 96" aria-hidden="true">
+    <defs>
+      <linearGradient id="mHair" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffd0e4"/><stop offset="1" stop-color="#ff9ec7"/>
+      </linearGradient>
+      <linearGradient id="mFace" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff6fa"/><stop offset="1" stop-color="#ffe7f1"/>
+      </linearGradient>
+    </defs>
+    <circle cx="48" cy="48" r="44" fill="#fff" opacity=".68"/>
+    <path d="M23 41c-7 7-9 18-6 26 2 6 9 7 12 2 3-4 2-10 0-16-2-5-4-9-6-12z" fill="url(#mHair)"/>
+    <path d="M73 41c7 7 9 18 6 26-2 6-9 7-12 2-3-4-2-10 0-16 2-5 4-9 6-12z" fill="url(#mHair)"/>
+    <path d="M48 15c17 0 28 12 28 28 0 6-1 11-3 15H23c-2-4-3-9-3-15 0-16 11-28 28-28z" fill="url(#mHair)"/>
+    <ellipse cx="48" cy="50" rx="19" ry="18" fill="url(#mFace)"/>
+    <path d="M28 47C28 32 37 23 48 23s20 9 20 24Q48 52 28 47z" fill="url(#mHair)"/>
+    <path d="M70 27l6-4v9l-6-3zM78 27l-6-4v9l6-3z" fill="#ff7fb0"/>
+    <circle cx="74" cy="27.5" r="2.2" fill="#ff9ec7"/>
+    <ellipse cx="40" cy="52" rx="3.4" ry="4.4" fill="#5b3a4d"/>
+    <ellipse cx="56" cy="52" rx="3.4" ry="4.4" fill="#5b3a4d"/>
+    <circle cx="41.2" cy="50.4" r="1.4" fill="#fff"/>
+    <circle cx="57.2" cy="50.4" r="1.4" fill="#fff"/>
+    <ellipse cx="32.5" cy="59.5" rx="4.2" ry="2.6" fill="#ffb6d3" opacity=".9"/>
+    <ellipse cx="63.5" cy="59.5" rx="4.2" ry="2.6" fill="#ffb6d3" opacity=".9"/>
+    <path d="M46 59.5q2 3 4 0" stroke="#e0719b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <circle cx="70" cy="15" r="2.6" fill="#fff" opacity=".9"/>
+    <circle cx="26" cy="24" r="2" fill="#fff" opacity=".85"/>
+  </svg>
+
+  <h1>呜…现在连不上网啦</h1>
+  <p class="sub">这条页面还没有被缓存到手机里。<br>已经逛过的文章、相册和小屋首页，断网也能照常翻。</p>
+
+  <section class="card">
+    <h2>🍥 还能做点什么</h2>
+    <ul>
+      <li>点下面的 <b>重新试试</b>，网络回来就自动好了</li>
+      <li>回到 <b>小屋首页</b>，看已经缓存的番外日常</li>
+      <li>想离线看更多？先在联网时把文章翻一遍，就会自动存进手机</li>
+      <li>iPhone / iPad 用 Safari「分享 → 添加到主屏幕」，就是一个离线小 App</li>
+    </ul>
+
+    <div class="actions">
+      <button class="btn" type="button" onclick="location.reload()">🔄 重新试试</button>
+      <a class="btn ghost" href="../">🏠 回小屋首页</a>
+    </div>
+
+    <div class="status"><span class="dot" id="dot"></span><span id="status-text">正在等待网络…</span></div>
+  </section>
+
+  <p class="foot">「我的动漫小屋」 · <a href="../">lkerylm.github.io</a></p>
+</main>
+
+<script>
+  // 纯原生脚本：离线也能跑，不依赖任何打包产物
+  (function () {
+    var dot = document.getElementById("dot");
+    var text = document.getElementById("status-text");
+
+    function render() {
+      var online = navigator.onLine;
+      dot.className = "dot" + (online ? " on" : "");
+      text.textContent = online
+        ? "网络已经回来啦，点「重新试试」就好～"
+        : "正在等待网络…（可以先看缓存过的页面）";
+    }
+
+    window.addEventListener("online", render);
+    window.addEventListener("offline", render);
+    render();
+  })();
+</script>
+</body>
+</html>

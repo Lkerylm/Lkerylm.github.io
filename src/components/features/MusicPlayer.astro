@@ -42,7 +42,7 @@ const widgetId =
     <div class="relative shrink-0 w-14 h-14 group">
             <div class="w-full h-full rounded-full overflow-hidden shadow-lg border-2 border-white dark:border-neutral-700 relative z-10 bg-[var(--primary)]/10 flex items-center justify-center">
             <Icon name="material-symbols:music-note-rounded" class="text-2xl text-[var(--primary)] opacity-40 absolute" aria-hidden="true" />
-            <img class="music-cover w-full h-full object-cover animate-spin-slow relative z-10 opacity-0 transition-opacity duration-300" src="" alt={i18n(I18nKey.musicCover)} style="animation-play-state: paused;" />
+            <img class="music-cover w-full h-full object-cover animate-spin-slow relative z-10 opacity-0 transition-opacity duration-300" alt={i18n(I18nKey.musicCover)} style="animation-play-state: paused;" />
             </div>
     </div>
 
@@ -162,7 +162,7 @@ const widgetId =
 <template id={`playlist-item-template-${widgetId}`}>
 <div class="playlist-item flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors group">
     <div class="w-8 h-8 rounded-md overflow-hidden shrink-0 relative bg-neutral-200 dark:bg-neutral-700">
-        <img src="" class="item-cover w-full h-full object-cover" loading="lazy" alt="" />
+        <img class="item-cover w-full h-full object-cover" loading="lazy" alt="" />
         <!-- Active Indicator overlay -->
         <div class="item-active-overlay absolute inset-0 bg-[var(--primary)]/20 hidden items-center justify-center">
                 <Icon name="material-symbols:graphic-eq-rounded" class="text-[var(--primary)] text-sm" />
@@ -309,7 +309,8 @@ const widgetId =
             ui.cover.src = track.pic;
             ui.cover.alt = track.name + ' - ' + track.artist;
         } else {
-            ui.cover.src = '';
+            // 不能赋空字符串：空 src 会被浏览器解析成当前页面地址，白白发一次请求并报错
+            ui.cover.removeAttribute('src');
             ui.cover.classList.add('opacity-0');
             ui.cover.alt = cfg.i18n.noCover;
         }
@@ -337,7 +338,13 @@ const widgetId =
             var title = clone.querySelector('.item-title');
             var artist = clone.querySelector('.item-artist');
 
-            img.src = track.pic || '';
+            if (track.pic) {
+                img.src = track.pic;
+                img.style.display = '';
+            } else {
+                img.removeAttribute('src');
+                img.style.display = 'none';
+            }
             img.alt = track.name + ' - ' + track.artist;
             title.innerText = track.name;
             artist.innerText = track.artist;

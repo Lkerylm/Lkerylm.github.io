@@ -11,7 +11,9 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 	showInNavbar: true,
 
 	// 使用方式："meting" 使用 Meting API，"local" 使用本地音乐列表
-	mode: "meting",
+	// 默认走本地：Meting 公共接口经常挂/被墙，一旦失败播放器会整块空转，
+	// 还会请求出 /meting/api 这种相对地址的音源（控制台一片红）。本地曲目零依赖、离线可用。
+	mode: "local",
 
 	// 默认音量 (0-1)
 	volume: 0.7,

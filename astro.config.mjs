@@ -77,6 +77,9 @@ export default defineConfig({
 				"#left-sidebar-dynamic",
 				"#right-sidebar-dynamic",
 				"#floating-toc-wrapper",
+				// 首页特有的全宽插槽（hero / 追番速览），必须是容器，
+				// 否则从首页跳到其它页面时旧内容会残留在 DOM 里
+				"#full-width-slot",
 			],
 			smoothScrolling: false,
 			cache: true,

@@ -194,6 +194,10 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (apiPath.startsWith("/api/")) {
+      // 构建时生成的静态接口（/api/allPostMeta.json、/api/comments/recent.json 等）优先：
+      // 否则会被下面的后端兜底 404 顶掉，导致日历 / 推荐阅读拿到 {ok:false} 而整块报错。
+      if ((method === "GET" || method === "HEAD") && tryStatic(req, res, pathname)) return;
+
       const ctx = {
         req,
         res,

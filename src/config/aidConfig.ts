@@ -8,7 +8,7 @@ import type { AidConfig } from "@/types/config";
  * 2. 每条信息都必须带官方来源链接，详情一律以官方页面为准；
  * 3. 数据来自 public/data/aid/missing-children.json，页面运行时拉取（默认 5 分钟刷新一次），
  *    可通过 scripts/sync-aid.mjs 或 GitHub Actions 定时同步，做到「实时更新」；
- * 4. 卡片可以手动关闭，关闭后一段时间内不再自动出现，右下角 🧸 按钮随时可以重新打开；
+ * 4. 卡片可以手动关闭，关闭后一段时间内不再自动出现，左下角 🧸 按钮随时可以重新打开；
  * 5. 点击卡片正文会跳转到官方公益链接（或该条信息的官方详情页）。
  */
 export const aidConfig: AidConfig = {
@@ -22,11 +22,18 @@ export const aidConfig: AidConfig = {
 	// 是否允许访客手动关闭卡片
 	closeable: true,
 
-	// 关闭后多少天内不再自动弹出（点右下角 🧸 仍可随时重新打开）
+	// 关闭后多少天内不再自动弹出（点左下角 🧸 仍可随时重新打开）
 	rememberDays: 7,
 
-	// 卡片默认位置（手机端会自动靠下并缩窄）
-	position: "bottom-right",
+	// 卡片默认位置（默认左下角：右下角被 Live2D 看板娘 / 返回顶部那一列按钮占着，
+	// 放过去会被挡住、也点不到；手机端会自动靠下并缩窄）
+	position: "bottom-left",
+
+	// 卡片左右两侧的小插画（纯手写 SVG，无版权问题；手机端自动隐藏，避免太挤）
+	art: true,
+
+	// 宽屏时在屏幕左边缘显示一条竖排「公益寻亲」小书签，点击即可打开卡片
+	sideRail: true,
 
 	// 多条协查信息 / 公益提示的轮播间隔（秒）
 	rotateSeconds: 8,

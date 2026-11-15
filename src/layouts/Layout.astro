@@ -3,13 +3,14 @@ import GoogleAnalytics from "@components/analytics/GoogleAnalytics.astro";
 import La51Analytics from "@components/analytics/La51Analytics.astro";
 import MicrosoftClarity from "@components/analytics/MicrosoftClarity.astro";
 import UmamiAnalytics from "@components/analytics/UmamiAnalytics.astro";
+import AnimeBgm from "@components/features/AnimeBgm.astro";
 import AnimeCursorLive2D from "@components/features/AnimeCursorLive2D.astro";
 import AnimeVoice from "@components/features/AnimeVoice.astro";
 import AnimeWallpaperGallery from "@components/features/AnimeWallpaperGallery.astro";
 import FancyboxManager from "@components/features/FancyboxManager.astro";
 import FontManager from "@components/features/FontManager.astro";
-import MissingChildAid from "@components/features/MissingChildAid.astro";
 import MusicManager from "@components/features/MusicManager.astro";
+import PwaManager from "@components/features/PwaManager.astro";
 import SakuraEffect from "@components/features/SakuraEffect.astro";
 import UiSounds from "@components/features/UiSounds.astro";
 import ConfigCarrier from "@components/layout/ConfigCarrier.astro";
@@ -89,6 +90,22 @@ if (siteConfig.generateOgImages && postSlug) {
 
 const favicons: Favicon[] =
 	siteConfig.favicon.length > 0 ? siteConfig.favicon : defaultFavicons;
+
+// iOS「添加到主屏幕」之后的启动图：不给的话，从主屏点开会先白一下
+// 尺寸由 scripts/generate-ios-splash.mjs 生成到 public/splash/，这里按机型挑
+const iosStartupImages = [
+	{ file: "1320x2868", w: 440, h: 956, dpr: 3 },
+	{ file: "1290x2796", w: 430, h: 932, dpr: 3 },
+	{ file: "1206x2622", w: 402, h: 874, dpr: 3 },
+	{ file: "1179x2556", w: 393, h: 852, dpr: 3 },
+	{ file: "1170x2532", w: 390, h: 844, dpr: 3 },
+	{ file: "1125x2436", w: 375, h: 812, dpr: 3 },
+	{ file: "828x1792", w: 414, h: 896, dpr: 2 },
+	{ file: "750x1334", w: 375, h: 667, dpr: 2 },
+	{ file: "2048x2732", w: 1024, h: 1366, dpr: 2 },
+	{ file: "1668x2388", w: 834, h: 1194, dpr: 2 },
+	{ file: "1536x2048", w: 768, h: 1024, dpr: 2 },
+];
 
 // const siteLang = siteConfig.lang.replace('_', '-')
 if (!lang) {
@@ -202,6 +219,25 @@ const websiteJsonLd = JSON.stringify({
           sizes={favicon.sizes}
           type={favicon.type}
           media={favicon.theme && `(prefers-color-scheme: ${favicon.theme})`}
+        />
+      ))
+    }
+
+    <!-- PWA：iPhone / iPad「添加到主屏幕」+ 离线可读（清单见 /manifest.webmanifest） -->
+    <link rel="manifest" href={url("/manifest.webmanifest")} />
+    <meta name="theme-color" content="#ffe9f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#241a2c" media="(prefers-color-scheme: dark)" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content={siteConfig.title} />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" sizes="180x180" href={url("/favicon/anime-180.png")} />
+    {
+      iosStartupImages.map((img) => (
+        <link
+          rel="apple-touch-startup-image"
+          href={url(`/splash/splash-${img.file}.png`)}
+          media={`(device-width: ${img.w}px) and (device-height: ${img.h}px) and (-webkit-device-pixel-ratio: ${img.dpr}) and (orientation: portrait)`}
         />
       ))
     }
@@ -594,8 +630,11 @@ const websiteJsonLd = JSON.stringify({
     <!-- Live2D 鼠标陪伴角色（跟随光标 · 说话气泡 · 星光拖尾 · 随机换装 · 可自选模型） -->
     <AnimeCursorLive2D />
 
-    <!-- 公益寻亲卡片：可手动关闭、点击跳转官方平台、数据运行时刷新 -->
-    <MissingChildAid />
+    <!-- 全站背景音乐：温柔二次元伴奏，第一次点屏幕后淡入，左下角 🎵 可关 -->
+    <AnimeBgm />
+
+    <!-- PWA：注册 Service Worker（离线可读）+ 断网 / 新版本小提示 -->
+    <PwaManager />
 
     <!-- Fancybox Manager -->
     <FancyboxManager />

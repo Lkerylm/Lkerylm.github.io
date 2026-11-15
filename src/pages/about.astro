@@ -1,11 +1,11 @@
 ---
-
 import { getEntry, render } from "astro:content";
-import CutePageHero from "@components/common/CutePageHero.astro";
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import Markdown from "@components/common/Markdown.astro";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import { url } from "@/utils/url-utils";
 
 const aboutPost = await getEntry("spec", "about");
 
@@ -14,20 +14,61 @@ if (!aboutPost) {
 }
 
 const { Content } = await render(aboutPost);
+
+const shortcuts = [
+	{ emoji: "🗂️", label: "时光归档", desc: "按年份翻旧番", href: url("/archive/") },
+	{ emoji: "📺", label: "追番清单", desc: "在看 / 想看", href: url("/bangumi/") },
+	{ emoji: "🖼️", label: "相册", desc: "二次元风景", href: url("/gallery/") },
+	{ emoji: "💌", label: "留言板", desc: "说点什么吧", href: url("/guestbook/") },
+];
 ---
+
 <MainGridLayout title={i18n(I18nKey.about)} description={i18n(I18nKey.about)}>
-    <CutePageHero
-        emoji="🌸"
-        title="关于我"
-        subtitle="一个常驻二次元的动画宅，在深夜补番，也在白天发呆。这里收好每一份心动～"
-        chips={["追番笔记", "动画杂谈", "同人碎片", "日常闪光"]}
-        tone="pink"
-    />
-    <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-32">
-        <div class="card-base z-10 px-9 py-6 relative w-full ">
-            <Markdown class="mt-2">
-                <Content />
-            </Markdown>
-        </div>
+  <div class="anime-page">
+    <AnimePageHero
+      kicker="ABOUT · 关于小屋"
+      emoji="🌸"
+      title="关于我"
+      subtitle="一个常驻二次元的动画宅，在深夜补番，也在白天发呆。这里收好每一份心动～"
+      chips={["追番笔记", "动画杂谈", "同人碎片", "日常闪光"]}
+      tone="pink"
+      video="/welcome.mp4"
+      image="/anime-wallpaper/desktop-05.avif"
+    >
+      <a class="anime-hero-btn primary" href={url("/archive/")} data-sound="open">
+        翻翻归档 →
+      </a>
+      <a class="anime-hero-btn" href={url("/guestbook/")} data-sound="tap">
+        💌 留个言
+      </a>
+    </AnimePageHero>
+
+    <div class="anime-panel is-lift anime-reveal">
+      <div class="anime-block-head">
+        <span class="anime-block-emoji" aria-hidden="true">📖</span>
+        <h2 class="anime-block-title">故事从这里开始</h2>
+        <span class="anime-block-extra">UPDATED · 常驻更新</span>
+      </div>
+      <Markdown class="mt-2">
+        <Content />
+      </Markdown>
     </div>
+
+    <div class="anime-panel anime-reveal">
+      <div class="anime-block-head">
+        <span class="anime-block-emoji" aria-hidden="true">🚪</span>
+        <h2 class="anime-block-title">随便逛逛</h2>
+        <span class="anime-block-extra">四条通往二次元的小路</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 anime-reveal-list">
+        {shortcuts.map((item) => (
+          <a class="anime-tile" href={item.href} data-sound="tap">
+            <span class="anime-tile-emoji" aria-hidden="true">{item.emoji}</span>
+            <span class="anime-tile-title">{item.label}</span>
+            <span class="anime-tile-desc">{item.desc}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
 </MainGridLayout>

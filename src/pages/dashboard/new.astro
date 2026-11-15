@@ -1,6 +1,7 @@
 ---
 import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
 import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
+import "@/styles/anime-console.css";
 export const prerender = true;
 ---
 
@@ -13,8 +14,8 @@ export const prerender = true;
   <AnimeHeadMeta />
   <script is:inline src="/firefly-api.js"></script>
   <style is:global>
-    * { box-sizing: border-box; }
-    body {
+    body.console-dashboard-new *{ box-sizing: border-box; }
+    body.console-dashboard-new{
       margin: 0;
       min-height: 100vh;
       background: linear-gradient(135deg, #1b1e33 0%, #0a0b12 100%);
@@ -22,11 +23,11 @@ export const prerender = true;
       color: #fff;
       padding: 40px 20px;
     }
-    .container { max-width: 800px; margin: 0 auto; }
-    h1 { margin: 0 0 8px; font-size: 26px; }
-    .sub { color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 28px; }
-    label { display: block; font-size: 13px; margin-bottom: 6px; color: rgba(255,255,255,0.75); }
-    input, textarea {
+    body.console-dashboard-new .container{ max-width: 800px; margin: 0 auto; }
+    body.console-dashboard-new h1{ margin: 0 0 8px; font-size: 26px; }
+    body.console-dashboard-new .sub{ color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 28px; }
+    body.console-dashboard-new label{ display: block; font-size: 13px; margin-bottom: 6px; color: rgba(255,255,255,0.75); }
+    body.console-dashboard-new input, body.console-dashboard-new textarea{
       width: 100%;
       padding: 12px 14px;
       background: rgba(0,0,0,0.3);
@@ -38,10 +39,10 @@ export const prerender = true;
       outline: none;
       font-family: inherit;
     }
-    input:focus, textarea:focus { border-color: #ff9ac8; box-shadow: 0 0 0 3px rgba(255,154,200,0.15); }
-    textarea { min-height: 320px; resize: vertical; line-height: 1.6; }
-    .actions { display: flex; gap: 12px; }
-    button, a {
+    body.console-dashboard-new input:focus, body.console-dashboard-new textarea:focus{ border-color: #ff9ac8; box-shadow: 0 0 0 3px rgba(255,154,200,0.15); }
+    body.console-dashboard-new textarea{ min-height: 320px; resize: vertical; line-height: 1.6; }
+    body.console-dashboard-new .actions{ display: flex; gap: 12px; }
+    body.console-dashboard-new button, body.console-dashboard-new a{
       padding: 12px 22px;
       border-radius: 10px;
       font-size: 14px;
@@ -51,44 +52,44 @@ export const prerender = true;
       border: none;
       transition: all 0.2s;
     }
-    .btn-primary { background: linear-gradient(135deg, #ff9ac8, #a78bfa); color: #fff; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(255,154,200,0.3); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-ghost { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
-    .btn-ghost:hover { background: rgba(255,255,255,0.15); }
-    .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
-    .msg {
+    body.console-dashboard-new .btn-primary{ background: linear-gradient(135deg, #ff9ac8, #a78bfa); color: #fff; }
+    body.console-dashboard-new .btn-primary:hover{ transform: translateY(-1px); box-shadow: 0 10px 30px rgba(255,154,200,0.3); }
+    body.console-dashboard-new .btn-primary:disabled{ opacity: 0.5; cursor: not-allowed; }
+    body.console-dashboard-new .btn-ghost{ background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+    body.console-dashboard-new .btn-ghost:hover{ background: rgba(255,255,255,0.15); }
+    body.console-dashboard-new .btn-ghost:disabled{ opacity: 0.5; cursor: not-allowed; }
+    body.console-dashboard-new .msg{
       margin-top: 16px;
       padding: 10px 14px;
       border-radius: 8px;
       font-size: 13px;
       display: none;
     }
-    .msg.err { display: block; background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
-    .msg.ok  { display: block; background: rgba(100,255,150,0.15); color: #a8ffc4; border: 1px solid rgba(100,255,150,0.3); }
-    .hint { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: -16px; margin-bottom: 20px; }
+    body.console-dashboard-new .msg.err{ display: block; background: rgba(255,80,80,0.15); color: #ffb0b0; border: 1px solid rgba(255,80,80,0.3); }
+    body.console-dashboard-new .msg.ok{ display: block; background: rgba(100,255,150,0.15); color: #a8ffc4; border: 1px solid rgba(100,255,150,0.3); }
+    body.console-dashboard-new .hint{ font-size: 12px; color: rgba(255,255,255,0.4); margin-top: -16px; margin-bottom: 20px; }
 
     /* 上传区 */
-    .upload-row {
+    body.console-dashboard-new .upload-row{
       display: flex;
       align-items: center;
       gap: 12px;
       margin-bottom: 8px;
       flex-wrap: wrap;
     }
-    .upload-row button {
+    body.console-dashboard-new .upload-row button{
       padding: 8px 16px;
       font-size: 13px;
     }
-    .upload-status {
+    body.console-dashboard-new .upload-status{
       font-size: 12px;
       color: rgba(255,255,255,0.5);
     }
-    .upload-status.ok { color: #a8ffc4; }
-    .upload-status.err { color: #ffb0b0; }
+    body.console-dashboard-new .upload-status.ok{ color: #a8ffc4; }
+    body.console-dashboard-new .upload-status.err{ color: #ffb0b0; }
   </style>
 </head>
-<body>
+<body class="console-dashboard-new">
   <AnimeBackdrop />
   <div class="container">
     <h1>写文章</h1>

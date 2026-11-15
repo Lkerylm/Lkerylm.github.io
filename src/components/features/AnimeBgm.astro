@@ -1,0 +1,363 @@
+---
+/**
+ * 全站背景音乐（二次元温柔伴奏）
+ *
+ * 需求对应：
+ * 1. 「无论什么页面都有音乐」 → 放在 Layout 与所有独立页面的最外层，走到哪都在；
+ * 2. 「anime 那种伴奏」       → 站点自带的温柔哼唱曲，循环播放、音量压得很低（0.28），
+ *                               不抢注意力，像隔壁房间飘过来的 BGM；
+ * 3. 浏览器不允许自动播放     → 先静音待命，用户第一次点屏幕 / 按键就无缝淡入；
+ * 4. 不打扰                   → 左下角 🎵 小胶囊一键关掉，状态记在 localStorage；
+ *                               别的播放器（侧边栏音乐）一响，它会自动让位，播完再接回来；
+ * 5. 省电                     → 切到后台自动暂停，回到页面继续。
+ *
+ * 想换歌：把 mp3 换掉，改下面脚本里的 TRACK 即可。
+ */
+---
+
+<button
+	id="anime-bgm"
+	class="anime-bgm"
+	type="button"
+	aria-pressed="true"
+	aria-label="背景音乐开关"
+	title="背景音乐（点一下关掉，再点打开）"
+>
+	<span class="anime-bgm-note" aria-hidden="true">🎶</span>
+	<span class="anime-bgm-bars" aria-hidden="true">
+		<i></i><i></i><i></i><i></i>
+	</span>
+	<span class="anime-bgm-text">BGM</span>
+</button>
+
+<style is:global>
+	.anime-bgm {
+		position: fixed;
+		left: 16px;
+		bottom: 16px;
+		z-index: 999994;
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		height: 38px;
+		padding: 0 12px 0 10px;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.7);
+		background: linear-gradient(
+			135deg,
+			rgba(255, 138, 200, 0.95),
+			rgba(184, 148, 255, 0.95)
+		);
+		color: #fff;
+		font-family: inherit;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		cursor: pointer;
+		box-shadow: 0 8px 22px rgba(255, 134, 200, 0.38);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		transition:
+			transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+			box-shadow 0.2s ease,
+			filter 0.2s ease,
+			opacity 0.2s ease;
+	}
+
+	.anime-bgm:hover {
+		transform: translateY(-2px) scale(1.03);
+		box-shadow: 0 12px 26px rgba(255, 134, 200, 0.5);
+	}
+
+	.anime-bgm:active {
+		transform: scale(0.95);
+	}
+
+	.anime-bgm:not(.is-on) {
+		filter: grayscale(0.55);
+		opacity: 0.72;
+		box-shadow: 0 6px 16px rgba(120, 110, 150, 0.3);
+	}
+
+	.anime-bgm-note {
+		font-size: 14px;
+		line-height: 1;
+	}
+
+	.anime-bgm-bars {
+		display: inline-flex;
+		align-items: flex-end;
+		gap: 2px;
+		height: 13px;
+	}
+
+	.anime-bgm-bars i {
+		display: block;
+		width: 2.5px;
+		height: 4px;
+		border-radius: 99px;
+		background: rgba(255, 255, 255, 0.9);
+		transform-origin: bottom;
+		animation: anime-bgm-wave 1.1s ease-in-out infinite;
+	}
+
+	.anime-bgm-bars i:nth-child(2) {
+		animation-delay: 0.18s;
+	}
+
+	.anime-bgm-bars i:nth-child(3) {
+		animation-delay: 0.36s;
+	}
+
+	.anime-bgm-bars i:nth-child(4) {
+		animation-delay: 0.54s;
+	}
+
+	.anime-bgm:not(.is-on) .anime-bgm-bars i {
+		animation: none;
+		height: 3px;
+		opacity: 0.7;
+	}
+
+	.anime-bgm-text {
+		line-height: 1;
+	}
+
+	@keyframes anime-bgm-wave {
+		0%,
+		100% {
+			height: 4px;
+		}
+		50% {
+			height: 13px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.anime-bgm {
+			left: 10px;
+			height: 34px;
+			padding: 0 10px 0 8px;
+			font-size: 11px;
+		}
+
+		.anime-bgm-bars {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.anime-bgm,
+		.anime-bgm-bars i {
+			animation: none !important;
+			transition: none !important;
+		}
+	}
+</style>
+
+
+<script is:inline>
+	(function () {
+		if (window.__animeBgmInstalled) return;
+		window.__animeBgmInstalled = true;
+
+		var btn = document.getElementById("anime-bgm");
+		if (!btn) return;
+
+		var KEY = "anime_bgm";
+		var VOLUME = 0.28;
+		var TRACK = encodeURI("/assets/music/使一颗心免于哀伤-哼唱.mp3");
+
+		function readPref() {
+			try {
+				var v = localStorage.getItem(KEY);
+				return v === null ? true : v === "1";
+			} catch (e) {
+				return true;
+			}
+		}
+
+		var on = readPref();
+		var pausedByOther = false;
+		var fadeTimer = null;
+		var audio = null;
+		var unlocked = false;
+
+		try {
+			audio = new Audio();
+			audio.src = TRACK;
+			audio.loop = true;
+			audio.preload = "none";
+			audio.volume = 0;
+			audio.setAttribute("playsinline", "");
+			audio.style.display = "none";
+			document.body.appendChild(audio);
+		} catch (e) {
+			audio = null;
+		}
+
+		/* 左下角如果已经站了一排小胶囊（音效 / 壁纸 / 声音 / 光标），就往上面叠，避免压在一起 */
+		function place() {
+			var stack = [
+				"#acx-dock",
+				"#anime-voice-open",
+				"#anime-wallpaper-open",
+				"#anime-sound-toggle",
+			];
+			var top = 0;
+			for (var i = 0; i < stack.length; i++) {
+				var el = document.querySelector(stack[i]);
+				if (!el) continue;
+				var rect = el.getBoundingClientRect();
+				if (!rect.height || rect.left > window.innerWidth / 2) continue;
+				/* 越靠上 top 越小，取最上面那一个，BGM 再叠到它头顶 */
+				if (!top || rect.top < top) top = rect.top;
+			}
+			btn.style.bottom =
+				(top > 0 ? Math.round(window.innerHeight - top + 10) : 16) + "px";
+		}
+
+		function paint() {
+			btn.classList.toggle("is-on", on);
+			btn.setAttribute("aria-pressed", on ? "true" : "false");
+			btn.title = on
+				? "背景音乐开 · 点一下关掉"
+				: "背景音乐关 · 点一下打开";
+		}
+
+		function fadeTo(target, done) {
+			if (!audio) return;
+			if (fadeTimer) clearInterval(fadeTimer);
+			fadeTimer = setInterval(function () {
+				var v = audio.volume;
+				var step = target > v ? 0.04 : -0.06;
+				v = Math.max(0, Math.min(1, v + step));
+				audio.volume = v;
+				if ((target > 0 && v >= target) || (target <= 0 && v <= 0)) {
+					clearInterval(fadeTimer);
+					fadeTimer = null;
+					if (done) done();
+				}
+			}, 60);
+		}
+
+		function play(force) {
+			if (!audio) return;
+			if (!on && !force) return;
+			var p = audio.play();
+			if (p && p.then) {
+				p.then(function () {
+					fadeTo(VOLUME);
+				}).catch(function () {
+					/* 被浏览器拦下来了，等用户第一次交互 */
+					armUnlock();
+				});
+			} else {
+				fadeTo(VOLUME);
+			}
+		}
+
+		function pause(silent) {
+			if (!audio) return;
+			fadeTo(0, function () {
+				audio.pause();
+			});
+			if (!silent) pausedByOther = false;
+		}
+
+		function armUnlock() {
+			if (unlocked) return;
+			var events = ["pointerdown", "touchstart", "keydown"];
+			function once() {
+				unlocked = true;
+				for (var i = 0; i < events.length; i++) {
+					document.removeEventListener(events[i], once, true);
+				}
+				if (on && !pausedByOther) play();
+			}
+			for (var i = 0; i < events.length; i++) {
+				document.addEventListener(events[i], once, true);
+			}
+		}
+
+		btn.addEventListener("click", function () {
+			on = !on;
+			try {
+				localStorage.setItem(KEY, on ? "1" : "0");
+			} catch (e) {
+				/* ignore */
+			}
+			pausedByOther = false;
+			paint();
+			if (on) play(true);
+			else pause();
+		});
+
+		/* 别的播放器（侧边栏音乐 / 看板娘语音 / 视频）一响，BGM 自动让位 */
+		document.addEventListener(
+			"play",
+			function (e) {
+				if (!audio || e.target === audio) return;
+				if (!audio.paused) {
+					pausedByOther = true;
+					pause(true);
+				}
+			},
+			true,
+		);
+
+		document.addEventListener(
+			"pause",
+			function (e) {
+				if (!audio || e.target === audio) return;
+				if (on && pausedByOther) {
+					var others = document.querySelectorAll("audio, video");
+					var busy = false;
+					for (var i = 0; i < others.length; i++) {
+						var el = others[i];
+						if (el !== audio && !el.paused && !el.ended) busy = true;
+					}
+					if (!busy) {
+						pausedByOther = false;
+						play();
+					}
+				}
+			},
+			true,
+		);
+
+		document.addEventListener("visibilitychange", function () {
+			if (!audio) return;
+			if (document.hidden) {
+				if (!audio.paused) audio.pause();
+			} else if (on && !pausedByOther) {
+				play();
+			}
+		});
+
+		window.AnimeBgm = {
+			get on() {
+				return on;
+			},
+			play: function () {
+				play(true);
+			},
+			pause: pause,
+			toggle: function () {
+				btn.click();
+			},
+		};
+
+		paint();
+		place();
+		window.addEventListener("resize", place);
+		window.addEventListener("load", place);
+		setTimeout(place, 600);
+
+		if (on) {
+			play();
+			/* 有的浏览器 play() 不报错但也不会响，这里补一次手势解锁 */
+			armUnlock();
+		}
+	})();
+</script>

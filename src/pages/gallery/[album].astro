@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import AnimePageHero from "@components/common/AnimePageHero.astro";
 import PhotoCard from "@/components/pages/gallery/PhotoCard.astro";
 import { galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
@@ -31,100 +32,34 @@ const columnWidth = galleryConfig.columnWidth || 240;
 ---
 
 <MainGridLayout title={albumMeta.name} description={albumMeta.description || ""}>
-  <!-- 相册封面横幅 -->
-  <div class="w-full rounded-(--radius-large) overflow-hidden relative">
-    {cover ? (
-      <div class="relative w-full aspect-[3/1] min-h-[200px] max-h-[360px]">
-        <img
-          src={cover}
-          alt={albumMeta.name}
-          class="w-full h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-        <!-- 返回按钮 -->
-        <a
-          href="/gallery/"
-          class="absolute top-4 left-4 inline-flex items-center gap-1.5 text-sm text-white/90 hover:text-white bg-black/30 hover:bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors"
-        >
-          <Icon name="material-symbols:arrow-back" class="text-base" />
-          {i18n(I18nKey.galleryBackToAlbums)}
-        </a>
-        <!-- 封面上的信息 -->
-        <div class="absolute bottom-0 left-0 right-0 p-6">
-          <div class="text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow-lg">
-            {albumMeta.name}
-          </div>
-          {albumMeta.description && (
-            <p class="text-sm text-white/75 leading-relaxed mb-2 max-w-2xl line-clamp-2">
-              {albumMeta.description}
-            </p>
-          )}
-          <div class="flex items-center gap-4 text-sm text-white/80 flex-wrap">
-            {albumMeta.date && (
-              <span class="inline-flex items-center gap-1">
-                <Icon name="mingcute:calendar-fill" class="text-sm" />
-                {albumMeta.date}
-              </span>
-            )}
-            {albumMeta.location && (
-              <span class="inline-flex items-center gap-1">
-                <Icon name="mingcute:location-fill" class="text-sm" />
-                {albumMeta.location}
-              </span>
-            )}
-            <span class="inline-flex items-center gap-1">
-              <Icon name="mingcute:pic-fill" class="text-sm" />
-              {photos.length} {i18n(I18nKey.galleryPhotos)}
-            </span>
-          </div>
-          {albumMeta.tags && albumMeta.tags.length > 0 && (
-            <div class="flex flex-wrap gap-1.5 mt-2.5">
-              {albumMeta.tags.map((tag) => (
-                <span class="text-xs px-2 py-0.5 rounded bg-white/20 text-white/90 backdrop-blur-sm">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    ) : (
-      <div class="card-base px-6 py-4">
-        <a
-          href="/gallery/"
-          class="inline-flex items-center gap-1 text-sm text-(--primary) hover:underline mb-3"
-        >
-          <Icon name="material-symbols:arrow-back" class="text-base" />
-          {i18n(I18nKey.galleryBackToAlbums)}
-        </a>
-        <div class="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          {albumMeta.name}
-        </div>
-        <div class="flex items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400 mt-2 flex-wrap">
-          {albumMeta.date && (
-            <span class="inline-flex items-center gap-1">
-              <Icon name="mingcute:calendar-fill" class="text-sm" />
-              {albumMeta.date}
-            </span>
-          )}
-          {albumMeta.location && (
-            <span class="inline-flex items-center gap-1">
-              <Icon name="mingcute:location-fill" class="text-sm" />
-              {albumMeta.location}
-            </span>
-          )}
-          <span>{photos.length} {i18n(I18nKey.galleryPhotos)}</span>
-        </div>
-      </div>
-    )}
-  </div>
+  <div class="anime-page">
+    <!-- 相册封面头图 -->
+    <AnimePageHero
+      kicker={`ALBUM · ${photos.length} ${i18n(I18nKey.galleryPhotos)}`}
+      emoji="📷"
+      title={albumMeta.name}
+      subtitle={albumMeta.description}
+      chips={[
+        ...(albumMeta.date ? [albumMeta.date] : []),
+        ...(albumMeta.location ? [albumMeta.location] : []),
+        `${photos.length} ${i18n(I18nKey.galleryPhotos)}`,
+        ...(albumMeta.tags || []),
+      ]}
+      tone="sky"
+      image={cover}
+      compact
+    >
+      <a class="anime-hero-btn primary" href="/gallery/" data-sound="tap">
+        <Icon name="material-symbols:arrow-back" class="text-base" />
+        {i18n(I18nKey.galleryBackToAlbums)}
+      </a>
+    </AnimePageHero>
 
-  <!-- 瀑布流照片网格 -->
-  <div class="w-full rounded-(--radius-large) overflow-hidden relative mt-4">
-    <div class="card-base z-10 px-6 py-6 relative w-full">
+    <!-- 瀑布流照片网格 -->
+    <div class="anime-panel is-lift anime-reveal mt-4">
       {photos.length > 0 ? (
         <div
-          class="gallery-masonry"
+          class="gallery-masonry anime-reveal-list"
           style={`--col-width: ${columnWidth}px;`}
         >
           {photos.map((photo) => (

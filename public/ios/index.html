@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>iOS 版 · 把「我的动漫小屋」添加到主屏幕</title>
+<meta name="theme-color" content="#ffe9f4">
+<meta name="description" content="iPhone / iPad 安装说明：用 Safari 打开本站 → 分享 → 添加到主屏幕，就能得到一个全屏的小屋，逛过的文章断网也能看。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="我的动漫小屋">
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --pink:#ff8ab8; --pink-deep:#e0448f; --taro:#b79cff;
+    --line:#ffd3e6; --ink:#6b4a5c; --ink-soft:#9a7c8d;
+  }
+  body{
+    margin:0;min-height:100vh;padding:26px 16px 56px;color:var(--ink);overflow-x:hidden;
+    font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+    background:
+      radial-gradient(680px 420px at 12% -8%,rgba(255,196,225,.75) 0%,transparent 62%),
+      radial-gradient(620px 400px at 104% 2%,rgba(199,182,255,.6) 0%,transparent 60%),
+      radial-gradient(560px 420px at 50% 112%,rgba(178,231,255,.55) 0%,transparent 62%),
+      linear-gradient(180deg,#fffafd 0%,#fff3f9 55%,#f7f2ff 100%);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:680px;margin:0 auto}
+  .back{
+    display:inline-block;margin-bottom:14px;font-size:12.5px;color:var(--pink-deep);
+    text-decoration:none;border-bottom:1px dashed #ffb3d4;
+  }
+  .hero{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .mascot{width:82px;height:82px;flex:0 0 auto;filter:drop-shadow(0 10px 18px rgba(255,138,184,.35))}
+  h1{
+    font-size:25px;margin:0 0 6px;font-weight:800;
+    background:linear-gradient(120deg,#ff6fa8 0%,#ff9ecb 38%,#b79cff 82%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .sub{color:var(--ink-soft);font-size:13px;line-height:1.75;margin:0}
+  .sub b{color:var(--pink-deep);font-weight:600}
+  .card{
+    position:relative;overflow:hidden;background:rgba(255,255,255,.86);
+    border:1.5px solid var(--line);border-radius:22px;padding:20px 20px 18px;margin-bottom:16px;
+    box-shadow:0 14px 34px rgba(255,158,203,.18),inset 0 1px 0 #fff;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .card h2{margin:0 0 8px;font-size:16.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#5c3d4d}
+  .tag{
+    display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;
+    background:linear-gradient(135deg,#ffe1ee,#ffeef7);border:1px solid #ffc4de;color:#d6407f;
+  }
+  .tag.green{background:linear-gradient(135deg,#e2f7ee,#effcf6);border-color:#b6e9d2;color:#1f8f63}
+  ul{margin:10px 0 0;padding-left:20px;font-size:13px;line-height:1.9;color:#7d5b6c}
+  ul li b{color:var(--pink-deep)}
+  .steps{list-style:none;margin:6px 0 0;padding:0;counter-reset:step}
+  .steps>li{
+    position:relative;display:flex;flex-direction:column;gap:10px;
+    padding:14px 14px 14px 52px;margin-bottom:12px;border-radius:16px;
+    background:linear-gradient(180deg,#fffafd,#fff5fa);border:1.5px dashed #ffd3e6;
+  }
+  .steps>li::before{
+    counter-increment:step;content:counter(step);
+    position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,#ff8ab8,#b79cff);box-shadow:0 6px 14px rgba(255,138,184,.4);
+  }
+  .step-text b{display:block;font-size:14px;color:#5c3d4d;margin-bottom:3px}
+  .step-text span{font-size:12.5px;line-height:1.75;color:var(--ink-soft)}
+  .step-text span b{display:inline;font-size:12.5px;color:var(--pink-deep)}
+  .ill{width:100%;height:auto;display:block;border-radius:14px}
+  details{
+    border:1.5px solid #ffe0ee;border-radius:14px;padding:11px 13px;margin-top:10px;background:#fffafd;
+  }
+  details[open]{background:#fff}
+  summary{font-size:13px;font-weight:700;color:#b74a80;cursor:pointer;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"🌸 "}
+  details p{margin:8px 0 0;font-size:12.5px;line-height:1.85;color:#8a6a7b}
+  details p a{color:var(--pink-deep)}
+  a.dl{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 24px;border-radius:15px;text-decoration:none;color:#fff;font-weight:700;font-size:14px;
+    background:linear-gradient(135deg,#ff7fb4,#ff9ecb 46%,#b79cff);
+    box-shadow:0 10px 20px rgba(255,122,184,.38),inset 0 1px 0 rgba(255,255,255,.55);
+    margin-top:4px;
+  }
+  a.dl.ghost{background:#fff;border:1.5px solid #ffc9e1;color:#d0437f;box-shadow:0 8px 18px rgba(255,158,203,.2)}
+  .meta{font-size:11.5px;color:#b79aa9;margin-top:10px;letter-spacing:.02em}
+  .foot{text-align:center;font-size:12px;color:#b79aa9;margin-top:26px;line-height:1.9}
+  .foot a{color:var(--pink-deep);text-decoration:none;border-bottom:1px dashed #ffb3d4}
+  @media (max-width:520px){
+    body{padding:20px 13px 44px}
+    .mascot{width:60px;height:60px}
+    h1{font-size:20px}
+    .sub{font-size:12.5px}
+    .card{padding:16px 14px;border-radius:18px}
+    .steps>li{padding:12px 12px 12px 48px}
+    a.dl{width:100%;padding:12px 16px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/app/">← 返回下载页</a>
+
+  <div class="hero">
+    <svg class="mascot" viewBox="0 0 96 96" aria-hidden="true">
+      <defs>
+        <linearGradient id="mHair" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffd0e4"/><stop offset="1" stop-color="#ff9ec7"/>
+        </linearGradient>
+        <linearGradient id="mFace" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fff6fa"/><stop offset="1" stop-color="#ffe7f1"/>
+        </linearGradient>
+      </defs>
+      <circle cx="48" cy="48" r="44" fill="#fff" opacity=".68"/>
+      <path d="M23 41c-7 7-9 18-6 26 2 6 9 7 12 2 3-4 2-10 0-16-2-5-4-9-6-12z" fill="url(#mHair)"/>
+      <path d="M73 41c7 7 9 18 6 26-2 6-9 7-12 2-3-4-2-10 0-16 2-5 4-9 6-12z" fill="url(#mHair)"/>
+      <path d="M48 15c17 0 28 12 28 28 0 6-1 11-3 15H23c-2-4-3-9-3-15 0-16 11-28 28-28z" fill="url(#mHair)"/>
+      <ellipse cx="48" cy="50" rx="19" ry="18" fill="url(#mFace)"/>
+      <path d="M28 47C28 32 37 23 48 23s20 9 20 24Q48 52 28 47z" fill="url(#mHair)"/>
+      <path d="M70 27l6-4v9l-6-3zM78 27l-6-4v9l6-3z" fill="#ff7fb0"/>
+      <circle cx="74" cy="27.5" r="2.2" fill="#ff9ec7"/>
+      <ellipse cx="40" cy="52" rx="3.4" ry="4.4" fill="#5b3a4d"/>
+      <ellipse cx="56" cy="52" rx="3.4" ry="4.4" fill="#5b3a4d"/>
+      <circle cx="41.2" cy="50.4" r="1.4" fill="#fff"/>
+      <circle cx="57.2" cy="50.4" r="1.4" fill="#fff"/>
+      <ellipse cx="32.5" cy="59.5" rx="4.2" ry="2.6" fill="#ffb6d3" opacity=".9"/>
+      <ellipse cx="63.5" cy="59.5" rx="4.2" ry="2.6" fill="#ffb6d3" opacity=".9"/>
+      <path d="M46 59.5q2 3 4 0" stroke="#e0719b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1>iOS 版 · 添加到主屏幕</h1>
+      <p class="sub">iPhone / iPad <b>装不了 APK</b>，苹果也不允许随便装别人的安装包。<br>
+        所以 iOS 版走的是苹果官方的 PWA 方式：用 Safari 把本站<b>添加到主屏幕</b>，
+        点图标就是一个没有地址栏的全屏小屋。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>三步装好<span class="tag">约 30 秒 · 不用越狱</span></h2>
+    <ol class="steps">
+      <li>
+        <div class="step-text">
+          <b>① 用 Safari 打开本站</b>
+          <span>一定要用 <b>Safari</b>。在微信、QQ、Chrome、夸克里打开都没法「添加到主屏幕」，
+            右上角「···」里选「在 Safari 中打开」也可以。</span>
+        </div>
+        <svg class="ill" viewBox="0 0 320 92" role="img" aria-label="Safari 地址栏画面">
+          <rect x="5" y="6" width="310" height="80" rx="16" fill="#fff" stroke="#ffd3e6" stroke-width="2"/>
+          <rect x="21" y="22" width="278" height="30" rx="15" fill="#fff4fa" stroke="#ffd3e6" stroke-width="1.5"/>
+          <path d="M36 37v-4a5 5 0 0 1 10 0v4" fill="none" stroke="#c88aa8" stroke-width="2" stroke-linecap="round"/>
+          <rect x="33" y="36" width="16" height="11" rx="3" fill="#ffc2dd"/>
+          <text x="58" y="41" font-size="12.5" font-family="system-ui,-apple-system,sans-serif" fill="#8a6a7b">lkerylm.github.io</text>
+          <text x="21" y="72" font-size="11" font-family="system-ui,-apple-system,sans-serif" fill="#c0a5b4">在 Safari 地址栏输入本站网址并回车</text>
+        </svg>
+      </li>
+      <li>
+        <div class="step-text">
+          <b>② 点底部的「分享」按钮</b>
+          <span>就是那个 <b>方框 + 向上箭头</b> 的图标，一般在中间。
+            如果没看到底部工具栏，在页面最上面轻点一下让它出现。</span>
+        </div>
+        <svg class="ill" viewBox="0 0 320 92" role="img" aria-label="Safari 底部分享按钮">
+          <rect x="5" y="16" width="310" height="60" rx="30" fill="#fff" stroke="#ffd3e6" stroke-width="2"/>
+          <g fill="none" stroke="#e2c0d1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M52 36l-9 10 9 10"/><path d="M268 36l9 10-9 10"/>
+            <path d="M86 34h-6v24h6"/><path d="M234 34h6v24h-6"/>
+          </g>
+          <circle cx="160" cy="46" r="21" fill="#ffe1ee" stroke="#ffb8d9" stroke-width="2"/>
+          <g fill="none" stroke="#d6407f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M160 34v13"/><path d="M153 41l7-7 7 7"/><path d="M150 46v11h20V46"/>
+          </g>
+          <text x="160" y="84" font-size="11" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" fill="#c0a5b4">点中间这个「分享」</text>
+        </svg>
+      </li>
+      <li>
+        <div class="step-text">
+          <b>③ 选「添加到主屏幕」→ 添加</b>
+          <span>在分享菜单里往下滑一点点，找到 <b>添加到主屏幕</b>，名字可以改成你喜欢的，
+            右上角点「添加」就好。主屏上会多一张樱花图标。</span>
+        </div>
+        <svg class="ill" viewBox="0 0 320 118" role="img" aria-label="分享菜单里的添加到主屏幕">
+          <rect x="5" y="6" width="310" height="106" rx="18" fill="#fff" stroke="#ffd3e6" stroke-width="2"/>
+          <g stroke="#ffe6f1" stroke-width="1.5">
+            <line x1="21" y1="38" x2="299" y2="38"/>
+            <line x1="21" y1="80" x2="299" y2="80"/>
+          </g>
+          <text x="30" y="30" font-size="12" font-family="system-ui,-apple-system,sans-serif" fill="#b79aa9">复制链接</text>
+          <rect x="21" y="47" width="278" height="26" rx="10" fill="#fff2f8" stroke="#ffb8d9" stroke-width="1.5"/>
+          <rect x="31" y="53" width="14" height="14" rx="4" fill="none" stroke="#d6407f" stroke-width="2"/>
+          <path d="M38 56v8M34 60h8" stroke="#d6407f" stroke-width="2" stroke-linecap="round"/>
+          <text x="54" y="65" font-size="12.5" font-weight="700" font-family="system-ui,-apple-system,sans-serif" fill="#d6407f">添加到主屏幕</text>
+          <text x="30" y="101" font-size="12" font-family="system-ui,-apple-system,sans-serif" fill="#b79aa9">添加到书签</text>
+          <rect x="252" y="82" width="42" height="20" rx="10" fill="#ff8ab8"/>
+          <text x="273" y="96" font-size="11.5" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" fill="#fff">添加</text>
+        </svg>
+      </li>
+    </ol>
+    <div class="meta">装好后主屏图标长这样：🌸 我的动漫小屋</div>
+  </div>
+
+  <div class="card">
+    <h2>装好之后是什么样<span class="tag green">和 App 一样</span></h2>
+    <ul>
+      <li>点主屏图标打开，是<b>没有地址栏的全屏小屋</b>，壁纸、看板娘、鼠标小可爱都在</li>
+      <li>内容是<b>在线版</b>：网站在更新，手机上打开就是最新的，不用重装</li>
+      <li>逛过的文章、图片、样式会被存进手机，<b>断网也能翻</b>；没逛过的页面会显示离线小页面</li>
+      <li>长按图标可以删除，和删普通 App 一样</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>离线怎么用<span class="tag">地铁 / 飞行模式</span></h2>
+    <ul>
+      <li>先在联网状态下<b>把想看的文章翻一遍</b>，页面就自动缓存好了</li>
+      <li>之后断网点图标，首页和逛过的文章都能打开；没缓存到的会落到离线小页面，点「重试」即可</li>
+      <li>离线时底部会飘一颗小提示「已离线 · 正在显示缓存内容」，联网后自动变回「已恢复在线」</li>
+      <li>提醒：APK 安装包、音视频不会缓存，那些内容需要联网</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>常见问题</h2>
+    <details>
+      <summary>为什么 App Store 里搜不到？</summary>
+      <p>本站没有上架 App Store（需要付费开发者账号和审核），而苹果对 iOS 的正规「免上架安装」方式就是 PWA：
+        添加到主屏幕后，它和使用 App 几乎没有区别，也不用经过 App Store。安卓手机想装安装包的话，
+        去 <a href="/app/">下载页</a> 拿 APK 就好。</p>
+    </details>
+    <details>
+      <summary>主屏图标是白纸 / 空白怎么办？</summary>
+      <p>多半是添加时图标还没加载完。把图标删掉，回到 Safari 让首页完整加载一次（看到樱花图标出现），
+        再重新「添加到主屏幕」就正常了。</p>
+    </details>
+    <details>
+      <summary>打开后一直停在白屏或者离线页面？</summary>
+      <p>先确认网络是否正常；如果是刚添加就断网测试，说明文章还没被缓存，联网打开一次再看。
+        也可以下拉刷新，或者在离线页面里点一下「重试」。</p>
+    </details>
+    <details>
+      <summary>网站更新了，主屏上的会跟着更新吗？</summary>
+      <p>会。打开时会自动检查新版本，有新内容时底部提示「有新版本啦 · 点右边刷新」，点一下刷新即可。</p>
+    </details>
+    <details>
+      <summary>会占很多存储空间吗？</summary>
+      <p>一般几 MB 到几十 MB（取决于你逛过多少带图的文章）。想清掉可以在
+        「设置 → Safari → 高级 → 网站数据」里删除本站数据，缓存会重新积累。</p>
+    </details>
+    <details>
+      <summary>会不会给我推送通知？</summary>
+      <p>不会。本站没有开启网页推送，也不会在后台耗电；只有你打开页面时才工作。</p>
+    </details>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <h2 style="justify-content:center">现在就去装<span class="tag">Safari 里操作</span></h2>
+    <p class="sub" style="margin-bottom:12px">先用 Safari 打开首页，再按上面三步添加即可。</p>
+    <a class="dl" href="/">🌸 打开小屋首页</a>
+    <a class="dl ghost" href="/app/" style="margin-top:10px">📱 看看安卓 APK</a>
+    <a class="dl ghost" href="/offline/" style="margin-top:10px">📴 预览离线小页面</a>
+  </div>
+
+  <div class="foot">「我的动漫小屋」3.0.2 · <a href="/">lkerylm.github.io</a></div>
+</div>
+</body>
+</html>

@@ -21,8 +21,9 @@ import { url } from "@/utils/url-utils";
         class="transition opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl"
       />
     </div>
+    {profileConfig.avatar && (
     <ImageWrapper
-      src={profileConfig.avatar || ""}
+      src={profileConfig.avatar}
       alt="Profile Image of the Author"
       class="mx-auto lg:w-full h-full lg:mt-0"
       loading="eager"
@@ -30,6 +31,7 @@ import { url } from "@/utils/url-utils";
       widths={[350]}
       sizes="350px"
     />
+    )}
   </a>
   <div class="px-2">
     <div
