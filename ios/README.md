@@ -28,7 +28,7 @@ ios/
     │   └── LocalSchemeHandler.swift  # app://localhost/ → OfflineWeb/
     ├── Online/Info.plist       # 在线版配置
     ├── Offline/Info.plist      # 离线版配置
-    ├── Assets.xcassets/        # 图标 / 启动图（脚本生成，png 不入库）
+    ├── Assets.xcassets/        # 图标 / 启动图（pnpm ios:assets 生成，已提交）
     └── OfflineWeb/             # 离线版整站（脚本生成，不入库）
 ```
 
@@ -152,6 +152,10 @@ macOS/Linux：`base64 -i Cert.p12 | pbcopy`。
 | `pnpm ios:pack` | 上面两步 + `pnpm build` |
 
 两个脚本都是纯 Node，Windows 上也能跑，只有 `xcodegen` / `xcodebuild` 需要 macOS。
+
+> 图标和启动图（共约 220 KB）已经提交进仓库，所以**克隆下来就能直接 `xcodegen generate` + 编译**；
+> 只有改了配色或换图标时才需要重新跑 `pnpm ios:assets`。
+> 离线站点（60 MB）不进仓库，编译 `FireflyOffline` 前必须先跑 `pnpm ios:web`。
 
 ## 和 PWA 的关系
 

@@ -3,11 +3,8 @@ ios/*.xcodeproj/
 ios/*.xcworkspace/
 ios/build/
 ios/DerivedData/
-# 打包进 App 的离线站点（pnpm ios:web 重新生成）
+# 打包进 App 的离线站点（pnpm ios:web 重新生成，60MB 不入库）
 ios/App/OfflineWeb/
-# 图标 / 启动图产物（pnpm ios:assets 重新生成）
-ios/App/Assets.xcassets/AppIcon.appiconset/*.png
-ios/App/Assets.xcassets/LaunchLogo.imageset/*.png
 # 导出物
 *.ipa
 Payload/
