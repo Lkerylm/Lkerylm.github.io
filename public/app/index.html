@@ -200,11 +200,26 @@
   </div>
 
   <div class="card">
+    <h2>iOS 安装包<span class="tag green">ipa · 需要自己签名</span></h2>
+    <div class="desc">如果「添加到主屏幕」不够用（比如想要真的 App 图标、想在飞行模式下直接打开），
+      这里也提供了 <b>真·iOS 安装包（ipa）</b>：在线版和离线版各一个，和安卓那两个 App 是同一份代码的孪生兄弟。</div>
+    <ul>
+      <li>它没上 App Store —— 苹果对「网页套壳」类 App 审核很严（4.2 最低功能条款），自签安装反而更省心</li>
+      <li>下载下来的 <code>unsigned.ipa</code> 要用电脑上的 <b>Sideloadly</b> 或 <b>AltStore</b>，填自己的 Apple ID 签一次再装</li>
+      <li>免费 Apple ID 签的包 <b>7 天</b>后失效，重新签一次就行；付费开发者账号（Ad Hoc）可以用 1 年</li>
+      <li>在线版约 2 MB（打开时加载本站），离线版约 43 MB（整站打包在 App 里，断网可看）</li>
+    </ul>
+    <a class="dl" href="https://github.com/Lkerylm/Lkerylm.github.io/releases" target="_blank" rel="noopener">⬇️ 去下载 iOS 安装包</a>
+    <a class="dl ghost" href="https://github.com/Lkerylm/Lkerylm.github.io/blob/main/ios/README.md" target="_blank" rel="noopener" style="margin-top:10px">📖 签名讲解 / 常见问题</a>
+    <div class="meta">包名 com.lkerylm.firefly.online（在线）/ com.lkerylm.firefly（离线）· iOS 15 及以上 · 每次网站更新都会重新打包</div>
+  </div>
+
+  <div class="card">
     <h2>安装小提示</h2>
     <ul>
       <li>第一次安装时安卓会提示「未知来源应用」，在设置里允许本次安装即可</li>
       <li>两个版本包名不同，可以同时装在手机上对比</li>
-      <li>iPhone / iPad 不用装包，按上面「iOS 版」把网页添加到主屏幕就好</li>
+      <li>iPhone / iPad 有两种玩法：不想折腾就按上面「iOS 版」添加到主屏幕，想装真 App 就下载 ipa 自己签</li>
       <li>离线内容存在手机本地，想清掉可以在浏览器设置里清除本站网站数据</li>
       <li>App 只负责把网页装进手机，不会上传你的任何数据</li>
       <li>想核对文件有没有下坏：站内的 <a href="/app/SHA256SUMS.txt">SHA256SUMS.txt</a> 里有四个包的校验值</li>

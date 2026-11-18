@@ -14,7 +14,7 @@
  *   *.map      —— sourcemap
  *   .DS_Store  —— macOS 垃圾文件
  */
-import { cp, mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -70,9 +70,7 @@ async function main() {
 
 	const { bytes, files } = await measure(DEST);
 	const pkg = JSON.parse(
-		await import("node:fs/promises").then((fs) =>
-			fs.readFile(path.join(root, "package.json"), "utf8"),
-		),
+		await readFile(path.join(root, "package.json"), "utf8"),
 	);
 
 	await writeFile(
