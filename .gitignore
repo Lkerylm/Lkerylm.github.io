@@ -1,3 +1,18 @@
+# iOS 原生壳（ios/project.yml 是唯一真源，Xcode 工程全部重新生成）
+ios/*.xcodeproj/
+ios/*.xcworkspace/
+ios/build/
+ios/DerivedData/
+# 打包进 App 的离线站点（pnpm ios:web 重新生成）
+ios/App/OfflineWeb/
+# 图标 / 启动图产物（pnpm ios:assets 重新生成）
+ios/App/Assets.xcassets/AppIcon.appiconset/*.png
+ios/App/Assets.xcassets/LaunchLogo.imageset/*.png
+# 导出物
+*.ipa
+Payload/
+
+
 # 签名密钥（不要提交）
 .apk-keystore/
 

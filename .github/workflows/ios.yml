@@ -1,0 +1,222 @@
+name: Build iOS IPA
+
+# 手动触发：Actions → Build iOS IPA → Run workflow
+# 自动触发：推到 main 且改动了 ios/ 或下面这些脚本时
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+    # 打 ios-v* 标签时顺便把 ipa 发到 Release（tag 推送不受下面的 paths 过滤影响）
+    tags: ["ios-v*"]
+    paths:
+      - "ios/**"
+      - "scripts/generate-ios-app-assets.mjs"
+      - "scripts/prepare-ios-web.mjs"
+      - ".github/workflows/ios.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SITE_URL: ${{ vars.SITE_URL }}
+  # —— 签名材料（没有也能跑，只是产出「未签名 ipa」，用 Sideloadly / AltStore 自签安装）——
+  #   IOS_CERT_P12_BASE64   .p12 证书的 base64（Apple Developer 后台导出，含私钥）
+  #   IOS_CERT_PASSWORD     .p12 的密码
+  #   IOS_PROVISION_BASE64  .mobileprovision 的 base64
+  #   IOS_TEAM_ID           开发者账号的 Team ID（10 位）
+  #   vars.IOS_EXPORT_METHOD  development / ad-hoc / app-store-connect，默认 development
+  IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
+  IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+  IOS_PROVISION_BASE64: ${{ secrets.IOS_PROVISION_BASE64 }}
+  IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+  IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
+
+jobs:
+  build:
+    # macOS 14 (Xcode 15) 起就能编 iOS 15+；想用更新的 Xcode 换成 macos-15
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.14.4
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build site (dist/)
+        run: pnpm run build
+
+      - name: 读取版本号
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "打包版本：$VERSION"
+
+      - name: 生成 App 图标 / 启动图
+        run: node scripts/generate-ios-app-assets.mjs
+
+      - name: 打包离线站点到 ios/App/OfflineWeb
+        run: node scripts/prepare-ios-web.mjs
+
+      - name: 安装 XcodeGen
+        run: brew install xcodegen
+
+      - name: 生成 Xcode 工程
+        working-directory: ios
+        run: xcodegen generate --spec project.yml
+
+      # 未签名 ipa：把 .app 塞进 Payload/ 再 zip 就是 ipa，
+      # 装的时候用 Sideloadly / AltStore / TrollStore 用自己的 Apple ID 签一下即可
+      - name: 编译两个 App（未签名 ipa）
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          for scheme in FireflyOnline FireflyOffline; do
+            echo "::group::xcodebuild $scheme"
+            xcodebuild \
+              -project ios/Firefly.xcodeproj \
+              -scheme "$scheme" \
+              -configuration Release \
+              -sdk iphoneos \
+              -derivedDataPath "build/DerivedData-$scheme" \
+              MARKETING_VERSION="$VERSION" \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY="" \
+              build
+            rm -rf Payload
+            mkdir -p Payload
+            cp -R "build/DerivedData-$scheme/Build/Products/Release-iphoneos/$scheme.app" Payload/
+            zip -qry "artifacts/$scheme-$VERSION-unsigned.ipa" Payload
+            rm -rf Payload
+            echo "::endgroup::"
+          done
+          ls -lh artifacts
+
+      # ——— 以下只在配置了签名 secrets 时才跑 ———
+
+      - name: 导入签名证书与描述文件
+        if: env.IOS_CERT_P12_BASE64 != '' && env.IOS_PROVISION_BASE64 != ''
+        env:
+          KEYCHAIN_PASSWORD: firefly-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          KEYCHAIN="$RUNNER_TEMP/firefly-signing.keychain-db"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+
+          # macOS 的 base64 各版本参数不太一样，用 openssl 解码最稳
+          printf '%s\n' "$IOS_CERT_P12_BASE64" | openssl base64 -d -out "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$IOS_CERT_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+
+          PROFILES="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILES"
+          printf '%s\n' "$IOS_PROVISION_BASE64" \
+            | openssl base64 -d -out "$PROFILES/firefly.mobileprovision"
+          security cms -D -i "$PROFILES/firefly.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          echo "PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/profile.plist")" >> "$GITHUB_ENV"
+
+      - name: 归档并导出已签名 ipa
+        if: env.PROFILE_NAME != ''
+        run: |
+          set -euo pipefail
+          EXPORT_METHOD="${IOS_EXPORT_METHOD:-development}"
+
+          for scheme in FireflyOnline FireflyOffline; do
+            echo "::group::archive $scheme ($EXPORT_METHOD)"
+            xcodebuild \
+              -project ios/Firefly.xcodeproj \
+              -scheme "$scheme" \
+              -configuration Release \
+              -sdk iphoneos \
+              -archivePath "build/$scheme.xcarchive" \
+              MARKETING_VERSION="$VERSION" \
+              CODE_SIGN_STYLE=Manual \
+              DEVELOPMENT_TEAM="$IOS_TEAM_ID" \
+              PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+              archive
+
+            OPTIONS="build/export-$scheme.plist"
+            plutil -create xml1 "$OPTIONS"
+            /usr/libexec/PlistBuddy -c "Add :method string $EXPORT_METHOD" "$OPTIONS"
+            /usr/libexec/PlistBuddy -c "Add :teamID string $IOS_TEAM_ID" "$OPTIONS"
+            /usr/libexec/PlistBuddy -c "Add :signingStyle string manual" "$OPTIONS"
+            /usr/libexec/PlistBuddy -c "Add :destination string export" "$OPTIONS"
+            /usr/libexec/PlistBuddy -c "Add :stripSwiftSymbols bool true" "$OPTIONS"
+            /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" "$OPTIONS"
+            /usr/libexec/PlistBuddy \
+              -c "Add :provisioningProfiles:com.lkerylm.firefly.online string $PROFILE_NAME" "$OPTIONS"
+            /usr/libexec/PlistBuddy \
+              -c "Add :provisioningProfiles:com.lkerylm.firefly string $PROFILE_NAME" "$OPTIONS"
+
+            xcodebuild -exportArchive \
+              -archivePath "build/$scheme.xcarchive" \
+              -exportPath "build/export-$scheme" \
+              -exportOptionsPlist "$OPTIONS"
+
+            cp "build/export-$scheme/"*.ipa "artifacts/$scheme-$VERSION-signed.ipa"
+            echo "::endgroup::"
+          done
+
+      - name: 上传 ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: Firefly-iOS-${{ env.VERSION }}
+          path: artifacts/*.ipa
+          if-no-files-found: error
+          retention-days: 30
+
+      # 打了 ios-v6.8.4 这种标签的话，顺手发到 Release，方便直接下载（公开仓库无需登录）
+      - name: 发版（ios-v* 标签）
+        if: startsWith(github.ref, 'refs/tags/ios-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.ipa
+          generate_release_notes: true
+          body: |
+            iOS 安装包（版本 ${{ env.VERSION }}）
+
+            - `FireflyOnline`：在线版，打开时加载 https://lkerylm.github.io/，需要联网
+            - `FireflyOffline`：离线版，整站打包进 App，断网可用
+
+            `unsigned.ipa` 需要用自己的 Apple ID 签一次（Sideloadly / AltStore），详见 `ios/README.md`。
+
+      - name: 输出说明
+        run: |
+          EXPORT_METHOD="${IOS_EXPORT_METHOD:-development}"
+          {
+            echo "### iOS 包已生成（版本 $VERSION）"
+            echo
+            ls -lh artifacts | sed 's/^/    /'
+            echo
+            echo "- 在线版 \`FireflyOnline\`：打开时加载 https://lkerylm.github.io/，内容和网站同步，需要联网"
+            echo "- 离线版 \`FireflyOffline\`：整站打包进 App（app:// 本地协议），断网可用"
+            echo
+            if [ -z "${PROFILE_NAME:-}" ]; then
+              echo "> 本次是**未签名**包：Windows 上用 [Sideloadly](https://sideloadly.io/) 或 [AltStore](https://altstore.io/) 用自己的 Apple ID 签名后安装（免费账号 7 天有效）。"
+              echo "> 想要免签直装（Ad Hoc，1 年 + 100 台设备），按 \`ios/README.md\` 配好 4 个 secrets 再跑一次。"
+            else
+              echo "> 已用描述文件 \`$PROFILE_NAME\` 签名（$EXPORT_METHOD），可直接用 Apple Configurator / 爱思助手装到已登记的设备。"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

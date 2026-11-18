@@ -17,6 +17,9 @@
     "lint": "biome check --write ./src",
     "preinstall": "npx only-allow pnpm",
     "icons": "node scripts/generate-icons.js",
+    "ios:assets": "node scripts/generate-ios-app-assets.mjs",
+    "ios:web": "node scripts/prepare-ios-web.mjs",
+    "ios:pack": "pnpm build && pnpm ios:assets && pnpm ios:web",
     "voice-packs": "node scripts/generate-voice-packs.mjs"
   },
   "dependencies": {

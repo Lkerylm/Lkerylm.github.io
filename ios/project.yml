@@ -1,0 +1,82 @@
+# XcodeGen 工程描述（https://github.com/yonaskolb/XcodeGen）
+#
+# 这个文件是「唯一真源」，.xcodeproj 由它生成，不进仓库（见 .gitignore）：
+#   cd ios && xcodegen generate      # 或者 brew install xcodegen
+#
+# 一条代码，两个 App：
+#   FireflyOnline  —— 在线版，加载 https://lkerylm.github.io/，内容永远和网站同步
+#   FireflyOffline —— 离线版，把 dist/ 打进包里（ios/App/OfflineWeb/），断网也能看
+# 两者共用 ios/App/Shared 下的 Swift 代码，区别只在各自的 Info.plist：
+#   FireflyWebMode = online / offline
+name: Firefly
+
+options:
+  bundleIdPrefix: com.lkerylm
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "15.0"
+  groupSortPosition: top
+
+settings:
+  base:
+    # 版本号由 CI 用 `MARKETING_VERSION=$(node -p "require('./package.json').version")` 覆盖
+    MARKETING_VERSION: "6.8.4"
+    CURRENT_PROJECT_VERSION: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    ENABLE_BITCODE: NO
+    GENERATE_INFOPLIST_FILE: NO
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    SUPPORTS_MACCATALYST: NO
+    # 签名：本地跑的时候在 Xcode 里选自己的 Team，CI 里用 secrets 导入证书
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  FireflyOnline:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/Shared
+      - path: App/Assets.xcassets
+    settings:
+      base:
+        INFOPLIST_FILE: App/Online/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.lkerylm.firefly.online
+        PRODUCT_NAME: FireflyOnline
+
+  FireflyOffline:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/Shared
+      - path: App/Assets.xcassets
+      # 蓝色文件夹引用：整棵 dist 树原样塞进 .app/OfflineWeb/，
+      # 由 LocalSchemeHandler 通过 app://localhost/ 读出来
+      - path: App/OfflineWeb
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        INFOPLIST_FILE: App/Offline/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.lkerylm.firefly
+        PRODUCT_NAME: FireflyOffline
+
+schemes:
+  FireflyOnline:
+    build:
+      targets:
+        FireflyOnline: all
+    run:
+      config: Release
+    archive:
+      config: Release
+  FireflyOffline:
+    build:
+      targets:
+        FireflyOffline: all
+    run:
+      config: Release
+    archive:
+      config: Release
