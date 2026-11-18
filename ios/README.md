@@ -81,6 +81,17 @@ FireflyOnline-6.8.4-signed.ipa       ← 配了 secrets 才有
 git tag ios-v6.8.4 && git push origin ios-v6.8.4
 ```
 
+## 已经打好的包
+
+不想本地折腾就直接下现成的（每打一个 `ios-v*` 标签就会发一版）：
+
+- https://github.com/Lkerylm/Lkerylm.github.io/releases
+
+```
+FireflyOnline-6.8.4-unsigned.ipa     0.45 MB
+FireflyOffline-6.8.4-unsigned.ipa   44.05 MB
+```
+
 `unsigned.ipa` 是「`.app` 塞进 `Payload/` 再 zip」的标准 ipa 结构，
 Windows 上用 [Sideloadly](https://sideloadly.io/) / [AltStore](https://altstore.io/) 用自己的 Apple ID 签一次就能装。
 
