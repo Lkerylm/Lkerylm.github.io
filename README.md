@@ -248,15 +248,32 @@ comment: true    # 是否允许评论
 
 ## 📝 许可协议
 
-本项目遵循 [MIT license](https://mit-license.org/) 开源协议，详细查看 [LICENSE](./LICENSE) 文件
+本站采用**分层授权**，请按用途区分（详见 [NOTICE.md](./NOTICE.md)）：
 
-最初 Fork 自 [saicaca/fuwari](https://github.com/saicaca/fuwari)，感谢原作者的贡献
+| 内容 | 授权 | 可否复用 |
+| --- | --- | --- |
+| 源代码（含 `ios/` 下的 Swift 外壳、CI 工作流、构建脚本） | [MIT](./LICENSE) | ✅ 需保留版权声明 |
+| 博客文章正文 | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) | ⚠️ 仅限非商业，须署名 + 相同方式共享 |
+| 壁纸 / 相册 / 音频 / TTS 语音包 / Live2D 模型 | 归各自权利人，**不在开源范围** | ❌ 未获授权请勿转载 |
+| 第三方组件（npm 依赖、图标、字体） | 各自许可（MIT / Apache-2.0 / OFL / CC BY 4.0 / CC0 / MPL-2.0） | ✅ 按其许可使用 |
+
+- 完整的第三方组件清单：**[THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md)**（构建后同步到站点 `/licenses/`，iOS 离线 App 内同样可访问）
+- 许可原文副本：**[LICENSES/](./LICENSES)**（Apache-2.0、OFL-1.1、MPL-2.0）
+- 自动合规自检：`pnpm legal:check`（提示） / `pnpm legal:check:strict`（打包 iOS 前必须通过）
+  —— 检查被禁依赖、copyleft 许可、声明文件与高风险素材
 
 **版权声明：**
-- Copyright (c) 2024 [saicaca](https://github.com/saicaca) - [fuwari](https://github.com/saicaca/fuwari)
-- Copyright (c) 2025 [CuteLeaf](https://github.com/CuteLeaf) - [Firefly](https://github.com/CuteLeaf/Firefly) 
 
-根据 MIT 开源协议，你可以自由使用、修改、分发代码，但需保留上述版权声明。
+- Copyright (c) 2024 [saicaca](https://github.com/saicaca) - [fuwari](https://github.com/saicaca/fuwari)
+- Copyright (c) 2025 [CuteLeaf](https://github.com/CuteLeaf) - [Firefly](https://github.com/CuteLeaf/Firefly)
+- Copyright (c) 2025-2026 [Lkerylm](https://github.com/Lkerylm) - 本站二次开发部分
+
+根据 MIT 开源协议，你可以自由使用、修改、分发**代码**，但需保留上述版权声明；
+`LICENSE` 中同时保留了上游 saicaca 与 CuteLeaf 的声明，请勿删除。
+
+「流萤」等角色形象版权归 [米哈游 / HoYoverse](https://www.mihoyo.com/) 所有，本站为非官方、非商业的同人站点；
+如权利人认为使用不当，请通过 [Issues](https://github.com/Lkerylm/Lkerylm.github.io/issues) 联系，我们会尽快下架相关内容。
+
 
 ## 🍀 贡献者
 

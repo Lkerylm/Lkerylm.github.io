@@ -16,6 +16,9 @@ Payload/
 # build output
 dist/
 
+# 许可信息页与依赖清单（pnpm build / pnpm legal 生成）
+public/licenses/
+
 # generated types
 .astro/
 

@@ -60,6 +60,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: 开源合规自检（block 级素材会中止打包）
+        run: pnpm legal:check:strict
+
       - name: Build site (dist/)
         run: pnpm run build
 

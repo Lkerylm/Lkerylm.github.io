@@ -2,6 +2,7 @@ MIT License
 
 Copyright (c) 2024 saicaca
 Copyright (c) 2025 CuteLeaf
+Copyright (c) 2025-2026 Lkerylm
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,4 +20,22 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE. 
+SOFTWARE.
+
+---
+
+适用范围（中文）
+
+本许可证（MIT）仅适用于本仓库中的**源代码**：Astro 组件与页面、样式表、构建脚本、
+GitHub Actions 工作流，以及 `ios/` 目录下的 Swift 源码与 XcodeGen 配置。
+本站的文章正文、插图、壁纸、音频、Live2D 模型、字体等**内容与素材不适用 MIT**，
+其版权归属与使用条件见 `NOTICE.md` 与 `THIRD-PARTY-NOTICES.md`。
+
+Scope (English)
+
+This MIT license covers the **source code** of this repository only
+(Astro components/pages, styles, build scripts, CI workflows and the Swift
+sources under `ios/`). Blog posts, artwork, wallpapers, audio files, Live2D
+models and fonts are **not** covered by MIT; see `NOTICE.md` and
+`THIRD-PARTY-NOTICES.md` for their respective ownership and terms.
+ 
