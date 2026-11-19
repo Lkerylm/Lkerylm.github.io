@@ -21,6 +21,7 @@
     "legal": "node scripts/sync-legal.mjs",
     "legal:check": "node scripts/check-legal.mjs",
     "legal:check:strict": "node scripts/check-legal.mjs --strict",
+    "music:generate": "node scripts/generate-cute-music.mjs",
     "ios:assets": "node scripts/generate-ios-app-assets.mjs",
     "ios:web": "node scripts/prepare-ios-web.mjs",
     "ios:pack": "pnpm legal:check:strict && pnpm build && pnpm ios:assets && pnpm ios:web",

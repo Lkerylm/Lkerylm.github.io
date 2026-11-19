@@ -51,24 +51,30 @@ const REQUIRED_FILES = [
  * 高风险素材：
  *  - block  : 基本可以确定无权随站点 / App 公开分发，应删除或替换
  *  - review : 来源或再分发条款不明确，需权利人确认（默认按「保留所有权利」处理）
+ *
+ * 说明：block 级的三项（星穹铁道同名单曲、网易云专辑封面、内嵌 Fancybox 的旧离线包）
+ * 已在 2026-11-19 删除，背景音乐换成 scripts/generate-cute-music.mjs 现场合成的 CC0 曲目。
+ * 这里保留条目当"回归守卫"：万一哪天又把这些文件放回来，strict 模式会立刻拦下。
+ * 文件不存在时不会报警（见下面 existsSync 判断）。
  */
 const RISKY_ASSETS = [
 	{
 		path: "public/assets/music/使一颗心免于哀伤-哼唱.mp3",
 		level: "block",
 		reason:
-			"与《崩坏：星穹铁道》官方曲目同名，录音与词曲版权属原权利方，不能随仓库 / App 分发",
+			"与《崩坏：星穹铁道》官方曲目同名，录音与词曲版权属原权利方；已于 2026-11-19 删除，请勿加回（改用 pnpm music:generate 生成的自制曲目）",
 	},
 	{
 		path: "public/assets/music/cover/109951169585655912.webp",
 		level: "block",
-		reason: "网易云音乐专辑封面，美术作品版权属原权利方，未获授权不得再分发",
+		reason:
+			"网易云音乐专辑封面，美术作品版权属原权利方；已于 2026-11-19 删除，请勿加回（封面改用自制 SVG）",
 	},
 	{
 		path: "public/app/AnimeHome-3.0.2-offline.apk",
 		level: "block",
 		reason:
-			"旧版离线安装包：内嵌了已移除的 Fancybox 代码，以及上面两首音乐 / 封面；需用当前代码重新打包或删除",
+			"旧版离线安装包：内嵌了已移除的 Fancybox 代码与上面两首音乐素材；已于 2026-11-19 删除，请用当前代码重新打包后再提供",
 	},
 	{
 		path: "public/tts",

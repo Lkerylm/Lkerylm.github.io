@@ -46,16 +46,20 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 
 	// 本地音乐配置（当 mode 为 'local' 时使用）
 	// 1. 支持传入歌词文件的路径
-	// lrc: "/assets/music/lrc/使一颗心免于哀伤-哼唱.lrc",
+	// lrc: "/assets/music/lrc/firefly-lullaby.lrc",
 	// 2. 或者直接填入歌词字符串内容
 	// lrc: "[00:00.00]歌词内容...",
+	//
+	// 曲目是本站自制的：波形由 scripts/generate-cute-music.mjs 现场算出来，
+	// 随仓库以 CC0 释出（随便用，不用署名），所以不会再有版权问题。
+	// 想换调子 / 速度 / 音色，改那个脚本顶部的常量再跑 pnpm music:generate。
 	local: {
 		playlist: [
 			{
-				name: "使一颗心免于哀伤",
-				artist: "知更鸟 / HOYO-MiX / Chevy",
-				url: "/assets/music/使一颗心免于哀伤-哼唱.mp3",
-				cover: "/assets/music/cover/109951169585655912.webp",
+				name: "萤火虫摇篮曲",
+				artist: "本站自制 · 八音盒 / CC0",
+				url: "/assets/music/firefly-lullaby.wav",
+				cover: "/assets/music/cover/firefly-lullaby.svg",
 				lrc: "",
 			},
 		],

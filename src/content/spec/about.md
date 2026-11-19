@@ -27,7 +27,7 @@
 - 🌏 **社区投稿**：[/community/](/community/)（登录后就能发帖、评论）
 - 🖼 **相册**：[/gallery/](/gallery/)
 - 💬 **留言板**：[/guestbook/](/guestbook/)
-- 📱 **手机 App**：[/app/](/app/)（在线版 / 离线版）
+- 📱 **手机 App**：[/app/](/app/)（在线版已上线，离线版正在用新代码重打包）
 - 📡 **RSS 订阅**：[/rss/](/rss/)
 
 ---

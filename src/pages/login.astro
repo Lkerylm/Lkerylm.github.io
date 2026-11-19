@@ -198,6 +198,57 @@ export const prerender = true;
 			color: rgba(255, 255, 255, 0.46);
 		}
 
+		/* 鼠标贴上去时，吉祥物会开心地摇一摇（纯装饰，不影响按钮） */
+		body.console-login .mascot:hover{
+			animation: wiggle 0.75s ease-in-out;
+			box-shadow:
+				0 12px 30px rgba(255, 154, 200, 0.5),
+				0 0 0 6px rgba(255, 175, 214, 0.16),
+				inset 0 -3px 8px rgba(0, 0, 0, 0.16);
+		}
+
+		@keyframes wiggle{
+			0%,
+			100% {
+				transform: rotate(0deg) scale(1);
+			}
+			25% {
+				transform: rotate(-12deg) scale(1.1);
+			}
+			65% {
+				transform: rotate(10deg) scale(1.06);
+			}
+		}
+
+		/* 卡片右上角三颗小萤火，慢慢一上一下地飘 */
+		body.console-login .card::after{
+			content: "";
+			position: absolute;
+			top: -13px;
+			right: 22px;
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: radial-gradient(circle, #fffbe0 0%, #ffe08a 45%, transparent 72%);
+			box-shadow:
+				-28px 15px 0 -1px rgba(255, 236, 170, 0.85),
+				13px 32px 0 -2px rgba(255, 236, 170, 0.65);
+			pointer-events: none;
+			animation: firefly 5.5s ease-in-out infinite;
+		}
+
+		@keyframes firefly{
+			0%,
+			100% {
+				transform: translate3d(0, 0, 0);
+				opacity: 0.5;
+			}
+			50% {
+				transform: translate3d(-4px, 9px, 0);
+				opacity: 0.95;
+			}
+		}
+
 		@keyframes bob{
 			0%,
 			100% {
@@ -409,7 +460,7 @@ export const prerender = true;
 			transition: background 0.3s ease;
 		}
 
-		body.console-login .status[data-state="online"] .dot{
+		body.console-login .status[data-state="online"] .dot, body.console-login .card::after, body.console-login .mascot:hover{
 			background: #63e6a2;
 			box-shadow: 0 0 0 0 rgba(99, 230, 162, 0.6);
 			animation: pulse 2.4s ease-out infinite;
@@ -460,7 +511,7 @@ export const prerender = true;
 		}
 
 		@media (prefers-reduced-motion: reduce){
-			body.console-login .card, body.console-login .mascot, body.console-login button[type="submit"]::after, body.console-login .petal, body.console-login .status[data-state="online"] .dot{
+			body.console-login .card, body.console-login .mascot, body.console-login button[type="submit"]::after, body.console-login .petal, body.console-login .status[data-state="online"] .dot, body.console-login .card::after, body.console-login .mascot:hover{
 				animation: none !important;
 			}
 		}

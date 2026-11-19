@@ -103,7 +103,14 @@ export function createUser(
     .run(username, email, passwordHash, role);
 
   const id = Number(result.lastInsertRowid);
-  return db
+  // node:sqlite 的 .get() 返回 Record<string, SQLOutputValue>，这里按表结构断言成 User
+  const created = db
     .prepare(`SELECT * FROM users WHERE id = ?`)
-    .get(id) as User;
+    .get(id) as unknown as User | undefined;
+
+  if (!created) {
+    throw new Error(`创建用户失败：刚插入的记录（id=${id}）读不回来`);
+  }
+
+  return created;
 }

@@ -44,7 +44,7 @@ const isRegister = mode === "register";
 				inputmode="numeric"
 				pattern="[0-9]{6}"
 			/>
-			<button type="button" id="sendCodeBtn" class="ff-code-btn">发送验证码</button>
+			<button type="button" id="sendCodeBtn" class="ff-code-btn">🕊️ 发送验证码</button>
 		</div>
 	</div>
 
@@ -79,7 +79,7 @@ const isRegister = mode === "register";
 
 	.ff-code-btn {
 		flex: 0 0 auto;
-		min-width: 98px;
+		min-width: 112px;
 		height: 48px;
 		padding: 0 12px;
 		border-radius: 14px;
@@ -118,8 +118,8 @@ const isRegister = mode === "register";
 
 	@media (max-width: 380px) {
 		.ff-code-btn {
-			min-width: 84px;
-			font-size: 12px;
+			min-width: 100px;
+			font-size: 11.5px;
 		}
 	}
 </style>
@@ -195,21 +195,21 @@ const isRegister = mode === "register";
 			}
 			if (left <= 0) {
 				sendBtn.disabled = false;
-				sendBtn.textContent = "发送验证码";
+				sendBtn.textContent = "🕊️ 发送验证码";
 				return;
 			}
 			sendBtn.disabled = true;
-			sendBtn.textContent = "重新发送 " + left + "s";
+			sendBtn.textContent = "🕊️ " + left + "s";
 			timer = setInterval(function () {
 				left -= 1;
 				if (left <= 0) {
 					clearInterval(timer);
 					timer = null;
 					sendBtn.disabled = false;
-					sendBtn.textContent = "发送验证码";
+					sendBtn.textContent = "🕊️ 发送验证码";
 					return;
 				}
-				sendBtn.textContent = "重新发送 " + left + "s";
+				sendBtn.textContent = "🕊️ " + left + "s";
 			}, 1000);
 		}
 
@@ -240,7 +240,7 @@ const isRegister = mode === "register";
 			}
 			clearMsg();
 			sendBtn.disabled = true;
-			sendBtn.textContent = "发送中…";
+			sendBtn.textContent = "🕊️ 送信中…";
 			try {
 				var res = await fetch("/api/auth/request-code/", {
 					method: "POST",
@@ -261,7 +261,7 @@ const isRegister = mode === "register";
 						localStorage.setItem(SENT_KEY, String(Date.now()));
 					} catch (e) {}
 					startCooldown(data.resendAfter || 60);
-					showMsg(data.hint || "验证码已发送，去邮箱看看（垃圾箱也翻一下）", "ok");
+					showMsg(data.hint || "🎉 验证码已发送，去邮箱看看（垃圾箱也翻一下）", "ok");
 					sound("click", 0.4);
 					if (data.devCode) {
 						codeInput.value = data.devCode;
@@ -275,7 +275,7 @@ const isRegister = mode === "register";
 				if (data && data.retryAfter) startCooldown(data.retryAfter);
 				else {
 					sendBtn.disabled = false;
-					sendBtn.textContent = "发送验证码";
+					sendBtn.textContent = "🕊️ 发送验证码";
 				}
 				showMsg(
 					(data && data.error) ||
@@ -287,7 +287,7 @@ const isRegister = mode === "register";
 				sound("error", 0.4);
 			} catch (err) {
 				sendBtn.disabled = false;
-				sendBtn.textContent = "发送验证码";
+				sendBtn.textContent = "🕊️ 发送验证码";
 				showMsg(
 					(err && err.message) ||
 						(IS_DEV ? "网络错误：检查后端是否在运行" : "网络有点问题，稍后再试"),

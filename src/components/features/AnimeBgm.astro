@@ -11,7 +11,7 @@
  *                               别的播放器（侧边栏音乐）一响，它会自动让位，播完再接回来；
  * 5. 省电                     → 切到后台自动暂停，回到页面继续。
  *
- * 想换歌：把 mp3 换掉，改下面脚本里的 TRACK 即可。
+ * 想换歌：改 scripts/generate-cute-music.mjs（自制八音盒小循环，CC0）后跑 pnpm music:generate 即可。
  */
 ---
 
@@ -166,7 +166,7 @@
 
 		var KEY = "anime_bgm";
 		var VOLUME = 0.28;
-		var TRACK = encodeURI("/assets/music/使一颗心免于哀伤-哼唱.mp3");
+		var TRACK = encodeURI("/assets/music/firefly-lullaby.wav");
 
 		function readPref() {
 			try {
