@@ -255,11 +255,13 @@ comment: true    # 是否允许评论
 | 源代码（含 `ios/` 下的 Swift 外壳、CI 工作流、构建脚本） | [MIT](./LICENSE) | ✅ 需保留版权声明 |
 | 博客文章正文 | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) | ⚠️ 仅限非商业，须署名 + 相同方式共享 |
 | 壁纸 / 相册 / 音频 / TTS 语音包 / Live2D 模型 | 归各自权利人，**不在开源范围** | ❌ 未获授权请勿转载 |
+| 背景音乐与封面（`public/assets/music/**`） | **CC0 1.0**（本站自制） | ✅ 随便用，不必署名 |
 | 第三方组件（npm 依赖、图标、字体） | 各自许可（MIT / Apache-2.0 / OFL / CC BY 4.0 / CC0 / MPL-2.0） | ✅ 按其许可使用 |
 
 - 完整的第三方组件清单：**[THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md)**（构建后同步到站点 `/licenses/`，iOS 离线 App 内同样可访问）
 - 许可原文副本：**[LICENSES/](./LICENSES)**（Apache-2.0、OFL-1.1、MPL-2.0）
 - 自动合规自检：`pnpm legal:check`（提示） / `pnpm legal:check:strict`（打包 iOS 前必须通过）
+- 背景音乐是**自制**的：`pnpm music:generate` 会用纯数学重算一遍八音盒小循环（16 kHz 单声道 WAV）和 SVG 封面，零依赖、不联网、不引用任何第三方素材，以 CC0 释出
   —— 检查被禁依赖、copyleft 许可、声明文件与高风险素材
 
 **版权声明：**
