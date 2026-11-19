@@ -82,7 +82,7 @@ Firefly 项目中所有可复用组件的集中管理。组件按照功能和职
 全局加载的功能增强和特效组件。
 
 **管理器（初始化和管理功能）**
-- `FancyboxManager.astro` - Fancybox 图片查看器管理
+- `LightboxManager.astro` - 图片灯箱管理（PhotoSwipe 5，MIT；兼容原有 `data-fancybox` / `data-src` 标记）
 - `FontManager.astro` - 字体加载和管理
 - `KatexManager.astro` - Katex 数学公式渲染管理
 - `MusicManager.astro` - 全局音乐播放管理器（单例，管理唯一 audio 元素和播放状态，通过 CustomEvent 同步所有 MusicPlayer 视图实例）

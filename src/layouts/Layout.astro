@@ -7,8 +7,8 @@ import AnimeBgm from "@components/features/AnimeBgm.astro";
 import AnimeCursorLive2D from "@components/features/AnimeCursorLive2D.astro";
 import AnimeVoice from "@components/features/AnimeVoice.astro";
 import AnimeWallpaperGallery from "@components/features/AnimeWallpaperGallery.astro";
-import FancyboxManager from "@components/features/FancyboxManager.astro";
 import FontManager from "@components/features/FontManager.astro";
+import LightboxManager from "@components/features/LightboxManager.astro";
 import MusicManager from "@components/features/MusicManager.astro";
 import PwaManager from "@components/features/PwaManager.astro";
 import SakuraEffect from "@components/features/SakuraEffect.astro";
@@ -571,7 +571,12 @@ const websiteJsonLd = JSON.stringify({
     ></style>
     <!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why -->
 
-    <!-- 账号 / 后端 API 桥（注册、登录、后台、实时数据都用它） -->
+    <!-- 可选：构建时注入后端地址（网站放静态托管、后端跑在自己电脑上时用） -->
+    {import.meta.env.PUBLIC_API_BASE && (
+      <meta name="firefly-api-base" content={import.meta.env.PUBLIC_API_BASE} />
+    )}
+
+    <!-- 账号 / 后端 API 桥（登录、验证码、后台、实时数据都用它） -->
     <script is:inline src="/firefly-api.js"></script>
 
     <slot name="head" />
@@ -636,8 +641,8 @@ const websiteJsonLd = JSON.stringify({
     <!-- PWA：注册 Service Worker（离线可读）+ 断网 / 新版本小提示 -->
     <PwaManager />
 
-    <!-- Fancybox Manager -->
-    <FancyboxManager />
+    <!-- 图片灯箱（PhotoSwipe · MIT） -->
+    <LightboxManager />
   </body>
 </html>
 

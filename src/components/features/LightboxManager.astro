@@ -1,0 +1,190 @@
+---
+/**
+ * 灯箱管理器（PhotoSwipe 5 · MIT 许可）
+ *
+ * 说明：
+ * 原实现使用 @fancyapps/ui（Fancybox 5/6），其许可协议为商业授权，
+ * 且明确禁止用于开源项目（https://fancyapps.com/license/），因此替换为
+ * MIT 许可的 PhotoSwipe，避免许可证侵权。
+ *
+ * 兼容性：继续识别页面里已有的 data-fancybox / data-src 标记（按属性值分组），
+ * 相册（gallery）与正文图片无需改动任何 HTML。PhotoSwipe 仅处理图片，
+ * 因此 data-type="iframe" / "video" 之类的标记不会被接管。
+ */
+import "photoswipe/style.css";
+import "@/styles/photoswipe.css";
+---
+
+<script>
+  type LightboxItem = {
+    src: string;
+    width: number;
+    height: number;
+    alt: string;
+  };
+
+  /** 正文里的图片（点击即开灯箱，同页共用一个分组） */
+  const CONTENT_IMAGE_SELECTOR = ".custom-md img, #post-cover img, .moment-images img";
+  /** 显式声明的灯箱触发器（data-fancybox="分组名"） */
+  const TRIGGER_SELECTOR = "[data-fancybox]";
+  /** 正文图片的隐式分组名 */
+  const PAGE_GROUP = "__page__";
+  /** 兜底尺寸，缩放器需要确定的宽高 */
+  const FALLBACK_SIZE = { width: 1200, height: 1600 };
+
+  let PhotoSwipeCtor: any = null;
+  let instance: any = null;
+  const sizeCache = new Map<string, { width: number; height: number }>();
+
+  /** 解析元素对应的原图地址 */
+  function resolveSrc(el: Element): string | null {
+    const dataSrc = el.getAttribute("data-src");
+    if (dataSrc) return dataSrc;
+    if (el instanceof HTMLAnchorElement) return el.getAttribute("href");
+    if (el instanceof HTMLImageElement) {
+      return el.getAttribute("data-original") || el.currentSrc || el.getAttribute("src");
+    }
+    const inner = el.querySelector("img");
+    return inner?.currentSrc || inner?.getAttribute("src") || null;
+  }
+
+  /** 解析无障碍描述，作为灯箱里的替代文本 */
+  function resolveAlt(el: Element): string {
+    const dataAlt = el.getAttribute("data-alt") || el.getAttribute("data-caption");
+    if (dataAlt) return dataAlt;
+    if (el instanceof HTMLImageElement) return el.getAttribute("alt") ?? "";
+    return el.querySelector("img")?.getAttribute("alt") ?? "";
+  }
+
+  /** 读取图片真实尺寸（PhotoSwipe 需要精确宽高） */
+  async function resolveSize(el: Element, src: string) {
+    if (el instanceof HTMLImageElement && el.naturalWidth > 0 && el.naturalHeight > 0) {
+      return { width: el.naturalWidth, height: el.naturalHeight };
+    }
+
+    const cached = sizeCache.get(src);
+    if (cached) return cached;
+
+    const size = await new Promise<{ width: number; height: number }>((resolve) => {
+      const probe = new Image();
+      probe.onload = () =>
+        resolve({
+          width: probe.naturalWidth || FALLBACK_SIZE.width,
+          height: probe.naturalHeight || FALLBACK_SIZE.height,
+        });
+      probe.onerror = () => resolve({ ...FALLBACK_SIZE });
+      probe.src = src;
+    });
+
+    sizeCache.set(src, size);
+    return size;
+  }
+
+  /** 收集同一分组内的所有触发元素 */
+  function collectElements(group: string): Element[] {
+    if (group === PAGE_GROUP) {
+      // 正文图片：排除已被 data-fancybox 包裹的，避免重复入组
+      return Array.from(document.querySelectorAll(CONTENT_IMAGE_SELECTOR)).filter(
+        (el) => !el.closest(TRIGGER_SELECTOR),
+      );
+    }
+    return Array.from(document.querySelectorAll(TRIGGER_SELECTOR)).filter(
+      (el) => el.getAttribute("data-fancybox") === group,
+    );
+  }
+
+  /** 把元素列表翻译成 PhotoSwipe 数据源（同时保留元素对应关系） */
+  async function buildEntries(elements: Element[]) {
+    const entries = await Promise.all(
+      elements.map(async (el) => {
+        const src = resolveSrc(el);
+        if (!src) return null;
+        const { width, height } = await resolveSize(el, src);
+        return { el, item: { src, width, height, alt: resolveAlt(el) } satisfies LightboxItem };
+      }),
+    );
+    return entries.filter((entry): entry is { el: Element; item: LightboxItem } => entry !== null);
+  }
+
+  async function ensurePhotoSwipe() {
+    if (!PhotoSwipeCtor) {
+      const mod: any = await import("photoswipe");
+      PhotoSwipeCtor = mod.default ?? mod;
+    }
+    return PhotoSwipeCtor;
+  }
+
+  async function openLightbox(current: Element, group: string) {
+    const elements = collectElements(group);
+    if (!elements.length) return;
+
+    const entries = await buildEntries(elements);
+    if (!entries.length) return;
+
+    const index = Math.max(
+      0,
+      entries.findIndex((entry) => entry.el === current),
+    );
+
+    const Ctor = await ensurePhotoSwipe();
+
+    instance?.close();
+    const pswp = new Ctor({
+      dataSource: entries.map((entry) => entry.item),
+      index,
+      bgOpacity: 0.92,
+      showHideAnimationType: "zoom",
+      wheelToZoom: true,
+      maxZoomLevel: 4,
+      loop: true,
+      preload: [1, 2],
+      padding: { top: 48, bottom: 48, left: 12, right: 12 },
+      imageClickAction: "zoom-or-close",
+      tapAction: "close",
+      doubleTapAction: "zoom",
+      closeTitle: "关闭",
+      zoomTitle: "缩放",
+      arrowPrevTitle: "上一张",
+      arrowNextTitle: "下一张",
+      errorMsg: "图片加载失败了",
+    });
+
+    instance = pswp;
+
+    // 关闭动画结束后再清空引用；用身份判断避免误清掉刚打开的新实例
+    pswp.on("close", () => {
+      if (instance === pswp) instance = null;
+    });
+
+    pswp.init();
+  }
+
+  function handleClick(event: MouseEvent) {
+    // 保留「新标签页打开 / 下载」等原生操作
+    if (event.defaultPrevented || event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const target = event.target as Element | null;
+    if (!target || typeof target.closest !== "function") return;
+
+    const groupEl = target.closest(TRIGGER_SELECTOR);
+    const contentEl = groupEl ? null : target.closest(CONTENT_IMAGE_SELECTOR);
+
+    const trigger = groupEl ?? contentEl;
+    if (!trigger) return;
+
+    const group = groupEl?.getAttribute("data-fancybox") || PAGE_GROUP;
+
+    // 阻止 <a> 跳转、图片拖拽等默认行为
+    if (event.cancelable) event.preventDefault();
+
+    void openLightbox(trigger, group);
+  }
+
+  // 事件委托：Swup 换页、加密文章解密后都无需重新绑定
+  document.addEventListener("click", handleClick, true);
+
+  document.addEventListener("swup:visit:start", () => {
+    instance?.close();
+  });
+</script>

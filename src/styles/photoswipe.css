@@ -1,5 +1,22 @@
 @reference "tailwindcss";
 
+/* PhotoSwipe 容器与配色（灯箱由 LightboxManager.astro 初始化） */
+.pswp {
+    --pswp-bg: #07050b;
+    --pswp-placeholder-bg: rgba(255, 255, 255, 0.06);
+    --pswp-root-z-index: 10000000;
+}
+
+.pswp__top-bar {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent) !important;
+    backdrop-filter: blur(6px);
+}
+
+.pswp__counter,
+.pswp__button {
+    font-variant-numeric: tabular-nums;
+}
+
 /* PhotoSwipe 按钮样式 */
 .pswp__button {
     transition: all 0.2s ease !important;
