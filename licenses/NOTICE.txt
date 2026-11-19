@@ -20,11 +20,12 @@
 | 源代码（Astro 组件/页面/样式/脚本、`ios/` 下 Swift 源码、CI 工作流） | **MIT**，见 [`LICENSE`](LICENSE) | ✅ 可以，需保留版权与许可声明 |
 | 博客文章正文（`src/content/posts/**`、`src/content/spec/**`） | **CC BY-NC-SA 4.0**（署名—非商业性使用—相同方式共享），见 `src/config/licenseConfig.ts` | ⚠️ 仅限非商业，须署名 + 相同协议 |
 | 壁纸 / 相册 / 插画（`public/anime-wallpaper/**`、`public/gallery/**`、`public/splash/**`、`public/assets/images/**`） | **保留所有权利**，来源与状态见 `THIRD-PARTY-NOTICES.md` | ❌ 未获授权请勿转载或再分发 |
-| 音频（`public/assets/music/**`、`public/tts/**`、`public/sounds/**`） | **保留所有权利**，逐项状态见 `THIRD-PARTY-NOTICES.md` | ❌ 未获授权请勿转载或再分发 |
+| 背景音乐与播放器封面（`public/assets/music/**`） | **CC0 1.0**（本站自制：由 `scripts/generate-cute-music.mjs` 现场合成波形与 SVG） | ✅ 随便用，不必署名 |
+| 音频（`public/tts/**`、`public/sounds/**`） | **保留所有权利**，逐项状态见 `THIRD-PARTY-NOTICES.md` | ❌ 未获授权请勿转载或再分发 |
 | Live2D 模型（`public/Firefly-live2d-main/**`） | 胶水代码与模型文件为 **MIT**（作者「流萤可爱捏」，已保留其 `LICENSE`）；**Cubism Core 运行时除外**（Live2D 专有许可） | ⚠️ 见下文第四节 |
 | 第三方组件（npm 依赖、图标集、字体） | 各自许可（MIT / Apache-2.0 / OFL-1.1 / CC BY 4.0 / CC0 / MPL-2.0 等） | ✅ 按其许可使用，见 `THIRD-PARTY-NOTICES.md` |
 
-一句话总结：**代码是开源的，文章是「非商业 + 相同方式共享」的，图片和音频不是开源的。**
+一句话总结：**代码是开源的，文章是「非商业 + 相同方式共享」的，图片和大部分音频不是开源的（背景音乐例外，见上表）。**
 
 ## 三、二创与角色 IP 声明
 
