@@ -2428,7 +2428,14 @@ const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.av
 						clearInterval(wait);
 					}, 15000);
 				})();
-			</script>  <div class="container"> <h1>个人资料</h1> <div class="sub">修改你的账号信息 · <a href="/dashboard/" class="back">← 返回用户中心</a></div> <!-- 头像 + 基本信息 --> <div class="card"> <h2>基本信息</h2> <div class="avatar-row"> <div class="avatar" id="avatarBox">?</div> <div> <button class="btn-ghost" id="uploadAvatarBtn" type="button">更换头像</button> <input type="file" id="avatarInput" accept="image/*" style="display: none;"> <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 8px;">支持 JPG / PNG，小于 5MB</div> </div> </div> <label>用户名（不可改）</label> <input type="text" id="username" disabled> <label>邮箱</label> <input type="email" id="email"> <label>个人简介</label> <textarea id="bio" placeholder="介绍一下你自己…"></textarea> <div class="actions"> <button class="btn-primary" id="saveInfoBtn">保存基本信息</button> </div> <div class="msg" id="infoMsg"></div> </div> <!-- 修改密码 --> <div class="card"> <h2>修改密码</h2> <label>原密码</label> <input type="password" id="oldPassword" placeholder="输入当前密码"> <label>新密码</label> <input type="password" id="newPassword" placeholder="至少 6 位"> <div class="actions"> <button class="btn-primary" id="savePassBtn">修改密码</button> </div> <div class="msg" id="passMsg"></div> </div> </div> <script>
+			</script>  <div class="container"> <h1>个人资料</h1> <div class="sub">修改你的账号信息 · <a href="/dashboard/" class="back">← 返回用户中心</a></div> <!-- 头像 + 基本信息 --> <div class="card"> <h2>基本信息</h2> <div class="avatar-row"> <div class="avatar" id="avatarBox">?</div> <div> <button class="btn-ghost" id="uploadAvatarBtn" type="button">更换头像</button> <input type="file" id="avatarInput" accept="image/*" style="display: none;"> <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 8px;">支持 JPG / PNG，小于 5MB</div> </div> </div> <label>用户名（不可改）</label> <input type="text" id="username" disabled> <label>邮箱</label> <input type="email" id="email"> <div id="emailHint" style="display: none; margin: -4px 0 12px; font-size: 12px; line-height: 1.6; color: rgba(255, 255, 255, 0.52);">
+邮箱就是你的登录凭证（收发验证码），暂不支持直接修改
+</div> <label>个人简介</label> <textarea id="bio" placeholder="介绍一下你自己…"></textarea> <div class="actions"> <button class="btn-primary" id="saveInfoBtn">保存基本信息</button> </div> <div class="msg" id="infoMsg"></div> </div> <!-- 修改密码（邮箱验证码登录的账号不需要密码，这里会折叠成提示） --> <div class="card"> <h2>修改密码</h2> <div id="passBody"> <label>原密码</label> <input type="password" id="oldPassword" placeholder="输入当前密码"> <label>新密码</label> <input type="password" id="newPassword" placeholder="至少 6 位"> <div class="actions"> <button class="btn-primary" id="savePassBtn">修改密码</button> </div> </div> <div class="msg" id="passNote" style="display: none; line-height: 1.8;">
+🔐 你的账号用<strong>邮箱验证码</strong>登录，不需要设置密码 —— 忘了密码这种事和你无关啦。
+</div> <div class="msg" id="passMsg"></div> </div> <!-- 我的数据：存在本站（站长电脑）上，但随时可以导出自己的一份 --> <div class="card"> <h2>我的数据</h2> <div style="font-size: 13px; line-height: 1.9; color: rgba(255,255,255,0.6); margin-bottom: 16px;">
+账号信息、投稿和评论保存在本站（站长的电脑上）。想自己留一份、换设备用，或者哪天不想留了，
+        都可以导出成 JSON 带走 —— 数据是你的，随时可以拿走。
+</div> <div class="actions"> <button class="btn-ghost" id="exportBtn" type="button">导出我的数据（JSON）</button> </div> <div class="msg" id="exportMsg"></div> </div> </div> <script>
     const avatarBox = document.getElementById('avatarBox');
     const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
     const avatarInput = document.getElementById('avatarInput');
@@ -2457,6 +2464,17 @@ const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.av
       const u = data.user;
       document.getElementById('username').value = u.username;
       document.getElementById('email').value = u.email;
+      // 邮箱验证码账号：邮箱就是登录凭证，不提供改邮箱 / 改密码
+      if (u.has_password === false) {
+        const emailEl = document.getElementById('email');
+        emailEl.readOnly = true;
+        emailEl.style.opacity = '0.72';
+        emailEl.title = '邮箱就是登录凭证，暂不支持修改';
+        document.getElementById('emailHint').style.display = 'block';
+        document.getElementById('passBody').style.display = 'none';
+        document.getElementById('passNote').style.display = 'block';
+      }
+
       document.getElementById('bio').value = u.bio || '';
       currentAvatar = u.avatar || '';
       if (currentAvatar) {
@@ -2572,6 +2590,37 @@ const mobile = ["/anime-wallpaper/mobile-01.avif","/anime-wallpaper/mobile-02.av
       } finally {
         btn.disabled = false;
         btn.textContent = '修改密码';
+      }
+    });
+
+    // 导出我的数据（账号 + 投稿 + 评论），浏览器直接下载 JSON
+    const exportBtn = document.getElementById('exportBtn');
+    const exportMsg = document.getElementById('exportMsg');
+    exportBtn.addEventListener('click', async () => {
+      exportBtn.disabled = true;
+      exportBtn.textContent = '打包中…';
+      try {
+        const res = await fetch('/api/user/export/', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) {
+          showMsg(exportMsg, data.error || '导出失败', 'err');
+          return;
+        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `firefly-${data.user.username}-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+        showMsg(exportMsg, '✅ 已导出，可以在下载文件夹里找到', 'ok');
+      } catch (err) {
+        showMsg(exportMsg, '网络错误，请稍后再试', 'err');
+      } finally {
+        exportBtn.disabled = false;
+        exportBtn.textContent = '导出我的数据（JSON）';
       }
     });
 

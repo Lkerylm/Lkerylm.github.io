@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>许可与致谢 · firefly 6.8.4</title>
+<meta name="robots" content="index,follow" />
+<style>
+  :root { color-scheme: light dark; --fg:#1c1a22; --muted:#605b6e; --bg:#fbf9ff; --card:#ffffff; --line:#e7e1f2; --accent:#b45cff; }
+  @media (prefers-color-scheme: dark) { :root { --fg:#ece9f5; --muted:#a8a2ba; --bg:#0f0d14; --card:#17141f; --line:#2b2637; --accent:#c98bff; } }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:2.5rem 1.25rem 4rem; background:var(--bg); color:var(--fg);
+         font: 15px/1.75 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+  main { max-width: 62rem; margin: 0 auto; }
+  h1 { font-size: 1.75rem; margin: 0 0 .35rem; }
+  h2 { font-size: 1.05rem; margin: 0 0 .75rem; }
+  p.lead { color: var(--muted); margin: 0 0 1.5rem; }
+  .card { background: var(--card); border:1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.25rem; }
+  .card + .card { margin-top: .9rem; }
+  ul { margin:.4rem 0; padding-left: 1.35rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .9em; }
+  .chips { display:flex; flex-wrap: wrap; gap: .45rem; margin:0 0 .9rem; }
+  .chip { border:1px solid var(--line); border-radius: 999px; padding: .15rem .7rem; font-size: .82rem; color: var(--muted); }
+  .chip b { color: var(--fg); }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  tr.warn td { color: #d1554a; }
+  .scroll { max-height: 32rem; overflow: auto; border:1px solid var(--line); border-radius: 12px; }
+  .scroll table { margin: 0; }
+  .scroll thead th { position: sticky; top: 0; background: var(--card); }
+  .hint { margin:.9rem 0 0; color: var(--muted); font-size: .85rem; }
+  footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>许可与致谢</h1>
+  <p class="lead">firefly 6.8.4 · 本页随站点与 iOS 离线包一起分发。</p>
+
+  <div class="card">
+    <h2>1. 代码：MIT</h2>
+    <p>本站源码以 MIT 许可开放，可自由使用、修改与再分发，但须保留版权与许可声明。</p>
+    <ul>
+      <li>许可原文：<a href="./LICENSE.txt">LICENSE.txt</a></li>
+      <li>版权行：saicaca (2024)、CuteLeaf (2025)、Lkerylm (2025-2026)</li>
+      <li>基于开源项目 <a href="https://github.com/CuteLeaf/Firefly" rel="noopener noreferrer" target="_blank">Firefly</a> 二次开发</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>2. 内容与素材：不在开源范围内</h2>
+    <p>文章正文采用 <b>CC BY-NC-SA 4.0</b>；壁纸、相册、音频、Live2D 模型等素材的版权归各自权利人所有，
+      未经许可请勿转载或再分发。</p>
+    <ul>
+      <li>授权分层与二创声明：<a href="./NOTICE.txt">NOTICE.txt</a></li>
+      <li>第三方组件与素材逐项致谢：<a href="./THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a></li>
+      <li>角色形象（流萤 /《崩坏：星穹铁道》）版权归 miHoYo / HoYoverse，本站为非官方、非商业的同人展示</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>3. 第三方组件（72 个直接依赖）</h2>
+    <div class="chips"><span class="chip">MIT <b>54</b></span> <span class="chip">Apache-2.0 <b>5</b></span> <span class="chip">CC-BY-4.0 <b>3</b></span> <span class="chip">MIT-0 <b>2</b></span> <span class="chip">OFL-1.1 <b>2</b></span> <span class="chip">BlueOak-1.0.0 <b>1</b></span> <span class="chip">BSD-3-Clause <b>1</b></span> <span class="chip">CC0-1.0 <b>1</b></span> <span class="chip">MIT OR Apache-2.0 <b>1</b></span> <span class="chip">MPL-2.0 <b>1</b></span> <span class="chip">Unlicense <b>1</b></span></div>
+    <p>图标来自 <a href="https://fontawesome.com/license/free" rel="noopener noreferrer" target="_blank">Font Awesome Free</a>
+      （Icons: CC BY 4.0，Fonts: SIL OFL 1.1，Code: MIT，© Fonticons, Inc.）；
+      图片灯箱为 <a href="https://photoswipe.com" rel="noopener noreferrer" target="_blank">PhotoSwipe</a>（MIT）；
+      站内搜索为 <a href="https://pagefind.app" rel="noopener noreferrer" target="_blank">Pagefind</a>（MIT）。</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>依赖</th><th>版本</th><th>许可</th></tr></thead>
+        <tbody>
+<tr><td><a href="https://github.com/withastro/astro/tree/main/packages/language-tools/astro-check" rel="noopener noreferrer" target="_blank">@astrojs/check</a></td><td>0.9.8</td><td>MIT</td></tr>
+<tr><td><a href="https://astro.build" rel="noopener noreferrer" target="_blank">@astrojs/compiler-rs</a></td><td>0.1.5</td><td>MIT</td></tr>
+<tr><td><a href="https://docs.astro.build/en/guides/integrations-guide/mdx/" rel="noopener noreferrer" target="_blank">@astrojs/mdx</a></td><td>5.0.2</td><td>MIT</td></tr>
+<tr><td><a href="https://astro.build" rel="noopener noreferrer" target="_blank">@astrojs/rss</a></td><td>4.0.17</td><td>MIT</td></tr>
+<tr><td><a href="https://docs.astro.build/en/guides/integrations-guide/sitemap/" rel="noopener noreferrer" target="_blank">@astrojs/sitemap</a></td><td>3.7.1</td><td>MIT</td></tr>
+<tr><td><a href="https://docs.astro.build/en/guides/integrations-guide/svelte/" rel="noopener noreferrer" target="_blank">@astrojs/svelte</a></td><td>8.0.2</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/withastro/astro" rel="noopener noreferrer" target="_blank">@astrojs/ts-plugin</a></td><td>1.10.7</td><td>MIT</td></tr>
+<tr><td><a href="https://biomejs.dev" rel="noopener noreferrer" target="_blank">@biomejs/biome</a></td><td>2.4.8</td><td>MIT OR Apache-2.0</td></tr>
+<tr><td><a href="https://github.com/expressive-code/expressive-code" rel="noopener noreferrer" target="_blank">@expressive-code/core</a></td><td>0.41.7</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/expressive-code/expressive-code" rel="noopener noreferrer" target="_blank">@expressive-code/plugin-collapsible-sections</a></td><td>0.41.7</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/expressive-code/expressive-code" rel="noopener noreferrer" target="_blank">@expressive-code/plugin-line-numbers</a></td><td>0.41.7</td><td>MIT</td></tr>
+<tr><td><a href="https://fontsource.org/fonts/jetbrains-mono" rel="noopener noreferrer" target="_blank">@fontsource-variable/jetbrains-mono</a></td><td>5.2.8</td><td>OFL-1.1</td></tr>
+<tr><td><a href="https://fontsource.org/fonts/roboto" rel="noopener noreferrer" target="_blank">@fontsource/roboto</a></td><td>5.2.10</td><td>OFL-1.1</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/fa7-brands/" rel="noopener noreferrer" target="_blank">@iconify-json/fa7-brands</a></td><td>1.2.2</td><td>CC-BY-4.0</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/fa7-regular/" rel="noopener noreferrer" target="_blank">@iconify-json/fa7-regular</a></td><td>1.2.3</td><td>CC-BY-4.0</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/fa7-solid/" rel="noopener noreferrer" target="_blank">@iconify-json/fa7-solid</a></td><td>1.2.4</td><td>CC-BY-4.0</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/material-symbols/" rel="noopener noreferrer" target="_blank">@iconify-json/material-symbols</a></td><td>1.2.63</td><td>Apache-2.0</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/mdi/" rel="noopener noreferrer" target="_blank">@iconify-json/mdi</a></td><td>1.2.3</td><td>Apache-2.0</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/mingcute/" rel="noopener noreferrer" target="_blank">@iconify-json/mingcute</a></td><td>1.2.7</td><td>Apache-2.0</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/simple-icons/" rel="noopener noreferrer" target="_blank">@iconify-json/simple-icons</a></td><td>1.2.74</td><td>CC0-1.0</td></tr>
+<tr><td><a href="https://icon-sets.iconify.design/svg-spinners/" rel="noopener noreferrer" target="_blank">@iconify-json/svg-spinners</a></td><td>1.2.4</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/iconify/iconify" rel="noopener noreferrer" target="_blank">@iconify/types</a></td><td>2.0.0</td><td>MIT</td></tr>
+<tr><td><a href="https://iconify.design/docs/libraries/utils/" rel="noopener noreferrer" target="_blank">@iconify/utils</a></td><td>3.1.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/rollup/plugins/tree/master/packages/yaml/#readme" rel="noopener noreferrer" target="_blank">@rollup/plugin-yaml</a></td><td>4.1.2</td><td>MIT</td></tr>
+<tr><td><a href="https://swup.js.org" rel="noopener noreferrer" target="_blank">@swup/astro</a></td><td>1.8.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/tailwindlabs/tailwindcss-typography" rel="noopener noreferrer" target="_blank">@tailwindcss/typography</a></td><td>0.5.19</td><td>MIT</td></tr>
+<tr><td><a href="https://tailwindcss.com" rel="noopener noreferrer" target="_blank">@tailwindcss/vite</a></td><td>4.1.18</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/hast" rel="noopener noreferrer" target="_blank">@types/hast</a></td><td>3.0.4</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/mdast" rel="noopener noreferrer" target="_blank">@types/mdast</a></td><td>4.0.4</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/qrcode" rel="noopener noreferrer" target="_blank">@types/qrcode</a></td><td>1.5.6</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/sanitize-html" rel="noopener noreferrer" target="_blank">@types/sanitize-html</a></td><td>2.16.1</td><td>MIT</td></tr>
+<tr><td><a href="https://astro.build" rel="noopener noreferrer" target="_blank">astro</a></td><td>6.0.6</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/expressive-code/expressive-code" rel="noopener noreferrer" target="_blank">astro-expressive-code</a></td><td>0.41.7</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/natemoo-re/astro-icon#readme" rel="noopener noreferrer" target="_blank">astro-icon</a></td><td>1.1.5</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/dcodeIO/bcrypt.js" rel="noopener noreferrer" target="_blank">bcryptjs</a></td><td>3.0.3</td><td>BSD-3-Clause</td></tr>
+<tr><td><a href="https://day.js.org" rel="noopener noreferrer" target="_blank">dayjs</a></td><td>1.11.20</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/frostybee/expressive-code-collapsible" rel="noopener noreferrer" target="_blank">expressive-code-collapsible</a></td><td>0.1.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/frostybee/expressive-code-language-badge" rel="noopener noreferrer" target="_blank">expressive-code-language-badge</a></td><td>1.1.0</td><td>MIT</td></tr>
+<tr><td><a href="git@github.com:isaacs/node-glob" rel="noopener noreferrer" target="_blank">glob</a></td><td>11.1.0</td><td>BlueOak-1.0.0</td></tr>
+<tr><td><a href="https://github.com/jonschlinkert/gray-matter" rel="noopener noreferrer" target="_blank">gray-matter</a></td><td>4.0.3</td><td>MIT</td></tr>
+<tr><td><a href="syntax-tree/hastscript" rel="noopener noreferrer" target="_blank">hastscript</a></td><td>9.0.1</td><td>MIT</td></tr>
+<tr><td><a href="https://katex.org" rel="noopener noreferrer" target="_blank">katex</a></td><td>0.16.38</td><td>MIT</td></tr>
+<tr><td><a href="https://marked.js.org" rel="noopener noreferrer" target="_blank">marked</a></td><td>16.4.2</td><td>MIT</td></tr>
+<tr><td><a href="syntax-tree/mdast-util-find-and-replace" rel="noopener noreferrer" target="_blank">mdast-util-find-and-replace</a></td><td>3.0.2</td><td>MIT</td></tr>
+<tr><td><a href="syntax-tree/mdast-util-to-string" rel="noopener noreferrer" target="_blank">mdast-util-to-string</a></td><td>4.0.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/taoqf/node-fast-html-parser" rel="noopener noreferrer" target="_blank">node-html-parser</a></td><td>7.0.2</td><td>MIT</td></tr>
+<tr><td><a href="https://nodemailer.com/" rel="noopener noreferrer" target="_blank">nodemailer</a></td><td>10.6.0</td><td>MIT-0</td></tr>
+<tr><td><a href="https://kingsora.github.io/OverlayScrollbars" rel="noopener noreferrer" target="_blank">overlayscrollbars</a></td><td>2.14.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/pagefind/pagefind#readme" rel="noopener noreferrer" target="_blank">pagefind</a></td><td>1.4.0</td><td>MIT</td></tr>
+<tr><td><a href="https://photoswipe.com" rel="noopener noreferrer" target="_blank">photoswipe</a></td><td>5.4.4</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/postcss/postcss-import" rel="noopener noreferrer" target="_blank">postcss-import</a></td><td>16.1.1</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting#readme" rel="noopener noreferrer" target="_blank">postcss-nesting</a></td><td>13.0.2</td><td>MIT-0</td></tr>
+<tr><td><a href="http://github.com/soldair/node-qrcode" rel="noopener noreferrer" target="_blank">qrcode</a></td><td>1.5.4</td><td>MIT</td></tr>
+<tr><td><a href="ngryman/reading-time" rel="noopener noreferrer" target="_blank">reading-time</a></td><td>1.5.0</td><td>MIT</td></tr>
+<tr><td><a href="rehypejs/rehype-autolink-headings" rel="noopener noreferrer" target="_blank">rehype-autolink-headings</a></td><td>7.1.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/lin-stephanie/rehype-callouts#readme" rel="noopener noreferrer" target="_blank">rehype-callouts</a></td><td>2.1.2</td><td>MIT</td></tr>
+<tr><td><a href="marekweb/rehype-components" rel="noopener noreferrer" target="_blank">rehype-components</a></td><td>0.3.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/remarkjs/remark-math/tree/main/packages/rehype-katex" rel="noopener noreferrer" target="_blank">rehype-katex</a></td><td>7.0.1</td><td>MIT</td></tr>
+<tr><td><a href="rehypejs/rehype-slug" rel="noopener noreferrer" target="_blank">rehype-slug</a></td><td>6.0.0</td><td>MIT</td></tr>
+<tr><td><a href="remarkjs/remark-directive" rel="noopener noreferrer" target="_blank">remark-directive</a></td><td>3.0.1</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/IGassmann/remark-directive-rehype#readme" rel="noopener noreferrer" target="_blank">remark-directive-rehype</a></td><td>0.4.2</td><td>Unlicense</td></tr>
+<tr><td><a href="https://github.com/remarkjs/remark-math/tree/main/packages/remark-math" rel="noopener noreferrer" target="_blank">remark-math</a></td><td>6.0.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/jake-low/remark-sectionize" rel="noopener noreferrer" target="_blank">remark-sectionize</a></td><td>2.1.0</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/apostrophecms/apostrophe/tree/main/packages/sanitize-html#readme" rel="noopener noreferrer" target="_blank">sanitize-html</a></td><td>2.17.2</td><td>MIT</td></tr>
+<tr><td><a href="https://github.com/vercel/satori#readme" rel="noopener noreferrer" target="_blank">satori</a></td><td>0.19.2</td><td>MPL-2.0</td></tr>
+<tr><td><a href="https://sharp.pixelplumbing.com" rel="noopener noreferrer" target="_blank">sharp</a></td><td>0.34.5</td><td>Apache-2.0</td></tr>
+<tr><td><a href="https://github.com/stylus/stylus" rel="noopener noreferrer" target="_blank">stylus</a></td><td>0.64.0</td><td>MIT</td></tr>
+<tr><td><a href="https://svelte.dev" rel="noopener noreferrer" target="_blank">svelte</a></td><td>5.53.11</td><td>MIT</td></tr>
+<tr><td><a href="https://tailwindcss.com" rel="noopener noreferrer" target="_blank">tailwindcss</a></td><td>4.1.18</td><td>MIT</td></tr>
+<tr><td><a href="https://www.typescriptlang.org/" rel="noopener noreferrer" target="_blank">typescript</a></td><td>5.9.3</td><td>Apache-2.0</td></tr>
+<tr><td><a href="syntax-tree/unist-util-is" rel="noopener noreferrer" target="_blank">unist-util-is</a></td><td>6.0.1</td><td>MIT</td></tr>
+<tr><td><a href="syntax-tree/unist-util-visit" rel="noopener noreferrer" target="_blank">unist-util-visit</a></td><td>5.1.0</td><td>MIT</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">机器可读清单：<a href="./dependencies.json">dependencies.json</a>（含首页地址，便于核对许可原文）</p>
+  </div>
+
+  <div class="card">
+    <h2>4. 许可原文</h2>
+    <ul>
+<li><a href="./Apache-2.0.txt">Apache-2.0.txt</a></li>
+<li><a href="./MPL-2.0.txt">MPL-2.0.txt</a></li>
+<li><a href="./OFL-1.1-JetBrainsMono.txt">OFL-1.1-JetBrainsMono.txt</a></li>
+<li><a href="./OFL-1.1.txt">OFL-1.1.txt</a></li>
+    </ul>
+    <p class="hint">MIT / Apache-2.0 / OFL-1.1 / MPL-2.0 等完整文本随仓库 LICENSES/ 目录一并分发。</p>
+  </div>
+
+  <footer>
+    <p>发现侵权内容？请到
+      <a href="https://github.com/Lkerylm/Lkerylm.github.io/issues" rel="noopener noreferrer" target="_blank">GitHub Issues</a>
+      提交文件路径与权利说明，核实后会尽快删除或替换。</p>
+    <p>本页由 <code>scripts/sync-legal.mjs</code> 生成，请勿直接编辑；
+      修改 <code>NOTICE.md</code> 或 <code>THIRD-PARTY-NOTICES.md</code> 后重新构建即可。</p>
+  </footer>
+</main>
+</body>
+</html>

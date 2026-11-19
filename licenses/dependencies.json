@@ -1,0 +1,441 @@
+{
+  "project": "firefly",
+  "version": "6.8.4",
+  "license": "MIT",
+  "generatedAt": "2026-11-19T08:50:53.501Z",
+  "count": 72,
+  "dependencies": [
+    {
+      "name": "@astrojs/check",
+      "version": "0.9.8",
+      "license": "MIT",
+      "homepage": "https://github.com/withastro/astro/tree/main/packages/language-tools/astro-check"
+    },
+    {
+      "name": "@astrojs/compiler-rs",
+      "version": "0.1.5",
+      "license": "MIT",
+      "homepage": "https://astro.build"
+    },
+    {
+      "name": "@astrojs/mdx",
+      "version": "5.0.2",
+      "license": "MIT",
+      "homepage": "https://docs.astro.build/en/guides/integrations-guide/mdx/"
+    },
+    {
+      "name": "@astrojs/rss",
+      "version": "4.0.17",
+      "license": "MIT",
+      "homepage": "https://astro.build"
+    },
+    {
+      "name": "@astrojs/sitemap",
+      "version": "3.7.1",
+      "license": "MIT",
+      "homepage": "https://docs.astro.build/en/guides/integrations-guide/sitemap/"
+    },
+    {
+      "name": "@astrojs/svelte",
+      "version": "8.0.2",
+      "license": "MIT",
+      "homepage": "https://docs.astro.build/en/guides/integrations-guide/svelte/"
+    },
+    {
+      "name": "@astrojs/ts-plugin",
+      "version": "1.10.7",
+      "license": "MIT",
+      "homepage": "https://github.com/withastro/astro"
+    },
+    {
+      "name": "@biomejs/biome",
+      "version": "2.4.8",
+      "license": "MIT OR Apache-2.0",
+      "homepage": "https://biomejs.dev"
+    },
+    {
+      "name": "@expressive-code/core",
+      "version": "0.41.7",
+      "license": "MIT",
+      "homepage": "https://github.com/expressive-code/expressive-code"
+    },
+    {
+      "name": "@expressive-code/plugin-collapsible-sections",
+      "version": "0.41.7",
+      "license": "MIT",
+      "homepage": "https://github.com/expressive-code/expressive-code"
+    },
+    {
+      "name": "@expressive-code/plugin-line-numbers",
+      "version": "0.41.7",
+      "license": "MIT",
+      "homepage": "https://github.com/expressive-code/expressive-code"
+    },
+    {
+      "name": "@fontsource-variable/jetbrains-mono",
+      "version": "5.2.8",
+      "license": "OFL-1.1",
+      "homepage": "https://fontsource.org/fonts/jetbrains-mono"
+    },
+    {
+      "name": "@fontsource/roboto",
+      "version": "5.2.10",
+      "license": "OFL-1.1",
+      "homepage": "https://fontsource.org/fonts/roboto"
+    },
+    {
+      "name": "@iconify-json/fa7-brands",
+      "version": "1.2.2",
+      "license": "CC-BY-4.0",
+      "homepage": "https://icon-sets.iconify.design/fa7-brands/"
+    },
+    {
+      "name": "@iconify-json/fa7-regular",
+      "version": "1.2.3",
+      "license": "CC-BY-4.0",
+      "homepage": "https://icon-sets.iconify.design/fa7-regular/"
+    },
+    {
+      "name": "@iconify-json/fa7-solid",
+      "version": "1.2.4",
+      "license": "CC-BY-4.0",
+      "homepage": "https://icon-sets.iconify.design/fa7-solid/"
+    },
+    {
+      "name": "@iconify-json/material-symbols",
+      "version": "1.2.63",
+      "license": "Apache-2.0",
+      "homepage": "https://icon-sets.iconify.design/material-symbols/"
+    },
+    {
+      "name": "@iconify-json/mdi",
+      "version": "1.2.3",
+      "license": "Apache-2.0",
+      "homepage": "https://icon-sets.iconify.design/mdi/"
+    },
+    {
+      "name": "@iconify-json/mingcute",
+      "version": "1.2.7",
+      "license": "Apache-2.0",
+      "homepage": "https://icon-sets.iconify.design/mingcute/"
+    },
+    {
+      "name": "@iconify-json/simple-icons",
+      "version": "1.2.74",
+      "license": "CC0-1.0",
+      "homepage": "https://icon-sets.iconify.design/simple-icons/"
+    },
+    {
+      "name": "@iconify-json/svg-spinners",
+      "version": "1.2.4",
+      "license": "MIT",
+      "homepage": "https://icon-sets.iconify.design/svg-spinners/"
+    },
+    {
+      "name": "@iconify/types",
+      "version": "2.0.0",
+      "license": "MIT",
+      "homepage": "https://github.com/iconify/iconify"
+    },
+    {
+      "name": "@iconify/utils",
+      "version": "3.1.0",
+      "license": "MIT",
+      "homepage": "https://iconify.design/docs/libraries/utils/"
+    },
+    {
+      "name": "@rollup/plugin-yaml",
+      "version": "4.1.2",
+      "license": "MIT",
+      "homepage": "https://github.com/rollup/plugins/tree/master/packages/yaml/#readme"
+    },
+    {
+      "name": "@swup/astro",
+      "version": "1.8.0",
+      "license": "MIT",
+      "homepage": "https://swup.js.org"
+    },
+    {
+      "name": "@tailwindcss/typography",
+      "version": "0.5.19",
+      "license": "MIT",
+      "homepage": "https://github.com/tailwindlabs/tailwindcss-typography"
+    },
+    {
+      "name": "@tailwindcss/vite",
+      "version": "4.1.18",
+      "license": "MIT",
+      "homepage": "https://tailwindcss.com"
+    },
+    {
+      "name": "@types/hast",
+      "version": "3.0.4",
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/hast"
+    },
+    {
+      "name": "@types/mdast",
+      "version": "4.0.4",
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/mdast"
+    },
+    {
+      "name": "@types/qrcode",
+      "version": "1.5.6",
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/qrcode"
+    },
+    {
+      "name": "@types/sanitize-html",
+      "version": "2.16.1",
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/sanitize-html"
+    },
+    {
+      "name": "astro",
+      "version": "6.0.6",
+      "license": "MIT",
+      "homepage": "https://astro.build"
+    },
+    {
+      "name": "astro-expressive-code",
+      "version": "0.41.7",
+      "license": "MIT",
+      "homepage": "https://github.com/expressive-code/expressive-code"
+    },
+    {
+      "name": "astro-icon",
+      "version": "1.1.5",
+      "license": "MIT",
+      "homepage": "https://github.com/natemoo-re/astro-icon#readme"
+    },
+    {
+      "name": "bcryptjs",
+      "version": "3.0.3",
+      "license": "BSD-3-Clause",
+      "homepage": "https://github.com/dcodeIO/bcrypt.js"
+    },
+    {
+      "name": "dayjs",
+      "version": "1.11.20",
+      "license": "MIT",
+      "homepage": "https://day.js.org"
+    },
+    {
+      "name": "expressive-code-collapsible",
+      "version": "0.1.0",
+      "license": "MIT",
+      "homepage": "https://github.com/frostybee/expressive-code-collapsible"
+    },
+    {
+      "name": "expressive-code-language-badge",
+      "version": "1.1.0",
+      "license": "MIT",
+      "homepage": "https://github.com/frostybee/expressive-code-language-badge"
+    },
+    {
+      "name": "glob",
+      "version": "11.1.0",
+      "license": "BlueOak-1.0.0",
+      "homepage": "git@github.com:isaacs/node-glob"
+    },
+    {
+      "name": "gray-matter",
+      "version": "4.0.3",
+      "license": "MIT",
+      "homepage": "https://github.com/jonschlinkert/gray-matter"
+    },
+    {
+      "name": "hastscript",
+      "version": "9.0.1",
+      "license": "MIT",
+      "homepage": "syntax-tree/hastscript"
+    },
+    {
+      "name": "katex",
+      "version": "0.16.38",
+      "license": "MIT",
+      "homepage": "https://katex.org"
+    },
+    {
+      "name": "marked",
+      "version": "16.4.2",
+      "license": "MIT",
+      "homepage": "https://marked.js.org"
+    },
+    {
+      "name": "mdast-util-find-and-replace",
+      "version": "3.0.2",
+      "license": "MIT",
+      "homepage": "syntax-tree/mdast-util-find-and-replace"
+    },
+    {
+      "name": "mdast-util-to-string",
+      "version": "4.0.0",
+      "license": "MIT",
+      "homepage": "syntax-tree/mdast-util-to-string"
+    },
+    {
+      "name": "node-html-parser",
+      "version": "7.0.2",
+      "license": "MIT",
+      "homepage": "https://github.com/taoqf/node-fast-html-parser"
+    },
+    {
+      "name": "nodemailer",
+      "version": "10.6.0",
+      "license": "MIT-0",
+      "homepage": "https://nodemailer.com/"
+    },
+    {
+      "name": "overlayscrollbars",
+      "version": "2.14.0",
+      "license": "MIT",
+      "homepage": "https://kingsora.github.io/OverlayScrollbars"
+    },
+    {
+      "name": "pagefind",
+      "version": "1.4.0",
+      "license": "MIT",
+      "homepage": "https://github.com/pagefind/pagefind#readme"
+    },
+    {
+      "name": "photoswipe",
+      "version": "5.4.4",
+      "license": "MIT",
+      "homepage": "https://photoswipe.com"
+    },
+    {
+      "name": "postcss-import",
+      "version": "16.1.1",
+      "license": "MIT",
+      "homepage": "https://github.com/postcss/postcss-import"
+    },
+    {
+      "name": "postcss-nesting",
+      "version": "13.0.2",
+      "license": "MIT-0",
+      "homepage": "https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-nesting#readme"
+    },
+    {
+      "name": "qrcode",
+      "version": "1.5.4",
+      "license": "MIT",
+      "homepage": "http://github.com/soldair/node-qrcode"
+    },
+    {
+      "name": "reading-time",
+      "version": "1.5.0",
+      "license": "MIT",
+      "homepage": "ngryman/reading-time"
+    },
+    {
+      "name": "rehype-autolink-headings",
+      "version": "7.1.0",
+      "license": "MIT",
+      "homepage": "rehypejs/rehype-autolink-headings"
+    },
+    {
+      "name": "rehype-callouts",
+      "version": "2.1.2",
+      "license": "MIT",
+      "homepage": "https://github.com/lin-stephanie/rehype-callouts#readme"
+    },
+    {
+      "name": "rehype-components",
+      "version": "0.3.0",
+      "license": "MIT",
+      "homepage": "marekweb/rehype-components"
+    },
+    {
+      "name": "rehype-katex",
+      "version": "7.0.1",
+      "license": "MIT",
+      "homepage": "https://github.com/remarkjs/remark-math/tree/main/packages/rehype-katex"
+    },
+    {
+      "name": "rehype-slug",
+      "version": "6.0.0",
+      "license": "MIT",
+      "homepage": "rehypejs/rehype-slug"
+    },
+    {
+      "name": "remark-directive",
+      "version": "3.0.1",
+      "license": "MIT",
+      "homepage": "remarkjs/remark-directive"
+    },
+    {
+      "name": "remark-directive-rehype",
+      "version": "0.4.2",
+      "license": "Unlicense",
+      "homepage": "https://github.com/IGassmann/remark-directive-rehype#readme"
+    },
+    {
+      "name": "remark-math",
+      "version": "6.0.0",
+      "license": "MIT",
+      "homepage": "https://github.com/remarkjs/remark-math/tree/main/packages/remark-math"
+    },
+    {
+      "name": "remark-sectionize",
+      "version": "2.1.0",
+      "license": "MIT",
+      "homepage": "https://github.com/jake-low/remark-sectionize"
+    },
+    {
+      "name": "sanitize-html",
+      "version": "2.17.2",
+      "license": "MIT",
+      "homepage": "https://github.com/apostrophecms/apostrophe/tree/main/packages/sanitize-html#readme"
+    },
+    {
+      "name": "satori",
+      "version": "0.19.2",
+      "license": "MPL-2.0",
+      "homepage": "https://github.com/vercel/satori#readme"
+    },
+    {
+      "name": "sharp",
+      "version": "0.34.5",
+      "license": "Apache-2.0",
+      "homepage": "https://sharp.pixelplumbing.com"
+    },
+    {
+      "name": "stylus",
+      "version": "0.64.0",
+      "license": "MIT",
+      "homepage": "https://github.com/stylus/stylus"
+    },
+    {
+      "name": "svelte",
+      "version": "5.53.11",
+      "license": "MIT",
+      "homepage": "https://svelte.dev"
+    },
+    {
+      "name": "tailwindcss",
+      "version": "4.1.18",
+      "license": "MIT",
+      "homepage": "https://tailwindcss.com"
+    },
+    {
+      "name": "typescript",
+      "version": "5.9.3",
+      "license": "Apache-2.0",
+      "homepage": "https://www.typescriptlang.org/"
+    },
+    {
+      "name": "unist-util-is",
+      "version": "6.0.1",
+      "license": "MIT",
+      "homepage": "syntax-tree/unist-util-is"
+    },
+    {
+      "name": "unist-util-visit",
+      "version": "5.1.0",
+      "license": "MIT",
+      "homepage": "syntax-tree/unist-util-visit"
+    }
+  ]
+}
