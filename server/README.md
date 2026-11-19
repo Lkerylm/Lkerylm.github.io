@@ -136,6 +136,13 @@ FIREFLY_MAIL_FROM_NAME=我的动漫小屋
 
 手机不在同一个 Wi-Fi 时，需要把 8787 暴露到公网，任选一种：
 
+0. **不想装东西：双击 `start-tunnel.cmd`**（用 npm 上的 localtunnel，国内网络一般能连）
+   → 窗口里会打印 `https://lkerylm-firefly.loca.lt` 这样的地址，发给朋友就能打开你的站；
+   地址固定（子域名 `lkerylm-firefly`），断线会自动重连，关掉窗口就断开。
+   如果打开是 408 / 502 / “Tunnel Unavailable”，那是 localtunnel 自己的服务器抽风（免费服务常态），
+   等几分钟重开一次即可；急用就换下面第 1 种。
+   如果窗口打印的域名不是 `lkerylm-firefly`（说明这个子域名被别人占了，localtunnel 会随机换一个），
+   就把 Actions 里的 `PUBLIC_API_BASE` 变量改成新地址，再手动跑一次 workflow，Pages 才会连对。
 1. **Cloudflare Tunnel（免费、给 https 地址）**
    ```powershell
    winget install --id Cloudflare.cloudflared
@@ -150,7 +157,9 @@ FIREFLY_MAIL_FROM_NAME=我的动漫小屋
 > 缺点是 `trycloudflare` 的临时域名每次重启都变；想固定就用 Cloudflare 的命名隧道 / 自己的域名。
 >
 > 如果你坚持「静态站放 GitHub Pages + 后端在家」：把隧道地址写进 `.env` 的 `PUBLIC_API_BASE`
-> 再 `pnpm build` 上传。访客仍然只要填邮箱和验证码，但隧道地址一换就得重新打包。
+> 再 `pnpm build` 上传，或者在仓库 **Settings → Secrets and variables → Actions → Variables**
+> 里加一个 `PUBLIC_API_BASE`（`deploy.yml` 会自动注入，换地址只改这一处再重跑 workflow）。
+> 访客仍然只要填邮箱和验证码，但隧道地址一换就得重新构建一次。
 
 > 公网暴露时建议：端口改成不常见的值、配上 SMTP（否则远程访客收不到验证码）、
 > 并留意 `/api/auth/request-code` 的频率限制日志。
