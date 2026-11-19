@@ -76,9 +76,8 @@ pnpm legal   # 重新生成 public/licenses/（依赖清单 + 许可页 + 文本
 | `public/splash/**` | 11 个 / 1.7 MB | iOS 启动图（由本站截图生成） | ✅ 视为本站自产 | 保留 |
 | `public/assets/images/sakura.png` | 1 个 / 43 KB | 樱花瓣贴图 | ⚠️ 来源未标注 | 若来自素材站，请确认其许可并在本表登记 |
 | `public/favicon/**`、`public/assets/images/avatar.avif` | 18 个 / 0.1 MB | 站点图标与头像 | ✅ 视为本站自产 | 保留 |
-| `public/assets/music/使一颗心免于哀伤-哼唱.mp3` | 1 个 / 915 KB | 背景音乐（与《崩坏：星穹铁道》相关曲目同名） | ❌ **高风险**：若为官方录音/翻唱，其录音与词曲版权属原权利方，不能随仓库与 App 分发 | **建议删除**，或替换为明确允许再分发的音乐；同时在 `src/config/musicConfig.ts` 更新曲目信息 |
-| `public/assets/music/cover/109951169585655912.webp` | 1 个 / 34 KB | 上面这首背景音乐的封面（网易云音乐专辑封面） | ❌ **高风险**：美术作品版权属原权利方 | **建议删除**，把 `musicConfig.ts` 里的 `cover` 改为自制图或留空 |
-| `public/app/*.apk` | 4 个 / 80.3 MB | 旧版安卓安装包（整站离线 / 在线封装） | ❌ **高风险**：`AnimeHome-3.0.2-offline.apk` 内嵌了**已移除的 Fancybox 代码**和上面两首音乐素材（其余 3 个包已抽查，未发现 Fancybox 与音乐文件） | **删除或重新打包**：本项目不含 Android 工程，需在打包工程里替换 `www/` 后重新签名；完成后从 `scripts/check-legal.mjs` 的 `RISKY_ASSETS` 删掉对应条目 |
+| `public/assets/music/firefly-lullaby.wav`、`public/assets/music/cover/firefly-lullaby.svg` | 2 个 / 0.7 MB | 背景音乐与封面（八音盒小循环 + 黑胶风 SVG 封面，均由 `scripts/generate-cute-music.mjs` 现场合成） | ✅ **本站自产，以 CC0 释出** | 保留；想换调子 / 速度改脚本顶部常量，跑 `pnpm music:generate` 重算 |
+| `public/app/AnimeHome-3.0.2-online.apk` | 1 个 / 3.7 MB | 在线版安卓安装包（只做 WebView 壳，不打包站点内容） | ✅ 待发布；不含音乐 / Fancybox | 保留；重新打包后同步更新 `SHA256SUMS.txt` |
 | `public/tts/**` | 105 个 / 4.6 MB | 13 套神经网络语音包（Xiaoxiao、Xiaoyi、Nanami、Mayu、Aoi、Hibiki、HsiaoChen… 等） | ⚠️ **高风险**：这些音色名对应 Microsoft Azure 神经网络语音，服务条款通常**不允许把合成音频作为文件再分发** | 建议改为运行时调用、或换成自录/已授权音源；至少不能用于商业用途 |
 | `public/sounds/ui/**` | 9 个 / 0.4 MB | 界面音效（click / open / success…） | ⚠️ 来源未标注 | 若来自素材站，登记其许可（多数素材站要求署名或不许再分发） |
 | `public/uploads/**` | 5 个 / 0.7 MB | 站点上传目录（评论/文章附件） | ⚠️ 逐个人工核对 | 建议在 `.gitignore` 中排除上传产物 |
@@ -91,6 +90,8 @@ pnpm legal   # 重新生成 public/licenses/（依赖清单 + 许可页 + 文本
 | 2026-11-18 | 原图片灯箱使用 `@fancyapps/ui`（Fancybox 5/6）。其[许可协议](https://fancyapps.com/license/)要求付费购买，并**明确禁止**「将软件用于开源项目」（"Use the Software in Open Source projects"），在 MIT 公开仓库中属许可违约 | 移除 `@fancyapps/ui` 依赖与相关组件，改用 **MIT** 许可的 `photoswipe`；新增 `src/components/features/LightboxManager.astro`，沿用原 `data-fancybox` / `data-src` 标记，页面 HTML 无需改动 |
 | 2026-11-18 | 仓库只有一句 MIT，没有区分「代码 / 文章 / 素材」，也没有随分发保留第三方声明 | 补齐 `LICENSE`（分层适用范围 + 上游版权行）、`NOTICE.md`、`THIRD-PARTY-NOTICES.md`、`LICENSES/` 原文；新增 `scripts/sync-legal.mjs` 在构建时生成 `/licenses/` 页面与依赖清单，随站点和 iOS 离线包一起分发 |
 | 2026-11-18 | 缺少持续检查手段，容易在升级依赖时无意引入 GPL / 商业包 | 新增 `scripts/check-legal.mjs`（`pnpm legal:check`），并接入 `pnpm build`、GitHub Actions 与 `pnpm ios:pack` 的严格模式 |
+| 2026-11-19 | 背景音乐是《崩坏：星穹铁道》同名曲目的录音，封面是网易云音乐专辑图，两者都不能随仓库 / App 分发 | 删除这两个文件；新增 **零依赖** 的 `scripts/generate-cute-music.mjs`，用纯数学合成 22.9 秒八音盒循环（16 kHz / 单声道 / 16 bit / 714 KB）与黑胶风 SVG 封面，以 **CC0** 释出；`musicConfig.ts` 改指新曲目，播放器界面与功能完全不变 |
+| 2026-11-19 | `public/app/AnimeHome-3.0.2-offline.apk`（47 MB）内嵌了已移除的 Fancybox 与上述音乐；另两个 2.0.1 旧包已过期 | 删除 3 个安装包（仓库瘦身 77 MB）；`/app/` 页离线版改为「正在用新代码重打包」，`SHA256SUMS.txt` 只保留当前在线版 |
 
 ## 6. 自动合规检查（`pnpm legal:check`）
 
@@ -128,9 +129,11 @@ pnpm ios:pack
 
 ## 7. 待办清单（按优先级）
 
-1. **P0 · 音乐**：确认 `public/assets/music/使一颗心免于哀伤-哼唱.mp3` 的来源；无法证明授权则删除。
-2. **P0 · 旧安装包**：`public/app/AnimeHome-3.0.2-offline.apk` 内嵌了旧版 Fancybox 与上述音乐素材，
-   请重新打包或从 `public/app/` 删除（`/app/` 页面同步去掉离线版按钮）。
+1. ~~**P0 · 音乐**~~ ✅ **已完成（2026-11-19）**：原背景音乐与网易云专辑封面已删除，
+   换成 `scripts/generate-cute-music.mjs` 现场合成的 CC0 八音盒循环（`pnpm music:generate` 可重算）。
+   以后再换曲子，务必保留能证明授权的记录（作者 + 许可证 + 链接）。
+2. ~~**P0 · 旧安装包**~~ ✅ **已完成（2026-11-19）**：`public/app/` 下的 3 个旧 APK 已删除，
+   `/app/` 页离线版改成「正在重新打包」；新包打好后要再核对一次有没有夹带受限素材与第三方组件。
 3. **P0 · 语音包**：确认 `public/tts/**` 的生成方式与服务条款；如为云端 TTS 合成，删除仓库内的音频文件。
 4. **P1 · 壁纸/相册/音效**：为 `anime-wallpaper`、`gallery`、`sounds/ui`、`sakura.png` 补来源与许可说明；
    来源不可考的，替换为自制或 CC0 素材（如 [Pixabay](https://pixabay.com)、[Unsplash](https://unsplash.com) 需按其许可使用）。
