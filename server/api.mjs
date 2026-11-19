@@ -18,7 +18,11 @@ import {
   publicUser,
   countUsers,
   isLegacyHash,
+  createUserByEmail,
+  markEmailVerified,
+  isPasswordless,
 } from "./auth.mjs";
+import { sendLoginCode, mailConfigured, mailMode } from "./mail.mjs";
 
 const now = () => Math.floor(Date.now() / 1000);
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -151,6 +155,258 @@ function logout(ctx) {
     logActivity({ userId: user.id, username: user.username, action: "logout", detail: "退出登录", ip: ctx.ip });
   }
   return ctx.json(200, { ok: true }, { "Set-Cookie": "blog_session=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax" });
+}
+
+/**
+ * 邮箱验证码登录
+ * ------------------------------------------------------------------
+ * 流程：输入邮箱 → 收 6 位验证码 → 校验通过即登录；
+ * 邮箱第一次出现时自动建号（首位用户自动成为管理员），用户不需要"注册"，
+ * 也不需要记密码。所有验证码 / 会话 / 用户资料都写在 data/blog.db 里。
+ */
+const CODE_TTL_SECONDS = Math.max(60, Number(process.env.FIREFLY_CODE_TTL || 600) || 600);
+const CODE_RESEND_SECONDS = Math.max(10, Number(process.env.FIREFLY_CODE_RESEND || 60) || 60);
+const CODE_MAX_ATTEMPTS = 5;
+const CODE_HOURLY_LIMIT = 5;
+const CODE_IP_HOURLY_LIMIT = 20;
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function hashEmailCode(email, code, salt) {
+  return crypto.createHash("sha256").update(`${salt}:${email}:${code}`).digest("hex");
+}
+
+function generateEmailCode() {
+  return String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
+}
+
+/** 本机 / 局域网 IP：没配 SMTP 时允许把验证码直接回给前端，方便自测 */
+function isPrivateIp(ip) {
+  const s = String(ip || "").replace(/^::ffff:/i, "");
+  if (!s) return false;
+  if (s === "::1" || s === "127.0.0.1") return true;
+  if (/^127\./.test(s)) return true;
+  if (/^10\./.test(s)) return true;
+  if (/^192\.168\./.test(s)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(s)) return true;
+  if (/^169\.254\./.test(s)) return true;
+  if (/^f[cd][0-9a-f]{2}:/i.test(s)) return true;
+  return false;
+}
+
+/**
+ * 真的是「坐在电脑前 / 同一个 Wi-Fi」的人：本机/局域网 IP，而且没有经过隧道或反代。
+ * 只有这种请求才把验证码直接回给页面；走 Cloudflare 隧道时 cloudflared 会加 X-Forwarded-For，
+ * 公网访客因此拿不到 devCode（否则任何人都能替别人的邮箱取码登录）。
+ */
+function isDirectLocal(ctx) {
+  if (!isPrivateIp(ctx.ip)) return false;
+  const h = (ctx.req && ctx.req.headers) || {};
+  const proxied = h["x-forwarded-for"] || h["x-real-ip"] || h["cf-connecting-ip"] || h["forwarded"];
+  return !proxied;
+}
+
+function cleanupEmailCodes() {
+  try {
+    db.prepare(`DELETE FROM email_codes WHERE expires_at < ?`).run(now() - 86400);
+  } catch (e) {
+    console.error("[auth] 清理验证码失败:", e.message);
+  }
+}
+
+function findUserByEmailCI(email) {
+  return db.prepare(`SELECT * FROM users WHERE lower(email) = ?`).get(email) ?? null;
+}
+
+function cookieFor(token) {
+  return {
+    "Set-Cookie": `blog_session=${token}; Path=/; Max-Age=${30 * 24 * 3600}; HttpOnly; SameSite=Lax`,
+  };
+}
+
+function mailStatus(ctx) {
+  const mode = mailMode();
+  return ctx.json(200, {
+    ok: true,
+    configured: mailConfigured(),
+    mode,
+    hint:
+      mode === "smtp"
+        ? "验证码会发送到你的邮箱"
+        : "未配置 SMTP：验证码只打印在服务器窗口里，本机 / 局域网访问会自动填入；公网访客会看到「暂时收不到验证码」",
+  });
+}
+
+async function requestCode(ctx) {
+  const email = normalizeEmail(ctx.body?.email);
+  if (!EMAIL_RE.test(email)) return fail(ctx, 400, "邮箱格式不正确");
+  if (email.length > 120) return fail(ctx, 400, "邮箱太长了");
+
+  cleanupEmailCodes();
+
+  const last = db
+    .prepare(`SELECT created_at FROM email_codes WHERE email = ? ORDER BY id DESC LIMIT 1`)
+    .get(email);
+  if (last && now() - last.created_at < CODE_RESEND_SECONDS) {
+    const retryAfter = CODE_RESEND_SECONDS - (now() - last.created_at);
+    return ctx.json(429, {
+      ok: false,
+      error: `发送太频繁了，${retryAfter} 秒后再试`,
+      retryAfter,
+    });
+  }
+
+  const hourly = db
+    .prepare(`SELECT COUNT(*) AS c FROM email_codes WHERE email = ? AND created_at > ?`)
+    .get(email, now() - 3600).c;
+  if (hourly >= CODE_HOURLY_LIMIT) {
+    return ctx.json(429, { ok: false, error: "这个邮箱一小时内验证码发得太多了，过一会儿再试" });
+  }
+
+  if (ctx.ip) {
+    const ipHourly = db
+      .prepare(`SELECT COUNT(*) AS c FROM email_codes WHERE ip = ? AND created_at > ?`)
+      .get(ctx.ip, now() - 3600).c;
+    if (ipHourly >= CODE_IP_HOURLY_LIMIT) {
+      return ctx.json(429, { ok: false, error: "网络请求太频繁，稍后再试" });
+    }
+  }
+
+  const code = generateEmailCode();
+  const salt = crypto.randomBytes(16).toString("hex");
+  const expiresAt = now() + CODE_TTL_SECONDS;
+  const inserted = db
+    .prepare(
+      `INSERT INTO email_codes (email, code_hash, salt, ip, expires_at)
+       VALUES (?, ?, ?, ?, ?)`
+    )
+    .run(email, hashEmailCode(email, code, salt), salt, ctx.ip || "", expiresAt);
+
+  const minutes = Math.max(1, Math.round(CODE_TTL_SECONDS / 60));
+  const sent = await sendLoginCode({ to: email, code, minutes });
+
+  if (!sent.ok && sent.reason === "send-failed") {
+    db.prepare(`DELETE FROM email_codes WHERE id = ?`).run(Number(inserted.lastInsertRowid));
+    console.error(`[auth] 发送验证码到 ${email} 失败:`, sent.error);
+    return fail(ctx, 502, "验证码邮件发送失败，请检查服务器的 SMTP 配置");
+  }
+
+  const payload = {
+    ok: true,
+    email,
+    expiresIn: CODE_TTL_SECONDS,
+    resendAfter: CODE_RESEND_SECONDS,
+    mail: sent.ok ? "sent" : "dev",
+  };
+
+  if (!sent.ok) {
+    console.log("");
+    console.log(`  [验证码] ${email} → ${code}（${minutes} 分钟内有效）`);
+    console.log("  ↑ 未配置 SMTP，已打印在窗口里；本机 / 局域网访问时页面会自动填入");
+    console.log("");
+    if (isDirectLocal(ctx)) {
+      payload.devCode = code;
+      payload.hint = "本机测试模式：验证码已自动填入（配置 SMTP 后就会发到邮箱）";
+    } else {
+      // 公网访客收不到信：不能谎报「已发送」，删掉这条码并给明确提示
+      db.prepare(`DELETE FROM email_codes WHERE id = ?`).run(Number(inserted.lastInsertRowid));
+      return fail(ctx, 503, "邮件服务还没开通，现在收不到验证码，请稍后再试（或联系站长）");
+    }
+  }
+
+  return ctx.json(200, payload);
+}
+
+function verifyCode(ctx) {
+  const email = normalizeEmail(ctx.body?.email);
+  const code = String(ctx.body?.code || "").trim();
+
+  if (!EMAIL_RE.test(email)) return fail(ctx, 400, "邮箱格式不正确");
+  if (!/^\d{6}$/.test(code)) return fail(ctx, 400, "请输入 6 位数字验证码");
+
+  const row = db
+    .prepare(
+      `SELECT * FROM email_codes
+       WHERE email = ? AND used = 0
+       ORDER BY id DESC LIMIT 1`
+    )
+    .get(email);
+  if (!row) return fail(ctx, 400, "验证码已失效，请重新获取");
+
+  if (row.expires_at <= now()) {
+    db.prepare(`UPDATE email_codes SET used = 2 WHERE id = ?`).run(row.id);
+    return fail(ctx, 400, "验证码已过期，请重新获取");
+  }
+
+  if (row.attempts >= CODE_MAX_ATTEMPTS) {
+    db.prepare(`UPDATE email_codes SET used = 2 WHERE id = ?`).run(row.id);
+    return fail(ctx, 429, "验证码错误次数太多，请重新获取");
+  }
+
+  const expected = Buffer.from(row.code_hash, "hex");
+  const actual = Buffer.from(hashEmailCode(email, code, row.salt), "hex");
+  const matched = expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+
+  if (!matched) {
+    db.prepare(`UPDATE email_codes SET attempts = attempts + 1 WHERE id = ?`).run(row.id);
+    const left = Math.max(0, CODE_MAX_ATTEMPTS - row.attempts - 1);
+    return fail(
+      ctx,
+      400,
+      left > 0 ? `验证码不正确，还可以再试 ${left} 次` : "验证码不正确，请重新获取"
+    );
+  }
+
+  // 一码一用：本次用掉，其它未用的同邮箱验证码一并作废
+  db.prepare(`UPDATE email_codes SET used = 1 WHERE id = ?`).run(row.id);
+  db.prepare(`DELETE FROM email_codes WHERE email = ? AND used != 1`).run(email);
+
+  let user = findUserByEmailCI(email);
+  const isNewUser = !user;
+  const isFirstAdmin = isNewUser && countUsers() === 0;
+
+  if (!user) {
+    user = createUserByEmail(email, isFirstAdmin ? "admin" : "user");
+  } else {
+    user = markEmailVerified(user.id);
+  }
+
+  const session = createSession(user.id, ctx.ip);
+  // createSession 会写 last_login_at，重新读一次让返回给前端的用户信息是最新的
+  user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(user.id) ?? user;
+
+  logActivity({
+    userId: user.id,
+    username: user.username,
+    action: isNewUser ? "register" : "login",
+    targetType: "user",
+    targetId: user.id,
+    detail: isNewUser
+      ? isFirstAdmin
+        ? "邮箱验证码首次登录：自动创建账号（首位用户，自动成为管理员）"
+        : "邮箱验证码首次登录：自动创建账号"
+      : "邮箱验证码登录成功",
+    ip: ctx.ip,
+  });
+
+  return ctx.json(
+    200,
+    {
+      ok: true,
+      token: session.id,
+      user: publicUser(user),
+      isNewUser,
+      isFirstAdmin,
+      message: isNewUser
+        ? isFirstAdmin
+          ? "欢迎！你是第一位用户，已自动成为管理员 🎉"
+          : "账号已自动创建，欢迎加入小屋！"
+        : "欢迎回来！",
+    },
+    cookieFor(session.id)
+  );
 }
 
 /* ==================== 文章 ==================== */
@@ -515,12 +771,19 @@ function adminActivity(ctx) {
 function userUpdate(ctx) {
   const user = needLogin(ctx);
   if (!user) return;
-  const { email, bio, avatar } = ctx.body || {};
+  let { email, bio, avatar } = ctx.body || {};
 
   if (email !== undefined) {
-    if (!EMAIL_RE.test(email)) return fail(ctx, 400, "邮箱格式不正确");
-    const exists = db.prepare(`SELECT id FROM users WHERE email = ? AND id != ?`).get(email, user.id);
+    const nextEmail = normalizeEmail(email);
+    if (!EMAIL_RE.test(nextEmail)) return fail(ctx, 400, "邮箱格式不正确");
+    if (nextEmail !== normalizeEmail(user.email) && isPasswordless(user)) {
+      return fail(ctx, 400, "邮箱就是你的登录凭证，暂不支持直接修改");
+    }
+    const exists = db
+      .prepare(`SELECT id FROM users WHERE lower(email) = ? AND id != ?`)
+      .get(nextEmail, user.id);
     if (exists) return fail(ctx, 400, "该邮箱已被使用");
+    email = nextEmail;
   }
 
   const updates = [];
@@ -543,6 +806,9 @@ async function userPassword(ctx) {
   const { oldPassword, newPassword } = ctx.body || {};
   if (!oldPassword || !newPassword) return fail(ctx, 400, "请填写完整");
   if (String(newPassword).length < 6) return fail(ctx, 400, "新密码至少 6 位");
+  if (isPasswordless(user)) {
+    return fail(ctx, 400, "你的账号使用邮箱验证码登录，不需要密码");
+  }
 
   const valid = await verifyPassword(oldPassword, user.password_hash);
   if (!valid) return fail(ctx, 400, "原密码错误");
@@ -626,11 +892,14 @@ async function upload(ctx) {
 /* ==================== 路由表 ==================== */
 
 const routes = new Map([
-  ["GET /api/health", (ctx) => ctx.json(200, { ok: true, service: "firefly-api", version: "1.1.0", time: new Date().toISOString() })],
+  ["GET /api/health", (ctx) => ctx.json(200, { ok: true, service: "firefly-api", version: "1.2.0", time: new Date().toISOString() })],
   ["GET /api/ping", (ctx) => ctx.json(200, { ok: true, message: "后端在线", time: new Date().toISOString() })],
 
   ["POST /api/auth/register", register],
   ["POST /api/auth/login", login],
+  ["GET /api/auth/mail-status", mailStatus],
+  ["POST /api/auth/request-code", requestCode],
+  ["POST /api/auth/verify-code", verifyCode],
   ["GET /api/auth/me", me],
   ["POST /api/auth/logout", logout],
 

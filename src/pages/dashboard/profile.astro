@@ -96,6 +96,9 @@ export const prerender = true;
 
       <label>邮箱</label>
       <input type="email" id="email" />
+      <div id="emailHint" style="display: none; margin: -4px 0 12px; font-size: 12px; line-height: 1.6; color: rgba(255, 255, 255, 0.52);">
+        邮箱就是你的登录凭证（收发验证码），暂不支持直接修改
+      </div>
 
       <label>个人简介</label>
       <textarea id="bio" placeholder="介绍一下你自己…"></textarea>
@@ -106,15 +109,20 @@ export const prerender = true;
       <div class="msg" id="infoMsg"></div>
     </div>
 
-    <!-- 修改密码 -->
+    <!-- 修改密码（邮箱验证码登录的账号不需要密码，这里会折叠成提示） -->
     <div class="card">
       <h2>修改密码</h2>
-      <label>原密码</label>
-      <input type="password" id="oldPassword" placeholder="输入当前密码" />
-      <label>新密码</label>
-      <input type="password" id="newPassword" placeholder="至少 6 位" />
-      <div class="actions">
-        <button class="btn-primary" id="savePassBtn">修改密码</button>
+      <div id="passBody">
+        <label>原密码</label>
+        <input type="password" id="oldPassword" placeholder="输入当前密码" />
+        <label>新密码</label>
+        <input type="password" id="newPassword" placeholder="至少 6 位" />
+        <div class="actions">
+          <button class="btn-primary" id="savePassBtn">修改密码</button>
+        </div>
+      </div>
+      <div class="msg" id="passNote" style="display: none; line-height: 1.8;">
+        🔐 你的账号用<strong>邮箱验证码</strong>登录，不需要设置密码 —— 忘了密码这种事和你无关啦。
       </div>
       <div class="msg" id="passMsg"></div>
     </div>
@@ -149,6 +157,17 @@ export const prerender = true;
       const u = data.user;
       document.getElementById('username').value = u.username;
       document.getElementById('email').value = u.email;
+      // 邮箱验证码账号：邮箱就是登录凭证，不提供改邮箱 / 改密码
+      if (u.has_password === false) {
+        const emailEl = document.getElementById('email');
+        emailEl.readOnly = true;
+        emailEl.style.opacity = '0.72';
+        emailEl.title = '邮箱就是登录凭证，暂不支持修改';
+        document.getElementById('emailHint').style.display = 'block';
+        document.getElementById('passBody').style.display = 'none';
+        document.getElementById('passNote').style.display = 'block';
+      }
+
       document.getElementById('bio').value = u.bio || '';
       currentAvatar = u.avatar || '';
       if (currentAvatar) {

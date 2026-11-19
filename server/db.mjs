@@ -2,6 +2,7 @@
  * Firefly 独立后端 - 数据库层
  * 复用原项目 data/blog.db 的表结构与数据（node:sqlite，无需安装任何依赖）
  */
+import "./env.mjs";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
@@ -100,6 +101,19 @@ function initTables() {
       created_at INTEGER NOT NULL DEFAULT (unixepoch())
     );
 
+    -- 邮箱验证码（只存哈希，不存明文；used: 0=未用 1=已用 2=已作废）
+    CREATE TABLE IF NOT EXISTS email_codes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL,
+      code_hash TEXT NOT NULL,
+      salt TEXT NOT NULL,
+      ip TEXT,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      used INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+      expires_at INTEGER NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
     CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
@@ -108,6 +122,8 @@ function initTables() {
     CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(user_id);
     CREATE INDEX IF NOT EXISTS idx_notif_unread ON notifications(user_id, is_read);
     CREATE INDEX IF NOT EXISTS idx_activity_created ON activity(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_email_codes_email ON email_codes(email, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_email_codes_created ON email_codes(created_at DESC);
   `);
 
   // 老库补列
@@ -115,6 +131,7 @@ function initTables() {
   ensureColumn("users", "bio", "bio TEXT DEFAULT ''");
   ensureColumn("users", "avatar", "avatar TEXT DEFAULT ''");
   ensureColumn("users", "last_login_at", "last_login_at INTEGER");
+  ensureColumn("users", "email_verified", "email_verified INTEGER NOT NULL DEFAULT 0");
 }
 
 initTables();

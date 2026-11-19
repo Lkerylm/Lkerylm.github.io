@@ -159,7 +159,7 @@ macOS/Linux：`base64 -i Cert.p12 | pbcopy`。
 | 命令 | 作用 |
 | --- | --- |
 | `pnpm ios:assets` | 用 `public/favicon/anime.svg` 生成 `Assets.xcassets` 图标 / 启动图（1024 无 alpha + 1x/2x/3x 启动图） |
-| `pnpm ios:web` | 把 `dist/` 复制到 `ios/App/OfflineWeb/`，跳过 `*.apk`（安卓包）和 `*.map` |
+| `pnpm ios:web` | 把 `dist/` 复制到 `ios/App/OfflineWeb/`，跳过 `*.apk`（安卓包）和 `*.map`；顺手校验 `login/`、`register/` 是不是最新的邮箱验证码页（还是旧版「点 ⚙ 填服务器地址」就报错，提醒你先 `pnpm build`） |
 | `pnpm ios:pack` | 上面两步 + `pnpm build` |
 
 两个脚本都是纯 Node，Windows 上也能跑，只有 `xcodegen` / `xcodebuild` 需要 macOS。
@@ -182,5 +182,31 @@ macOS/Linux：`base64 -i Cert.p12 | pbcopy`。
 - **免费账号 7 天后闪退/打不开**：正常，重新签一次，或者上 AltStore 自动续签。
 - **离线版点安卓下载按钮没反应**：`OfflineWeb/` 里没有 `*.apk`（被脚本跳过了），iOS 上本来也用不上。
 - **离线版内容不更新**：重新跑 `pnpm ios:pack` 再打包安装；日常用建议装在线版。
+- **离线版里还是旧登录页 / 点了没用**：离线站是打包那一刻的快照，`pnpm ios:web` 会检查 `login/`、`register/` 里有没有 `authEmail` 表单，有旧文案就直接报错；同理 `public/app/*.apk` 里的网页也是打包时的快照，要更新得重新出 APK。
 - **`xcodegen generate` 报找不到 `App/OfflineWeb`**：先跑 `pnpm build && pnpm ios:web`。
 - **想改站点地址**：改 `ios/App/Online/Info.plist` 和 `Offline/Info.plist` 里的 `FireflyOnlineURL`。
+
+## 许可与合规
+
+打出来的 ipa 会**把整个站点打包进去**（离线版是完整站点，在线版也仅是一个壳），因此分发 App 就等于分发站内内容，
+以下几点必须在公开发布前确认：
+
+1. **声明随包分发**：`pnpm build` 会先跑 `pnpm legal`，把 `LICENSE` / `NOTICE.md` / `THIRD-PARTY-NOTICES.md`
+   和 `LICENSES/` 里的许可原文复制到站点 `public/licenses/`，所以 App 内访问 `app://localhost/licenses/`
+   就能看到全部声明 —— 满足 MIT / Apache-2.0 / CC BY 4.0 的「随分发保留声明」要求。
+2. **壳代码**：`ios/` 下的 Swift 源码与 XcodeGen 配置同样以 MIT 发布，可自由复用（保留版权行）。
+3. **素材不随代码授权**：壁纸、相册、背景音乐、TTS 语音包、Live2D 模型版权归各自权利人，
+   **不要把 ipa 解包后的素材再分发**，也不要上架收费（见仓库 `NOTICE.md`）。
+4. **Live2D Cubism Core**：`Firefly-live2d-main/load/live2dcubismcore.min.js` 是 Live2D 公司的专有运行时
+   （协议中的 "Redistributable Code"），可以随 App 一起分发，但不能改写成 MIT，也不能单独抽取分发；
+   商业化前请核对 Live2D 的营收门槛条款。
+5. **上架 App Store 前**：先按 `THIRD-PARTY-NOTICES.md` 第 6 节的 **P0** 清单处理
+   （背景音乐来源、TTS 语音包来源），否则审核或后续维权都可能出问题。
+6. **灯箱组件**：原先用的 Fancybox 是商业授权且**禁止用于开源项目**，已换成 MIT 许可的 PhotoSwipe
+   （`src/components/features/LightboxManager.astro`）。若日后要换回 Fancybox，需先购买授权。
+7. **打包前自检**：`pnpm ios:pack` 会先跑 `pnpm legal:check:strict`，一旦发现 block 级素材
+   （例如与官方曲目同名的背景音乐）就会中止打包；确已知情可用 `FIREFLY_ALLOW_BLOCKING_ASSETS=1` 跳过。
+   当前仓库还有 3 个 block 项未处理（背景音乐、其网易云封面、内嵌旧版 Fancybox 的
+   `public/app/AnimeHome-3.0.2-offline.apk`），所以 **GitHub Actions 的 iOS 工作流会一直红**，
+   按 `THIRD-PARTY-NOTICES.md` 第 7 节 P0 清单清理后即恢复。
+

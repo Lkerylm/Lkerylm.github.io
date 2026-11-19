@@ -35,9 +35,6 @@ importers:
       '@expressive-code/plugin-line-numbers':
         specifier: ^0.41.7
         version: 0.41.7
-      '@fancyapps/ui':
-        specifier: ^6.1.13
-        version: 6.1.13
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.2.6
         version: 5.2.8
@@ -116,6 +113,9 @@ importers:
       node-html-parser:
         specifier: ^7.0.2
         version: 7.0.2
+      nodemailer:
+        specifier: ^10.6.0
+        version: 10.6.0
       overlayscrollbars:
         specifier: ^2.14.0
         version: 2.14.0
@@ -1236,9 +1236,6 @@ packages:
 
   '@expressive-code/plugin-text-markers@0.41.7':
     resolution: {integrity: sha512-Ewpwuc5t6eFdZmWlFyeuy3e1PTQC0jFvw2Q+2bpcWXbOZhPLsT7+h8lsSIJxb5mS7wZko7cKyQ2RLYDyK6Fpmw==}
-
-  '@fancyapps/ui@6.1.13':
-    resolution: {integrity: sha512-C7EGAWxeTIRXZF2gznVUdMgFM3km6FUaz1S9IB+6+GWeKeIDk1tChwO60GfJE4Mi32OPfVynVIdx8wypNaK96A==}
 
   '@fontsource-variable/jetbrains-mono@5.2.8':
     resolution: {integrity: sha512-WBA9elru6Jdp5df2mES55wuOO0WIrn3kpXnI4+W2ek5u3ZgLS9XS4gmIlcQhiZOWEKl95meYdvK7xI+ETLCq/Q==}
@@ -3874,6 +3871,10 @@ packages:
 
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
+
+  nodemailer@10.6.0:
+    resolution: {integrity: sha512-jWanL7D9GD3jvUDYKmoC5rWTiG8MnBgnN2yV68bgMKip1zUJhiSTyz7Eg+18y8sk5OvdVDzws5nZK5arSI4f5Q==}
+    engines: {node: '>=20.0.0'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -6691,8 +6692,6 @@ snapshots:
   '@expressive-code/plugin-text-markers@0.41.7':
     dependencies:
       '@expressive-code/core': 0.41.7
-
-  '@fancyapps/ui@6.1.13': {}
 
   '@fontsource-variable/jetbrains-mono@5.2.8': {}
 
@@ -9981,6 +9980,8 @@ snapshots:
   node-mock-http@1.0.4: {}
 
   node-releases@2.0.27: {}
+
+  nodemailer@10.6.0: {}
 
   normalize-path@3.0.0: {}
 

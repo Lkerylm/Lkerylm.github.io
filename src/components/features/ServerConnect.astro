@@ -1,13 +1,22 @@
 ---
 /**
  * 服务器连接面板（浮动 ⚙）
- * 用于没有导航栏的独立页面（登录 / 注册 / 社区…）：
- * 后端不在线时，可以直接在这里填自己电脑的地址，测通后自动保存。
+ * 用于没有导航栏的独立页面（登录 / 注册…）：后端地址可以在这里填，测通后自动保存。
+ *
+ * 显示规则（重要）：
+ *   - 打包时在 .env 里写了 PUBLIC_API_BASE（公网部署，后端在你电脑上）
+ *     → 面板默认完全隐藏：访客只需要输邮箱和验证码，**永远不用填地址**；
+ *       只有你自己需要临时改地址时，在网址后面加 ?setup=1 才会出现。
+ *   - 没有 PUBLIC_API_BASE（本地开发 / 还没配好后端）
+ *     → 显示面板，作为兜底，方便你把自己电脑的地址填进去。
  * 依赖 /firefly-api.js
  */
+const bakedBase = String(import.meta.env.PUBLIC_API_BASE || "").trim();
+const forceShow = Astro.url.searchParams.has("setup");
+const hideForVisitors = Boolean(bakedBase) && !forceShow;
 ---
 
-<button id="ffs-open" class="ffs-fab" type="button" title="连接我的电脑服务器">⚙ 服务器</button>
+<button id="ffs-open" class="ffs-fab" type="button" title="连接我的电脑服务器" data-force-show={forceShow ? "1" : "0"} hidden={hideForVisitors}>⚙ 服务器</button>
 
 <div id="ffs-mask" class="ffs-mask" aria-hidden="true">
   <div class="ffs-box" role="dialog" aria-label="服务器设置">
@@ -171,8 +180,48 @@
 
     document.addEventListener("firefly:backend", function (e) {
       var ok = e && e.detail && e.detail.ok;
+      if (fab.hidden) return;
       fab.dataset.state = ok ? "online" : "offline";
       fab.textContent = ok ? "⚙ 已连接电脑" : "⚙ 服务器";
     });
+
+    /**
+     * 站点本身就跑在你电脑上（start-server.cmd 同时发网页和 /api/*）时，
+     * 同源探一下 /api/health：通了就把 ⚙ 收起来 —— 访客看到的就是普通网站，
+     * 不用也不会被要求填任何服务器地址。只有「网页在公网、后端在别处」才需要它。
+     */
+    function autoHideWhenServedLocally() {
+      var forceShowNow = false;
+      try {
+        forceShowNow = new URLSearchParams(location.search).has("setup");
+      } catch (e) {}
+      if (fab.hidden || fab.dataset.forceShow === "1" || forceShowNow) return;
+      if (!/^https?:$/i.test(location.protocol)) return;
+      if (!window.fetch) return;
+      var done = false;
+      try {
+        var ctl = window.AbortController ? new AbortController() : null;
+        var timer = setTimeout(function () {
+          if (ctl) ctl.abort();
+        }, 2500);
+        fetch(location.origin + "/api/health", {
+          cache: "no-store",
+          signal: ctl ? ctl.signal : undefined
+        })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (info) {
+            clearTimeout(timer);
+            if (done) return;
+            done = true;
+            if (info && info.ok) {
+              fab.hidden = true;
+              fab.style.display = "none";
+              closePanel();
+            }
+          })
+          .catch(function () { clearTimeout(timer); });
+      } catch (e) {}
+    }
+    autoHideWhenServedLocally();
   })();
 </script>

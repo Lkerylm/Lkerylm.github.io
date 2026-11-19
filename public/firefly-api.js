@@ -32,6 +32,16 @@
     } catch (e) {}
   }
 
+  // 构建时注入的默认后端地址（<meta name="firefly-api-base" content="https://xxx">）
+  // 适合把网站放在 GitHub Pages、后端跑在自己电脑上的情况：访客打开就能用，不用手动填地址。
+  try {
+    if (!readLS(LS_BASE)) {
+      var meta = document.querySelector('meta[name="firefly-api-base"]');
+      var metaBase = meta && meta.getAttribute("content");
+      if (metaBase) writeLS(LS_BASE, String(metaBase).trim().replace(/\/+$/, ""));
+    }
+  } catch (e) {}
+
   // 支持 ?api=https://xxx / ?server=... 直接带上后端地址（APK 跳转、分享链接用）
   try {
     var qp = new URLSearchParams(location.search);
@@ -88,7 +98,7 @@
 
       var p = origFetch(input, init);
 
-      if (/\/api\/auth\/(login|register)\/?([?#]|$)/.test(url)) {
+      if (/\/api\/auth\/(login|register|verify-code)\/?([?#]|$)/.test(url)) {
         return p.then(function (res) {
           try {
             res
@@ -172,6 +182,21 @@
     return api("/api/auth/me/", { headers: getToken() ? { Authorization: "Bearer " + getToken() } : {} });
   }
 
+  /** 邮件模式：smtp（真发信）/ dev（验证码打印在服务器窗口） */
+  function mailStatus() {
+    return api("/api/auth/mail-status/");
+  }
+
+  /** 发送邮箱验证码；dev 模式且本机/局域网访问时会带回 devCode 方便自动填入 */
+  function requestCode(email) {
+    return api("/api/auth/request-code/", { method: "POST", body: { email: email } });
+  }
+
+  /** 校验验证码并登录（邮箱首次出现会自动建号）；token 由上面的 fetch 钩子自动保存 */
+  function verifyCode(email, code) {
+    return api("/api/auth/verify-code/", { method: "POST", body: { email: email, code: code } });
+  }
+
   window.FireflyAPI = {
     get base() {
       return getBase();
@@ -185,6 +210,9 @@
     apiUrl: apiUrl,
     api: api,
     me: me,
+    mailStatus: mailStatus,
+    requestCode: requestCode,
+    verifyCode: verifyCode,
     check: check,
     get status() {
       return status;

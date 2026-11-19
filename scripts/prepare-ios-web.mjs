@@ -68,6 +68,26 @@ async function main() {
 		throw new Error("离线壳里缺 index.html，构建产物不对劲");
 	}
 
+	// 登录 / 注册页必须是最新的邮箱验证码版，别把「点 ⚙ 填服务器地址」的旧页打进 App
+	const STALE_MARKERS = ["还没有连上账号服务器", 'id="regForm"', 'id="loginForm"'];
+	for (const page of ["login", "register"]) {
+		const html = await readFile(path.join(DEST, page, "index.html"), "utf8").catch(
+			() => null,
+		);
+		if (!html) continue;
+		const hit = STALE_MARKERS.find((marker) => html.includes(marker));
+		if (hit) {
+			throw new Error(
+				`${page}/index.html 还是旧版登录页（含有「${hit}」）：先 pnpm build 再重跑 ios:web`,
+			);
+		}
+		if (!html.includes("authEmail")) {
+			throw new Error(
+				`${page}/index.html 里没有邮箱验证码表单（authEmail）：构建产物不对，先 pnpm build`,
+			);
+		}
+	}
+
 	const { bytes, files } = await measure(DEST);
 	const pkg = JSON.parse(
 		await readFile(path.join(root, "package.json"), "utf8"),

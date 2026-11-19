@@ -2,6 +2,7 @@
 import AnimeBackdrop from "@/components/features/AnimeBackdrop.astro";
 import AnimeHeadMeta from "@/components/features/AnimeHeadMeta.astro";
 import AuthLive2D from "@/components/features/AuthLive2D.astro";
+import EmailCodeAuth from "@/components/features/EmailCodeAuth.astro";
 import ServerConnect from "@/components/features/ServerConnect.astro";
 
 export const prerender = true;
@@ -14,6 +15,9 @@ export const prerender = true;
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>注册 · 我的动漫小屋</title>
 	<AnimeHeadMeta />
+	{import.meta.env.PUBLIC_API_BASE && (
+		<meta name="firefly-api-base" content={import.meta.env.PUBLIC_API_BASE} />
+	)}
 	<script is:inline src="/firefly-api.js"></script>
 	<style is:global>
 		body.console-register *{
@@ -476,49 +480,12 @@ export const prerender = true;
 			</div>
 		</header>
 
-		<form id="regForm" novalidate>
-			<div class="field">
-				<span class="ico" aria-hidden="true">👤</span>
-				<input
-					id="username"
-					name="username"
-					type="text"
-					required
-					minlength="2"
-					maxlength="20"
-					placeholder="用户名（2~20 位）"
-					autocomplete="username"
-				/>
-			</div>
-			<div class="field">
-				<span class="ico" aria-hidden="true">✉️</span>
-				<input
-					id="email"
-					name="email"
-					type="email"
-					required
-					placeholder="邮箱 you@example.com"
-					autocomplete="email"
-				/>
-			</div>
-			<div class="field">
-				<span class="ico" aria-hidden="true">🔒</span>
-				<input
-					id="password"
-					name="password"
-					type="password"
-					required
-					placeholder="密码"
-					autocomplete="current-password"
-				/>
-			</div>
-			<button type="submit" id="submitBtn">注 册</button>
-		</form>
+		<EmailCodeAuth mode="register" />
 
 		<div class="msg" id="msg" role="status" aria-live="polite"></div>
 
 		<nav class="links">
-			已经有账号啦？<a href="/login/">去登录</a>
+			已经有账号？<a href="/login/">直接登录</a>
 			<span class="divider">·</span>
 			<a href="/">返回首页</a>
 			<span class="divider">·</span>
@@ -564,11 +531,9 @@ export const prerender = true;
 				}
 				el.dataset.state = s.ok ? "online" : "offline";
 				if (s.ok) {
-					text.textContent = "小服务器在线 · " + (s.base || "同源");
-				} else if (s.base) {
-					text.textContent = "连不上 " + s.base + "（点右下角 ⚙ 改地址）";
+					text.textContent = "邮箱验证码登录 · 账号服务在线";
 				} else {
-					text.textContent = "未配置账号服务器 · 只浏览内容也完全 OK";
+					text.textContent = "账号服务暂时离线 · 先逛逛内容也完全 OK";
 				}
 			}
 
@@ -589,126 +554,5 @@ export const prerender = true;
 		})();
 	</script>
 
-	<script is:inline>
-		(function () {
-			var form = document.getElementById("regForm");
-			var msg = document.getElementById("msg");
-			var btn = document.getElementById("submitBtn");
-			if (!form || !msg || !btn) return;
-
-			var btnLabel = btn.textContent;
-
-			function showMsg(text, type) {
-				msg.textContent = text;
-				msg.className = "msg show " + type;
-			}
-
-			function sound(name, vol) {
-				try {
-					if (window.AnimeSounds) window.AnimeSounds.play(name, vol);
-				} catch (e) {
-					/* 音效是锦上添花 */
-				}
-			}
-
-			function playWelcomeVoice() {
-				try {
-					var audio = new Audio("/tts/Nanami/2.mp3");
-					audio.volume = 0.7;
-					var p = audio.play();
-					if (p && p.catch) p.catch(function () {});
-				} catch (e) {
-					/* ignore */
-				}
-			}
-
-			function unlock() {
-				btn.disabled = false;
-				btn.textContent = btnLabel;
-			}
-
-			form.addEventListener("submit", function (e) {
-				e.preventDefault();
-				msg.className = "msg";
-
-				var username = (
-					document.getElementById("username").value || ""
-				).trim();
-				var email = (
-					document.getElementById("email").value || ""
-				).trim();
-				var password = document.getElementById("password").value || "";
-
-				if (!username || !email || !password) {
-					showMsg("用户名、邮箱、密码都要填哦～", "err");
-					sound("error", 0.4);
-					return;
-				}
-
-				if (username.length < 2) {
-					showMsg("用户名至少 2 个字～", "err");
-					sound("error", 0.4);
-					return;
-				}
-
-				if (password.length < 6) {
-					showMsg("密码至少 6 位，安全一点～", "err");
-					sound("error", 0.4);
-					return;
-				}
-
-				btn.disabled = true;
-				btn.textContent = "注册中…";
-
-				fetch("/api/auth/register/", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					credentials: "include",
-					body: JSON.stringify({
-						username: username,
-						email: email,
-						password: password,
-					}),
-				})
-					.then(function (res) {
-						if (res.status === 404 || res.status === 405) {
-							throw new Error(
-								"还没有连上账号服务器：点右下角 ⚙ 服务器，填上 http://电脑IP:8787 再注册（只浏览内容不用注册）",
-							);
-						}
-						return res.json();
-					})
-					.then(function (data) {
-						if (data && data.ok) {
-							var isAdmin = data.user && data.user.role === "admin";
-							showMsg(
-								isAdmin
-									? "注册成功！你是第一位用户，已经自动成为管理员 🎉"
-									: "注册成功！小屋欢迎你，正在跳转…",
-								"ok",
-							);
-							sound("login", 0.45);
-							playWelcomeVoice();
-							setTimeout(function () {
-								location.href = isAdmin ? "/admin/" : "/dashboard/";
-							}, 1100);
-							return;
-						}
-						showMsg((data && data.error) || "注册失败了，换个名字试试？", "err");
-						sound("error", 0.4);
-						unlock();
-					})
-					.catch(function (err) {
-						showMsg(
-							(err && err.message) ||
-								"网络错误：看下右下角 ⚙ 里的服务器地址，或稍后再试",
-							"err",
-						);
-						sound("error", 0.4);
-						unlock();
-					});
-			});
-		})();
-	</script>
 </body>
 </html>

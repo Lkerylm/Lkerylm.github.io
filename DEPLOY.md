@@ -154,20 +154,23 @@ node server\server.mjs        # http://localhost:8787  +  http://192.168.x.x:878
 
 同一个端口同时提供 **打包好的网站（dist/）** 和 **全部接口（/api/*）**：
 
-- 注册 / 登录 / 退出 / 当前用户
+- 邮箱验证码登录（免密码，邮箱第一次出现自动建号）/ 退出 / 当前用户
 - 投稿 / 改稿 / 删除 / 审核（管理员）
 - 评论 / 通知
-- 后台：统计、用户管理（升降级、删除、重置密码）、评论管理、**活动流水**
+- 后台：统计、用户管理（升降级、删除）、评论管理、**活动流水**
 - 上传图片（`public/uploads/`）
 
 前端通过 `public/firefly-api.js` 统一接入：它给所有 `fetch('/api/...')` 自动拼后端地址、带上
-`Authorization: Bearer <token>`，登录/注册成功后自动保存 token。所以：
+`Authorization: Bearer <token>`，登录成功后自动保存 token。所以：
 
-- 在 `http://localhost:8787/` 打开网站 → 同源，直接可用；
-- 在 GitHub Pages 上打开 → 点导航栏的 **⚙**，填 `http://192.168.x.x:8787` 即可跨域连上（后端已开 CORS）。
+- 在 `http://localhost:8787/` 打开网站 → 同源，**访客不用填任何地址**（登录页右下角的 ⚙ 探测到同源接口后会自动消失）；
+- 网站放 GitHub Pages、后端跑在你电脑上 → 打包时在 `.env` 写一次 `PUBLIC_API_BASE=https://你的隧道地址`，访客同样看不到 ⚙，输入邮箱收验证码就能用；
+- 只有「网页在公网、后端地址又没写进构建」时才需要你自己打开 `/login/?setup=1` 手动填一次。
 
-第一个注册的账号自动成为管理员；老库（`data/blog.db`）里的用户和文章继续有效，
-bcrypt 老密码会在下次登录时自动升级为 scrypt。
+（公网访客要收到验证码，需要在 `.env` 配 `FIREFLY_SMTP_*`；没配时接口会明确返回 503，不会假装「已发送」。）
+
+第一个登录的邮箱自动成为管理员；老库（`data/blog.db`）里的用户和文章继续有效，
+老账号用原来的邮箱收验证码就能登进来，密码列不再参与登录。
 
 详见 `server/README.md`。两个 APK 的构建见 `FireflyAPK/APK-README.md`（`node build-two-apks.mjs both`）。
 

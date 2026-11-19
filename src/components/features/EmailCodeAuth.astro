@@ -1,0 +1,417 @@
+---
+/**
+ * 邮箱验证码登录表单（登录 / 注册共用）
+ * ------------------------------------------------------------------
+ * 只需要一个邮箱：发验证码 → 填 6 位数字 → 自动登录；
+ * 邮箱第一次出现时后端会自动建号，所以「登录」和「注册」是同一个动作。
+ * 依赖 /firefly-api.js（自动带 token、自动保存 token）。
+ */
+interface Props {
+	mode?: "login" | "register";
+}
+
+const { mode = "login" } = Astro.props;
+const isRegister = mode === "register";
+---
+
+<form id="authForm" data-mode={mode} novalidate>
+	<div class="field">
+		<span class="ico" aria-hidden="true">✉️</span>
+		<input
+			id="authEmail"
+			name="email"
+			type="email"
+			required
+			maxlength="120"
+			placeholder="邮箱 you@example.com"
+			autocomplete="email"
+			inputmode="email"
+			spellcheck="false"
+		/>
+	</div>
+
+	<div class="field">
+		<span class="ico" aria-hidden="true">🔑</span>
+		<div class="ff-code-row">
+			<input
+				id="authCode"
+				name="code"
+				type="text"
+				required
+				maxlength="6"
+				placeholder="6 位验证码"
+				autocomplete="one-time-code"
+				inputmode="numeric"
+				pattern="[0-9]{6}"
+			/>
+			<button type="button" id="sendCodeBtn" class="ff-code-btn">发送验证码</button>
+		</div>
+	</div>
+
+	<button type="submit" id="submitBtn">{isRegister ? "登 录 / 注 册" : "登 录"}</button>
+</form>
+
+<div class="ff-auth-hint" id="authHint">
+	{isRegister
+		? "不用设密码：填邮箱 → 收验证码 → 账号自动创建，下次同样方式登录。"
+		: "第一次来也没关系：验证后会自动创建账号，以后再也不用记密码。"}
+</div>
+
+<style is:global>
+	.ff-code-row {
+		display: flex;
+		align-items: stretch;
+		gap: 8px;
+	}
+
+	.ff-code-row input {
+		flex: 1 1 auto;
+		width: auto !important;
+		min-width: 0;
+		letter-spacing: 0.3em;
+		font-size: 16px;
+	}
+
+	.ff-code-row input::placeholder {
+		letter-spacing: normal;
+		font-size: 14px;
+	}
+
+	.ff-code-btn {
+		flex: 0 0 auto;
+		min-width: 98px;
+		height: 48px;
+		padding: 0 12px;
+		border-radius: 14px;
+		border: 1px solid rgba(255, 175, 214, 0.45);
+		background: rgba(255, 154, 200, 0.16);
+		color: #ffd9ea;
+		font-family: inherit;
+		font-size: 12.5px;
+		font-weight: 600;
+		white-space: nowrap;
+		cursor: pointer;
+		transition:
+			background 0.2s ease,
+			opacity 0.2s ease,
+			transform 0.2s ease;
+	}
+
+	.ff-code-btn:hover:not(:disabled) {
+		background: rgba(255, 154, 200, 0.3);
+		transform: translateY(-1px);
+	}
+
+	.ff-code-btn:disabled {
+		opacity: 0.55;
+		cursor: default;
+		transform: none;
+	}
+
+	.ff-auth-hint {
+		margin-top: 13px;
+		font-size: 11.5px;
+		line-height: 1.75;
+		text-align: center;
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	@media (max-width: 380px) {
+		.ff-code-btn {
+			min-width: 84px;
+			font-size: 12px;
+		}
+	}
+</style>
+
+<script>
+	(function () {
+		"use strict";
+
+		const get = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+		if (
+			!document.getElementById("authForm") ||
+			!document.getElementById("authEmail") ||
+			!document.getElementById("authCode") ||
+			!document.getElementById("sendCodeBtn") ||
+			!document.getElementById("submitBtn") ||
+			!document.getElementById("msg")
+		) {
+			return;
+		}
+		const form = get<HTMLFormElement>("authForm");
+		const emailInput = get<HTMLInputElement>("authEmail");
+		const codeInput = get<HTMLInputElement>("authCode");
+		const sendBtn = get<HTMLButtonElement>("sendCodeBtn");
+		const submitBtn = get<HTMLButtonElement>("submitBtn");
+		const msg = get<HTMLElement>("msg");
+		const hint = document.getElementById("authHint");
+
+		var EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+		var SENT_KEY = "firefly_code_sent_at";
+		// 本地开发时提示「先运行 start-server.cmd」，线上只对访客说人话
+		var IS_DEV = import.meta.env.DEV;
+		var submitLabel: string | null = submitBtn.textContent;
+		var timer: any = null;
+		var submitting = false;
+
+		type MsgType = "ok" | "err";
+
+		function showMsg(text: string, type: MsgType) {
+			msg.textContent = text;
+			msg.className = "msg show " + type;
+		}
+		function clearMsg() {
+			msg.textContent = "";
+			msg.className = "msg";
+		}
+		function sound(name: string, vol: number) {
+			try {
+				var snd = (window as any).AnimeSounds;
+				if (snd && typeof snd.play === "function") snd.play(name, vol);
+			} catch (e) {}
+		}
+		function welcomeVoice() {
+			try {
+				var audio = new Audio("/tts/Nanami/0.mp3");
+				audio.volume = 0.7;
+				var p = audio.play();
+				if (p && p.catch) p.catch(function () {});
+			} catch (e) {}
+		}
+		function setSubmitBusy(busy: boolean, text?: string) {
+			submitBtn.disabled = !!busy;
+			submitBtn.textContent = busy ? text || "验证中…" : submitLabel;
+		}
+		function email() {
+			return (emailInput.value || "").trim();
+		}
+
+		function startCooldown(seconds: number) {
+			var left = Math.max(0, Math.round(Number(seconds) || 0));
+			if (timer) {
+				clearInterval(timer);
+				timer = null;
+			}
+			if (left <= 0) {
+				sendBtn.disabled = false;
+				sendBtn.textContent = "发送验证码";
+				return;
+			}
+			sendBtn.disabled = true;
+			sendBtn.textContent = "重新发送 " + left + "s";
+			timer = setInterval(function () {
+				left -= 1;
+				if (left <= 0) {
+					clearInterval(timer);
+					timer = null;
+					sendBtn.disabled = false;
+					sendBtn.textContent = "发送验证码";
+					return;
+				}
+				sendBtn.textContent = "重新发送 " + left + "s";
+			}, 1000);
+		}
+
+		function restoreCooldown() {
+			try {
+				var ts = Number(localStorage.getItem(SENT_KEY) || 0);
+				if (!ts) return;
+				var left = 60 - Math.floor((Date.now() - ts) / 1000);
+				if (left > 0) startCooldown(left);
+			} catch (e) {}
+		}
+
+		async function readJson(res: Response) {
+			try {
+				return await res.json();
+			} catch (e) {
+				return {};
+			}
+		}
+
+		async function sendCode() {
+			var address = email();
+			if (!EMAIL_RE.test(address)) {
+				showMsg("先填一个正确的邮箱呀～", "err");
+				sound("error", 0.4);
+				emailInput.focus();
+				return;
+			}
+			clearMsg();
+			sendBtn.disabled = true;
+			sendBtn.textContent = "发送中…";
+			try {
+				var res = await fetch("/api/auth/request-code/", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+					body: JSON.stringify({ email: address }),
+				});
+				if (res.status === 404 || res.status === 405) {
+					throw new Error(
+						IS_DEV
+							? "服务器还没连上：先在电脑上运行 start-server.cmd"
+							: "登录服务暂时连不上，请稍后再试",
+					);
+				}
+				var data = await readJson(res);
+				if (data && data.ok) {
+					try {
+						localStorage.setItem(SENT_KEY, String(Date.now()));
+					} catch (e) {}
+					startCooldown(data.resendAfter || 60);
+					showMsg(data.hint || "验证码已发送，去邮箱看看（垃圾箱也翻一下）", "ok");
+					sound("click", 0.4);
+					if (data.devCode) {
+						codeInput.value = data.devCode;
+						setTimeout(function () {
+							if (!submitting && codeInput.value.length === 6) submit();
+						}, 150);
+					}
+					codeInput.focus();
+					return;
+				}
+				if (data && data.retryAfter) startCooldown(data.retryAfter);
+				else {
+					sendBtn.disabled = false;
+					sendBtn.textContent = "发送验证码";
+				}
+				showMsg(
+					(data && data.error) ||
+						(IS_DEV
+							? "验证码发送失败：后端没启动？先运行 start-server.cmd"
+							: "验证码发送失败，请稍后再试"),
+					"err",
+				);
+				sound("error", 0.4);
+			} catch (err) {
+				sendBtn.disabled = false;
+				sendBtn.textContent = "发送验证码";
+				showMsg(
+					(err && err.message) ||
+						(IS_DEV ? "网络错误：检查后端是否在运行" : "网络有点问题，稍后再试"),
+					"err",
+				);
+				sound("error", 0.4);
+			}
+		}
+
+		async function submit() {
+			if (submitting) return;
+			var address = email();
+			var code = (codeInput.value || "").replace(/\D/g, "");
+			if (!EMAIL_RE.test(address)) {
+				showMsg("邮箱还没填对哦～", "err");
+				emailInput.focus();
+				return;
+			}
+			if (!/^\d{6}$/.test(code)) {
+				showMsg("验证码是 6 位数字～", "err");
+				codeInput.focus();
+				return;
+			}
+
+			clearMsg();
+			submitting = true;
+			setSubmitBusy(true, "验证中…");
+			try {
+				var res = await fetch("/api/auth/verify-code/", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+					body: JSON.stringify({ email: address, code: code }),
+				});
+				if (res.status === 404 || res.status === 405) {
+					throw new Error(
+						IS_DEV
+							? "服务器还没连上：先在电脑上运行 start-server.cmd"
+							: "登录服务暂时连不上，请稍后再试",
+					);
+				}
+				var data = await readJson(res);
+				if (data && data.ok && data.token) {
+					var api = (window as any).FireflyAPI;
+					if (api && typeof api.setToken === "function") api.setToken(data.token);
+					else {
+						try {
+							localStorage.setItem("firefly_token", data.token);
+						} catch (e) {}
+					}
+					window.dispatchEvent(new CustomEvent("firefly:auth", { detail: { user: data.user || null } }));
+					var name = data.user && data.user.username ? "，" + data.user.username : "";
+					showMsg((data.message || "登录成功") + name, "ok");
+					if (hint) {
+						hint.textContent = "已登录 · 正在进入小屋…";
+						hint.dataset.touched = "1";
+					}
+					sound("login", 0.45);
+					welcomeVoice();
+					// 跳到哪：?redirect= 优先；管理员去后台；其他人回主页（就像普通网站注册完直接进站）
+					var next = "";
+					try {
+						next = new URLSearchParams(location.search).get("redirect") || "";
+					} catch (e) {}
+					if (next.indexOf("/") !== 0 || next.indexOf("//") === 0) {
+						next = data.user && data.user.role === "admin" ? "/admin/" : "/";
+					}
+					setTimeout(function () {
+						location.href = next;
+					}, 900);
+					return;
+				}
+				showMsg((data && data.error) || "验证码不正确，再试一次？", "err");
+				sound("error", 0.4);
+			} catch (err) {
+				showMsg((err && err.message) || "网络有点问题，稍后再试", "err");
+				sound("error", 0.4);
+			} finally {
+				submitting = false;
+				setSubmitBusy(false);
+			}
+		}
+
+		form.addEventListener("submit", function (e) {
+			e.preventDefault();
+			submit();
+		});
+		sendBtn.addEventListener("click", sendCode);
+		emailInput.addEventListener("keydown", function (e) {
+			if (e.key === "Enter") {
+				e.preventDefault();
+				sendCode();
+			}
+		});
+		codeInput.addEventListener("input", function () {
+			var digits = (codeInput.value || "").replace(/\D/g, "").slice(0, 6);
+			if (codeInput.value !== digits) codeInput.value = digits;
+			if (digits.length === 6 && !submitting) submit();
+		});
+
+		restoreCooldown();
+
+		// 探测邮件模式：没配 SMTP 时提前说明「验证码暂时发不出去」，避免公网访客白等邮件
+		// （本机 / 局域网访问会自动填入验证码，不需要这条提醒）
+		function looksLocalHost() {
+			var h = location.hostname;
+			return (
+				h === "localhost" ||
+				h === "127.0.0.1" ||
+				h === "::1" ||
+				/^10\./.test(h) ||
+				/^192\.168\./.test(h) ||
+				/^172\.(1[6-9]|2\d|3[01])\./.test(h)
+			);
+		}
+		fetch("/api/auth/mail-status/")
+			.then(function (r) {
+				return r.json();
+			})
+			.then(function (d) {
+				if (d && d.ok && d.mode === "dev" && hint && !hint.dataset.touched && !looksLocalHost()) {
+					hint.textContent = "暂时发不出验证码：站长还没开通邮箱服务，请稍后再来～";
+				}
+			})
+			.catch(function () {});
+	})();
+</script>

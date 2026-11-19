@@ -13,8 +13,10 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { spawn } from "node:child_process";
 import { handleApi } from "./api.mjs";
 import { ROOT_DIR, DB_PATH, ensureAdmin, db } from "./db.mjs";
+import { mailConfigured } from "./mail.mjs";
 
 const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || "0.0.0.0";
@@ -111,6 +113,27 @@ function fileExists(p) {
     return fs.statSync(p).isFile();
   } catch {
     return false;
+  }
+}
+
+/**
+ * 启动后自动打开浏览器到登录页（FIREFLY_NO_OPEN=1 可关掉）。
+ * 目的：双击 start-server.cmd 后就跟你平时上网一样，直接开始输邮箱 + 验证码。
+ */
+function openBrowser(url) {
+  if (process.env.FIREFLY_NO_OPEN === "1") return;
+  const cmd =
+    process.platform === "win32"
+      ? ["cmd", ["/c", "start", "", url]]
+      : process.platform === "darwin"
+        ? ["open", [url]]
+        : ["xdg-open", [url]];
+  try {
+    const child = spawn(cmd[0], cmd[1], { detached: true, stdio: "ignore" });
+    child.on("error", () => {});
+    child.unref();
+  } catch {
+    /* 没有桌面环境就安静跳过 */
   }
 }
 
@@ -277,11 +300,17 @@ server.listen(PORT, HOST, () => {
   console.log(`  接口:    http://localhost:${PORT}/api/health`);
   console.log(`  数据库:  ${DB_PATH}`);
   console.log(`  静态站:  ${HAS_DIST ? "dist/（已打包）" : "public/（未打包，建议先 pnpm build）"}`);
+  console.log(
+    `  登录:    邮箱验证码（${mailConfigured() ? "SMTP 已配置，验证码会发到邮箱" : "未配置 SMTP，验证码显示在本窗口"}）`
+  );
   console.log(`  用户: ${userCount} 个，管理员: ${adminCount} 个`);
   if (promoted) console.log(`  ⚠ 已自动把最早注册的用户「${promoted.username}」提升为管理员`);
-  if (adminCount === 0 && userCount === 0) console.log("  ⚠ 还没有账号：打开 /register/ 注册的第一个账号会自动成为管理员");
+  if (adminCount === 0 && userCount === 0) {
+    console.log("  ⚠ 还没有账号：打开 /login/ 输入邮箱 + 验证码，第一个账号会自动成为管理员");
+  }
   console.log("  ────────────────────────────────────────────");
   console.log("  按 Ctrl+C 停止\n");
+  if (HAS_DIST) openBrowser(`http://localhost:${PORT}/login/`);
 });
 
 server.on("error", (err) => {

@@ -107,6 +107,52 @@ export function findUserByEmail(email) {
   return db.prepare(`SELECT * FROM users WHERE email = ?`).get(email) ?? null;
 }
 
+/* ---------------- 邮箱验证码账号（无密码） ---------------- */
+
+/** 无密码账号在 password_hash 里放这个标记，永远不会被密码登录命中 */
+export const PASSWORDLESS_MARK = "!passwordless";
+
+export function isPasswordless(user) {
+  return String(user?.password_hash || "").startsWith("!");
+}
+
+/** 用邮箱前缀生成一个不与现有用户冲突的用户名 */
+export function suggestUsername(email) {
+  const local = String(email || "").split("@")[0] || "";
+  const base =
+    local
+      .normalize("NFKC")
+      .replace(/[^\w\u4e00-\u9fa5.-]+/g, "-")
+      .replace(/^[-.]+|[-.]+$/g, "")
+      .slice(0, 16) || "user";
+  const safeBase = base.length < 2 ? `user-${base}`.slice(0, 16) : base;
+
+  let name = safeBase;
+  for (let i = 2; findUserByUsername(name) && i < 10000; i++) {
+    const suffix = `-${i}`;
+    name = safeBase.slice(0, Math.max(1, 20 - suffix.length)) + suffix;
+  }
+  if (findUserByUsername(name)) name = `user-${crypto.randomBytes(3).toString("hex")}`;
+  return name;
+}
+
+/** 邮箱验证码首次登录：自动建号（不需要密码、不需要单独注册） */
+export function createUserByEmail(email, role = "user") {
+  const username = suggestUsername(email);
+  const result = db
+    .prepare(
+      `INSERT INTO users (username, email, password_hash, role, email_verified)
+       VALUES (?, ?, ?, ?, 1)`
+    )
+    .run(username, email, PASSWORDLESS_MARK, role);
+  return db.prepare(`SELECT * FROM users WHERE id = ?`).get(Number(result.lastInsertRowid));
+}
+
+export function markEmailVerified(userId) {
+  db.prepare(`UPDATE users SET email_verified = 1 WHERE id = ?`).run(userId);
+  return db.prepare(`SELECT * FROM users WHERE id = ?`).get(userId);
+}
+
 export function createUser(username, email, passwordHash, role = "user") {
   const result = db
     .prepare(`INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)`)
@@ -126,6 +172,9 @@ export function publicUser(u) {
     avatar: u.avatar || "",
     created_at: u.created_at,
     last_login_at: u.last_login_at || null,
+    email_verified: !!u.email_verified,
+    // 验证码账号没有密码；老账号 / 管理员重置过密码的是 true
+    has_password: !isPasswordless(u),
   };
 }
 
