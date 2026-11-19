@@ -166,6 +166,8 @@ node server\server.mjs        # http://localhost:8787  +  http://192.168.x.x:878
 - 在 `http://localhost:8787/` 打开网站 → 同源，**访客不用填任何地址**，页面里连 ⚙ 都不出现；
 - 网站放 GitHub Pages、后端跑在你电脑上 → 打包时在 `.env` 写一次 `PUBLIC_API_BASE=https://你的隧道地址`，访客同样看不到任何设置项，输入邮箱收验证码就能用；
 - 访客在任何部署下都看不到 ⚙「服务器」：它默认隐藏，只有你自己打开 `/login/?setup=1` 才会出现，用来临时改一次后端地址（浏览器会记住）。
+- 不想每次改地址都重新提交 `.env`：在仓库 **Settings → Secrets and variables → Actions → Variables** 里加一个 `PUBLIC_API_BASE`（填隧道地址），
+  `deploy.yml` 构建时会自动把它写进页面——换隧道只改这个变量，再在 Actions 里点一次 “Deploy to Pages Branch → Run workflow” 即可。
 
 （公网访客要收到验证码，需要在 `.env` 配 `FIREFLY_SMTP_*`；没配时接口会明确返回 503，不会假装「已发送」。）
 
