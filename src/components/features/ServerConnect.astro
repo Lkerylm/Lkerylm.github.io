@@ -137,11 +137,17 @@ const hideForVisitors = !forceShow;
     /*
      * 离线 App（app:// / file:// 打开，没有同源后端）里保留 ⚙，主人还能连自己电脑；
      * 普通网站的访客永远看不到它 —— 服务端渲染时就已经是 hidden。
+     * 主人自己要在公网页面临时改后端地址：网址后面加 ?setup=1，这里再把它放出来。
      */
     try {
       if (!/^https?:$/i.test(location.protocol) && fab.dataset.forceShow !== "1") {
         fab.hidden = false;
         fab.style.display = "";
+      }
+      if (new URLSearchParams(location.search).has("setup")) {
+        fab.hidden = false;
+        fab.style.display = "";
+        fab.dataset.forceShow = "1";
       }
     } catch (e) {}
 

@@ -163,9 +163,9 @@ node server\server.mjs        # http://localhost:8787  +  http://192.168.x.x:878
 前端通过 `public/firefly-api.js` 统一接入：它给所有 `fetch('/api/...')` 自动拼后端地址、带上
 `Authorization: Bearer <token>`，登录成功后自动保存 token。所以：
 
-- 在 `http://localhost:8787/` 打开网站 → 同源，**访客不用填任何地址**（登录页右下角的 ⚙ 探测到同源接口后会自动消失）；
-- 网站放 GitHub Pages、后端跑在你电脑上 → 打包时在 `.env` 写一次 `PUBLIC_API_BASE=https://你的隧道地址`，访客同样看不到 ⚙，输入邮箱收验证码就能用；
-- 只有「网页在公网、后端地址又没写进构建」时才需要你自己打开 `/login/?setup=1` 手动填一次。
+- 在 `http://localhost:8787/` 打开网站 → 同源，**访客不用填任何地址**，页面里连 ⚙ 都不出现；
+- 网站放 GitHub Pages、后端跑在你电脑上 → 打包时在 `.env` 写一次 `PUBLIC_API_BASE=https://你的隧道地址`，访客同样看不到任何设置项，输入邮箱收验证码就能用；
+- 访客在任何部署下都看不到 ⚙「服务器」：它默认隐藏，只有你自己打开 `/login/?setup=1` 才会出现，用来临时改一次后端地址（浏览器会记住）。
 
 （公网访客要收到验证码，需要在 `.env` 配 `FIREFLY_SMTP_*`；没配时接口会明确返回 503，不会假装「已发送」。）
 
