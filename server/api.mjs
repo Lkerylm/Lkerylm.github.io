@@ -818,6 +818,50 @@ async function userPassword(ctx) {
   return ctx.json(200, { ok: true });
 }
 
+/**
+ * 导出「我的数据」：账号信息 + 投稿 + 评论
+ *
+ * 数据本身存在站长的电脑（data/blog.db）上，这个接口让每个用户随时能把
+ * 属于自己的一份下载走，换设备 / 不想留了都可以自己处理，选择权在用户手里。
+ */
+function userExport(ctx) {
+  const user = needLogin(ctx);
+  if (!user) return;
+
+  const u = db
+    .prepare(
+      `SELECT id, username, email, role, bio, avatar, created_at, last_login_at
+       FROM users WHERE id = ?`
+    )
+    .get(user.id);
+
+  const posts = db
+    .prepare(
+      `SELECT id, title, slug, content, status, cover, created_at, updated_at
+       FROM posts WHERE author_id = ? ORDER BY id ASC`
+    )
+    .all(user.id);
+
+  const comments = db
+    .prepare(
+      `SELECT c.id, c.post_id, p.title AS post_title, c.content, c.status, c.created_at
+       FROM comments c LEFT JOIN posts p ON p.id = c.post_id
+       WHERE c.author_id = ? ORDER BY c.id ASC`
+    )
+    .all(user.id);
+
+  logActivity({
+    userId: user.id,
+    username: user.username,
+    action: "data_export",
+    detail: "导出了自己的数据",
+    ip: ctx.ip,
+  });
+
+  // 密码哈希、会话令牌、验证码等凭据不会出现在导出文件里
+  return ctx.json(200, { ok: true, exportedAt: now(), user: u, posts, comments });
+}
+
 function notificationsList(ctx) {
   const user = needLogin(ctx);
   if (!user) return;
@@ -925,6 +969,7 @@ const routes = new Map([
 
   ["POST /api/user/update", userUpdate],
   ["POST /api/user/password", userPassword],
+  ["GET /api/user/export", userExport],
 
   ["GET /api/notifications/list", notificationsList],
   ["POST /api/notifications/read", notificationsRead],

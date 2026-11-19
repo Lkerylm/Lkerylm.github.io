@@ -126,6 +126,19 @@ export const prerender = true;
       </div>
       <div class="msg" id="passMsg"></div>
     </div>
+
+    <!-- 我的数据：存在本站（站长电脑）上，但随时可以导出自己的一份 -->
+    <div class="card">
+      <h2>我的数据</h2>
+      <div style="font-size: 13px; line-height: 1.9; color: rgba(255,255,255,0.6); margin-bottom: 16px;">
+        账号信息、投稿和评论保存在本站（站长的电脑上）。想自己留一份、换设备用，或者哪天不想留了，
+        都可以导出成 JSON 带走 —— 数据是你的，随时可以拿走。
+      </div>
+      <div class="actions">
+        <button class="btn-ghost" id="exportBtn" type="button">导出我的数据（JSON）</button>
+      </div>
+      <div class="msg" id="exportMsg"></div>
+    </div>
   </div>
 
   <script is:inline>
@@ -283,6 +296,37 @@ export const prerender = true;
       } finally {
         btn.disabled = false;
         btn.textContent = '修改密码';
+      }
+    });
+
+    // 导出我的数据（账号 + 投稿 + 评论），浏览器直接下载 JSON
+    const exportBtn = document.getElementById('exportBtn');
+    const exportMsg = document.getElementById('exportMsg');
+    exportBtn.addEventListener('click', async () => {
+      exportBtn.disabled = true;
+      exportBtn.textContent = '打包中…';
+      try {
+        const res = await fetch('/api/user/export/', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) {
+          showMsg(exportMsg, data.error || '导出失败', 'err');
+          return;
+        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `firefly-${data.user.username}-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+        showMsg(exportMsg, '✅ 已导出，可以在下载文件夹里找到', 'ok');
+      } catch (err) {
+        showMsg(exportMsg, '网络错误，请稍后再试', 'err');
+      } finally {
+        exportBtn.disabled = false;
+        exportBtn.textContent = '导出我的数据（JSON）';
       }
     });
 

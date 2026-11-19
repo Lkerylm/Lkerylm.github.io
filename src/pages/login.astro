@@ -494,7 +494,7 @@ export const prerender = true;
 
 		<div class="status" id="serverStatus" data-state="unknown">
 			<span class="dot" aria-hidden="true"></span>
-			<span id="serverStatusText">正在确认小服务器…</span>
+			<span id="serverStatusText">正在连接…</span>
 		</div>
 	</main>
 
@@ -526,14 +526,14 @@ export const prerender = true;
 			function paint(s) {
 				if (!s) {
 					el.dataset.state = "unknown";
-					text.textContent = "正在确认小服务器…";
+					text.textContent = "正在连接…";
 					return;
 				}
 				el.dataset.state = s.ok ? "online" : "offline";
 				if (s.ok) {
-					text.textContent = "邮箱验证码登录 · 账号服务在线";
+					text.textContent = "账号服务在线 · 邮箱验证码就能登录";
 				} else {
-					text.textContent = "账号服务暂时离线 · 先逛逛内容也完全 OK";
+					text.textContent = "账号服务暂时连不上，稍后再试；浏览内容不受影响";
 				}
 			}
 

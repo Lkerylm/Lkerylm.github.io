@@ -119,6 +119,7 @@ FIREFLY_MAIL_FROM_NAME=我的动漫小屋
 | GET | `/api/admin/comments` | 全部评论 |
 | GET | `/api/admin/activity?afterId=` | **活动流水（增量，用于实时刷新）** |
 | POST | `/api/user/update` / `/api/user/password` | 资料 / 改密码 |
+| GET | `/api/user/export` | **导出「我的数据」**：账号信息 + 投稿 + 评论（JSON，不含密码哈希 / 会话 / 验证码），个人资料页有按钮 |
 | POST | `/api/upload` | 上传图片（multipart，5MB，JPG/PNG/GIF/WebP） |
 
 所有路径带不带结尾斜杠都行（`/api/auth/login/` 与 `/api/auth/login` 等价）。
